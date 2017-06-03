@@ -44,7 +44,7 @@ find_package(OpenCV)
 target_link_libraries(prlib
         ${OpenCV_LIBS}
         -llept
-        -fPIC
+        #-fPIC
         #liblibjpeg.a
         #[[-lzlib
         -ltiff.a

@@ -27,13 +27,13 @@
 #include "opencv2/imgproc.hpp"
 
 void prl::warpCrop(const cv::Mat& sourceImg,
-              cv::Mat& destImg,
-              const int x0, const int y0,
-              const int x1, const int y1,
-              const int x2, const int y2,
-              const int x3, const int y3,
-              const int borderMode /*= cv::BORDER_CONSTANT*/,
-              const cv::Scalar& borderValue /*= cv::Scalar()*/)
+                   cv::Mat& destImg,
+                   const int x0, const int y0,
+                   const int x1, const int y1,
+                   const int x2, const int y2,
+                   const int x3, const int y3,
+                   const int borderMode /*= cv::BORDER_CONSTANT*/,
+                   const cv::Scalar& borderValue /*= cv::Scalar()*/)
 {
     const double side1 = sqrt((x1 - x0) * (x1 - x0) + (y1 - y0) * (y1 - y0));
     const double side2 = sqrt((x3 - x2) * (x3 - x2) + (y3 - y2) * (y3 - y2));

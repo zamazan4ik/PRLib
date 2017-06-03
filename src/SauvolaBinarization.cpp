@@ -44,7 +44,7 @@ void sauvolaBinarization(
     int wSqr = w * w;
     double wSqrBack = 1.0 / static_cast<double>(wSqr);
     const double k = thresholdCoefficient;
-    const double R = 128;
+    const double R = 128.0;
     const double RBack = 1.0 / R;
 
     //! add borders
@@ -84,7 +84,7 @@ void sauvolaBinarization(
     cv::Mat localDevianceValues;
 
     //! get local deviations
-    filter2D(integralImageSqr(processingRect), localDevianceValues, usedFloatType,
+    cv::filter2D(integralImageSqr(processingRect), localDevianceValues, usedFloatType,
              localWeightedSumsFilterKernel);
 
     localDevianceValues -= localMeanValuesSqr;

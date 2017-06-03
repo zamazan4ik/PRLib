@@ -25,10 +25,11 @@
 #include "Deblur.hpp"
 
 #include "opencv2/imgproc.hpp"
-
+#include "opencv2/videostab.hpp"
 
 void basicDeblur(const cv::Mat& src, cv::Mat& dst)
 {
+    //http://stackoverflow.com/questions/4993082/how-to-sharpen-an-image-in-opencv
     std::vector<cv::Mat> channels;
     cv::split(src, channels);
 

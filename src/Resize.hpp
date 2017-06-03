@@ -29,7 +29,7 @@
 
 namespace prl
 {
-extern "C" void resize(const cv::Mat& src, cv::Mat& dst, int scaleX, int scaleY, int nProcessedImageSize);
+extern "C" void resize(const cv::Mat& src, cv::Mat& dst, int scaleX, int scaleY, int maxSize);
 }
 
 #endif //PRLIB_RESIZE_HPP

@@ -48,6 +48,7 @@ void prl::binarize(const cv::Mat& src, cv::Mat& dst,
         {
             cv::Mat temp = src.clone();
             prl::sauvolaBinarization(temp, dst);
+            break;
         }
         default:
             //TODO: Maybe later we should add more binarization algorithms

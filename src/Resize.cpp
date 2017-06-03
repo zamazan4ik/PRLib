@@ -26,13 +26,8 @@
 
 #include "opencv2/imgproc.hpp"
 
-void prl::resize(const cv::Mat& src, cv::Mat& dst, int scaleX, int scaleY, int nProcessedImageSize)
+void prl::resize(const cv::Mat& src, cv::Mat& dst, int scaleX, int scaleY, int maxSize)
 {
-    cv::Mat imageToProc;
-
-    //! Store source image size
-    cv::Size sourceImageSize(src.size());
-
     cv::Size newImageSize;
 
     if (scaleX > 0 && scaleY > 0)
@@ -42,7 +37,7 @@ void prl::resize(const cv::Mat& src, cv::Mat& dst, int scaleX, int scaleY, int n
                 static_cast<int>(src.rows * scaleY)
         );
 
-        cv::resize(src, imageToProc, newImageSize, 0, 0, cv::INTER_AREA);
+        cv::resize(src, dst, newImageSize, 0, 0, cv::INTER_AREA);
     }
     else
     {
@@ -51,13 +46,13 @@ void prl::resize(const cv::Mat& src, cv::Mat& dst, int scaleX, int scaleY, int n
         int scaleFactorX = 1;
         int scaleFactorY = 1;
 
-        imageToProc = src.clone();
+        dst = src.clone();
 
-        while (longSide > nProcessedImageSize)
+        while (longSide > maxSize)
         {
-            cv::pyrDown(imageToProc, imageToProc);
+            cv::pyrDown(dst, dst);
 
-            longSide = std::max(imageToProc.cols, imageToProc.rows);
+            longSide = std::max(dst.cols, dst.rows);
             scaleFactorX *= 2;
             scaleFactorY *= 2;
         }
