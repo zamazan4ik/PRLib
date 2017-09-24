@@ -44,7 +44,7 @@ enum class BinarizationMethod
 };
 
 //TODO: Rewrite all binarization algorithms. By default should use OtsuThreshold.
-extern "C" void binarize(const cv::Mat& src, cv::Mat& dst, BinarizationMethod method = BinarizationMethod::Otsu);
+void binarize(const cv::Mat& src, cv::Mat& dst, BinarizationMethod method = BinarizationMethod::Otsu);
 //extern "C" void binarize(const cv::Mat& src, cv::Mat& dst, int method = 0);
 }
 

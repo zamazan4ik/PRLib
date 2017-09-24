@@ -35,7 +35,7 @@ enum class BlurDetectionAlgo
     LAPM, LAPV, TENG, GLVN
 };
 
-extern "C" bool isBlurred(const cv::Mat& src, BlurDetectionAlgo algo);
+bool isBlurred(const cv::Mat& src, BlurDetectionAlgo algo);
 
 }
 #endif //UFOCR_BLURDETECTION_HPP

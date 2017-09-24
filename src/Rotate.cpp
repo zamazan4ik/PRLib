@@ -23,27 +23,31 @@
 */
 
 #include "Rotate.hpp"
+#include "Utils.hpp"
+
+#include <cmath>
 
 #include "opencv2/imgproc.hpp"
 
 namespace prl
 {
-void rotate(const cv::Mat& input, cv::Mat& output, const double angle)
+void rotate(const cv::Mat& input, cv::Mat& output, double angle)
 {
-    if (angle == 90)
+    angle = std::fmod(angle, 360.0);
+    if (prl::eq_d(angle, 90.0, EQ_DELTA))
     {
         // rotate on 90
         cv::transpose(input, output);
         cv::flip(output, output, 1);
         return;
     }
-    else if (angle == 180)
+    else if (prl::eq_d(angle, 180.0, EQ_DELTA))
     {
         // rotate on 180
         cv::flip(input, output, -1);
         return;
     }
-    else if (angle == 270)
+    else if (prl::eq_d(angle, 270.0, EQ_DELTA))
     {
         // rotate on 270
         cv::transpose(input, output);

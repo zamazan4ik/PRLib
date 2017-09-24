@@ -28,7 +28,7 @@ set(SOURCES src/logger.hpp src/logger.cpp src/BlurDetection.hpp
         src/Binarization.hpp src/Denoising.cpp src/Denoising.hpp src/SauvolaBinarization.cpp
         src/SauvolaBinarization.h src/Deblur.cpp src/Deblur.hpp src/Rotate.cpp src/Rotate.hpp
         src/FormatConvert.cpp src/FormatConvert.hpp src/Compatibility.hpp src/Resize.cpp
-        src/Resize.hpp)
+        src/Resize.hpp src/GlareDetection.cpp src/GlareDetection.hpp src/Utils.hpp src/Utils.cpp)
 
 
 
@@ -37,7 +37,7 @@ set(CMAKE_BUILD_TYPE Debug)
 
 include_directories( ${CMAKE_BINARY_DIR} ${PROJECT_SOURCE_DIR}/src)
 
-add_library(prlib SHARED ${SOURCES})
+add_library(prlib STATIC ${SOURCES})
 
 find_package(OpenCV)
 

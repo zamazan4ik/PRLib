@@ -26,6 +26,7 @@
 
 #include "Rotate.hpp"
 #include "FormatConvert.hpp"
+#include "Utils.hpp"
 
 #include "opencv2/imgproc.hpp"
 #include "opencv2/highgui.hpp"
@@ -93,27 +94,23 @@ double FindOrientation(const cv::Mat& input)
     }
 
     double angle = 0;
-    if (iOrientation == L_TEXT_ORIENT_UP)
+    switch(iOrientation)
     {
-        angle = 0.0;
-    }
-    else if (iOrientation == L_TEXT_ORIENT_LEFT)
-    {
-        angle = 90.0;
-    }
-    else if (iOrientation == L_TEXT_ORIENT_DOWN)
-    {
-        angle = 180.0;
-    }
-    else if (iOrientation == L_TEXT_ORIENT_RIGHT)
-    {
-        angle = 270.0;
-    }
-    else
-    { // if (iOrientation == L_TEXT_ORIENT_UNKNOWN)
-        angle = 0.0;
-    }
+        case L_TEXT_ORIENT_UP:
+        case L_TEXT_ORIENT_UNKNOWN:
+            angle = 0.0;
+            break;
+        case L_TEXT_ORIENT_LEFT:
+            angle = 90.0;
+            break;
+        case L_TEXT_ORIENT_DOWN:
+            angle = 180.0;
+            break;
+        case L_TEXT_ORIENT_RIGHT:
+            angle = 270.0;
+            break;
 
+    }
     pixDestroy(&pix);
 
     return angle;
@@ -122,12 +119,6 @@ double FindOrientation(const cv::Mat& input)
 bool compare_pairs(const std::pair<double, int>& p1, const std::pair<double, int>& p2)
 {
     return p1.second < p2.second;
-}
-
-bool eq_d(const double v1, const double v2, const double delta)
-{
-    return std::abs(v1 - v2) <= delta;
-
 }
 
 double FindAngle(const cv::Mat& input_orig)
@@ -209,7 +200,7 @@ bool prl::deskew(cv::Mat& inputImage, cv::Mat& deskewedImage)
         processingImage = inputImage.clone();
     }
 
-    //TODO: Maybe here we should something instead of global Otsu?
+    //TODO: Maybe here we should use something more efficient than global Otsu?
     cv::threshold(processingImage, processingImage, 128, 255, CV_THRESH_BINARY | CV_THRESH_OTSU);
 
     double angle = FindAngle(processingImage);

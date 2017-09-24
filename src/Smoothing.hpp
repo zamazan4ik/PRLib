@@ -37,6 +37,6 @@ enum class SmoothMethod
 };
 
 //TODO: Add more filters from ximgproc
-extern "C" void smooth(const cv::Mat& src, cv::Mat& dst, SmoothMethod method = SmoothMethod::Bilateral);
+void smooth(const cv::Mat& src, cv::Mat& dst, SmoothMethod method = SmoothMethod::Bilateral);
 }
 #endif //UFOCR_SMOOTHING_HPP

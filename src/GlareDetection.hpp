@@ -22,19 +22,14 @@
     SOFTWARE.
 */
 
-#ifndef UFOCR_COLORBALANCE_HPP
-#define UFOCR_COLORBALANCE_HPP
+#ifndef PRLIB_GLAREDETECTION_HPP
+#define PRLIB_GLAREDETECTION_HPP
 
 #include "opencv2/core.hpp"
 
 namespace prl
 {
-//TODO: Add white balance, gamma-correction. Manual and automatic
-enum class ColorBalance
-{
-    Simple, Grayworld
-};
-
-void whiteBalance(const cv::Mat& src, cv::Mat& dst, ColorBalance method = ColorBalance::Simple);
+bool isGlared(const cv::Mat& src);
 }
-#endif //UFOCR_COLORBALANCE_HPP
+
+#endif //PRLIB_GLAREDETECTION_HPP

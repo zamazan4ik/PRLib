@@ -29,7 +29,7 @@
 
 namespace prl
 {
-extern "C" void rotate(const cv::Mat& input, cv::Mat& output, const double angle);
+void rotate(const cv::Mat& input, cv::Mat& output, double angle);
 }
 
 #endif //PRLIB_ROTATE_HPP
