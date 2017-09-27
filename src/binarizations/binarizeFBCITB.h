@@ -1,0 +1,69 @@
+#ifndef PRLIB_FBCITB_Binarizator_h
+#define PRLIB_FBCITB_Binarizator_h
+
+#include <opencv2/core/core.hpp>
+
+#include <map>
+
+namespace prl
+{
+
+/*!
+ * \brief List of operations to use in binarization procedure
+ * \sa FBCITB_ParamsCodes, FBCITB_ParamsMap
+ */
+enum class OPERATIONS
+{
+    // for contours detection
+            USE_CANNY = 1,    //!< Use Canny edge detector.
+    USE_VARIANCES = 2,    //!< Use local variance values map.
+
+    // Additional operation
+            USE_CANNY_ON_VARIANCES = 32,   //!< Apply Canny edge detector to local variance values map.
+    USE_OTHER_COLOR_SPACE = 64,   //!< Change processed image color space.
+    USE_CLAHE = 128,  //!< Use contrast enhancement.
+    USE_BILATERAL = 256,  //!< Use bilateral filtration.
+    USE_MORPHOLOGY = 512   //!< Apply morphology operations.
+};
+
+/*!
+ * \brief List of possible processing parameter codes.
+ * \sa OPERATIONS, FBCITB_ParamsMap
+ */
+enum class FBCITB_ParamsCodes
+{
+    COLOR_SPACE,                                //!< Color space parameter.
+    CLAHE_CLIP_LIMIT,                           //!< CLAHE procedure parameter.
+    BILATERAL_FILTER_KERNEL_SIZE,               //!< Bilateral filter kernel size.
+    BILATERAL_FILTER_KERNEL_INTENSITY_SIGMA,    //!< Bilateral filter intensity sigma.
+    BILATERAL_FILTER_KERNEL_SPATIAL_SIGMA,      //!< Bilateral filter spatial sigma.
+    CANNY_GAUSSIAN_BLUR_KERNEL_SIZE,    //!< Gaussian blur kernel size for Canny edge detector.
+    CANNY_LOWER_THRESHOLD_COEFF,    //!< Coefficient for lower threshold of Canny edge detector.
+    CANNY_UPPER_THRESHOLD_COEFF,    //!< Coefficient for upper threshold of Canny edge detector.
+    VARIANCE_MAP_THRESHOLD,         //!< Threshold value for local variance map.
+    BOUNDING_RECT_MAX_AREA_COEFF    //!< Coefficient for maximal possible bounding rectangle area.
+};
+
+/*!
+ * \typedef FBCITB_ParamsMap
+ * \brief Map of binarization parameters.
+ * \sa FBCITB_ParamsCodes, OPERATIONS
+ */
+typedef std::map<int, double> FBCITB_ParamsMap;
+
+
+/*!
+ * \brief Implementation of font and background color independent text binarization.
+ * \param[in] inputImage Input image.
+ * \param[out] outputImage Output image.
+ * \param[in] operations Used operations.
+ * \param[in] paramsMap Parameters map for operations.
+ * \details This is an implementation of "Font and Background Color Independent Text Binarization".
+ */
+void binarizeFBCITB(
+        cv::Mat& inputImage, cv::Mat& outputImage,
+        long operations = USE_CANNY,
+        const FBCITB_ParamsMap& paramsMap = FBCITB_ParamsMap());
+
+}
+#endif // PRLIB_FBCITB_Binarizator_h

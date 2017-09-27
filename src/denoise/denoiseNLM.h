@@ -22,17 +22,15 @@
     SOFTWARE.
 */
 
-#ifndef PRLIB_IMAGEPROCESSING_HPP
-#define PRLIB_IMAGEPROCESSING_HPP
+#ifndef PRLIB_DENOISING_HPP
+#define PRLIB_DENOISING_HPP
 
-#include "src/detectors/blurDetection.h"
-#include "Thinning.h"
-#include "warp.h"
-#include "ColorBalance.hpp"
-#include "smooth.h"
-#include "src/deskew/Deskew.hpp"
-#include "src/border_detection/Cropping.hpp"
-#include "src/denoise/denoiseNLM.h"
-#include "rotate.h"
+#include "opencv2/core.hpp"
 
-#endif //PRLIB_IMAGEPROCESSING_HPP
+namespace prl
+{
+void denoise(const cv::Mat& src, cv::Mat& dst);
+}
+
+
+#endif //PRLIB_DENOISING_HPP

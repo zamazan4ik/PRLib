@@ -22,17 +22,20 @@
     SOFTWARE.
 */
 
-#ifndef PRLIB_IMAGEPROCESSING_HPP
-#define PRLIB_IMAGEPROCESSING_HPP
+#ifndef PRLIB_BLURDETECTION_HPP
+#define PRLIB_BLURDETECTION_HPP
 
-#include "src/detectors/blurDetection.h"
-#include "Thinning.h"
-#include "warp.h"
-#include "ColorBalance.hpp"
-#include "smooth.h"
-#include "src/deskew/Deskew.hpp"
-#include "src/border_detection/Cropping.hpp"
-#include "src/denoise/denoiseNLM.h"
-#include "rotate.h"
+#include "opencv2/core.hpp"
 
-#endif //PRLIB_IMAGEPROCESSING_HPP
+namespace prl
+{
+
+enum class BlurDetectionAlgo
+{
+    LAPM, LAPV, TENG, GLVN
+};
+
+bool isBlurred(const cv::Mat& src, BlurDetectionAlgo algo);
+
+}
+#endif //PRLIB_BLURDETECTION_HPP

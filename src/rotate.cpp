@@ -22,17 +22,51 @@
     SOFTWARE.
 */
 
-#ifndef PRLIB_IMAGEPROCESSING_HPP
-#define PRLIB_IMAGEPROCESSING_HPP
-
-#include "src/detectors/blurDetection.h"
-#include "Thinning.h"
-#include "warp.h"
-#include "ColorBalance.hpp"
-#include "smooth.h"
-#include "src/deskew/Deskew.hpp"
-#include "src/border_detection/Cropping.hpp"
-#include "src/denoise/denoiseNLM.h"
 #include "rotate.h"
+#include "utils.h"
 
-#endif //PRLIB_IMAGEPROCESSING_HPP
+#include <cmath>
+
+#include "opencv2/imgproc.hpp"
+
+namespace prl
+{
+void rotate(const cv::Mat& input, cv::Mat& output, double angle)
+{
+    angle = std::fmod(angle, 360.0);
+    if (eq_d(angle, 90.0, EQ_DELTA))
+    {
+        // rotate on 90
+        cv::transpose(input, output);
+        cv::flip(output, output, 1);
+        return;
+    }
+    else if (eq_d(angle, 180.0, EQ_DELTA))
+    {
+        // rotate on 180
+        cv::flip(input, output, -1);
+        return;
+    }
+    else if (eq_d(angle, 270.0, EQ_DELTA))
+    {
+        // rotate on 270
+        cv::transpose(input, output);
+        cv::flip(output, output, 0);
+        return;
+    }
+    else
+    {
+        output = input.clone();
+        cv::bitwise_not(input, input);
+
+        int len = std::max(output.cols, output.rows);
+        cv::Point2f pt(static_cast<float>(len / 2.0), static_cast<float>(len / 2.0));
+        cv::Mat r = cv::getRotationMatrix2D(pt, angle, 1.0);
+
+        cv::warpAffine(input, output, r, cv::Size(len, len));
+
+        cv::bitwise_not(input, input);
+        cv::bitwise_not(output, output);
+    }
+}
+}

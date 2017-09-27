@@ -22,17 +22,9 @@
     SOFTWARE.
 */
 
-#ifndef PRLIB_IMAGEPROCESSING_HPP
-#define PRLIB_IMAGEPROCESSING_HPP
+#include "glareDetection.h"
 
-#include "src/detectors/blurDetection.h"
-#include "Thinning.h"
-#include "warp.h"
-#include "ColorBalance.hpp"
-#include "smooth.h"
-#include "src/deskew/Deskew.hpp"
-#include "src/border_detection/Cropping.hpp"
-#include "src/denoise/denoiseNLM.h"
-#include "rotate.h"
-
-#endif //PRLIB_IMAGEPROCESSING_HPP
+bool prl::isGlared(const cv::Mat& src)
+{
+    
+}

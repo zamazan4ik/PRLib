@@ -22,17 +22,21 @@
     SOFTWARE.
 */
 
-#ifndef PRLIB_IMAGEPROCESSING_HPP
-#define PRLIB_IMAGEPROCESSING_HPP
+#ifndef PRLIB_WARP_HPP
+#define PRLIB_WARP_HPP
 
-#include "src/detectors/blurDetection.h"
-#include "Thinning.h"
-#include "warp.h"
-#include "ColorBalance.hpp"
-#include "smooth.h"
-#include "src/deskew/Deskew.hpp"
-#include "src/border_detection/Cropping.hpp"
-#include "src/denoise/denoiseNLM.h"
-#include "rotate.h"
+#include "opencv2/core.hpp"
 
-#endif //PRLIB_IMAGEPROCESSING_HPP
+namespace prl
+{
+void warpCrop(const cv::Mat& sourceImg,
+              cv::Mat& destImg,
+              const int x0, const int y0,
+              const int x1, const int y1,
+              const int x2, const int y2,
+              const int x3, const int y3,
+              const int borderMode = cv::BORDER_CONSTANT,
+              const cv::Scalar& borderValue = cv::Scalar());
+}
+
+#endif //PRLIB_WARP_HPP

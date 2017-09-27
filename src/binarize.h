@@ -22,17 +22,30 @@
     SOFTWARE.
 */
 
-#ifndef PRLIB_IMAGEPROCESSING_HPP
-#define PRLIB_IMAGEPROCESSING_HPP
+#ifndef PRLIB_BINARIZATION_HPP
+#define PRLIB_BINARIZATION_HPP
 
-#include "src/detectors/blurDetection.h"
-#include "Thinning.h"
-#include "warp.h"
-#include "ColorBalance.hpp"
-#include "smooth.h"
-#include "src/deskew/Deskew.hpp"
-#include "src/border_detection/Cropping.hpp"
-#include "src/denoise/denoiseNLM.h"
-#include "rotate.h"
+#include "opencv2/core.hpp"
 
-#endif //PRLIB_IMAGEPROCESSING_HPP
+namespace prl
+{
+enum class BinarizationMethod
+{
+    Otsu, /*!< Otsu global binarization */
+    Adaptive,
+    OtsuMA,
+    Niblack, /*!< Niblack adaptive binarization */
+    Sauvola, /*!< Sauvola adaptive binarization */
+    MaxEntropy, /*!< Maximum entropy global binarization */
+    Bradley, /*!< Bradley adaptive binarization */
+    Iterative, /*!< Global iterative binarization */
+    Bernsen, /*!< Bernsen adaptive binarization */
+    Gatos /*!< Ga'tos adaptive binarization */
+};
+
+//TODO: Rewrite all binarization algorithms. By default should use OtsuThreshold.
+void binarize(const cv::Mat& src, cv::Mat& dst, BinarizationMethod method = BinarizationMethod::Otsu);
+//extern "C" void binarize(const cv::Mat& src, cv::Mat& dst, int method = 0);
+}
+
+#endif //PRLIB_BINARIZATION_HPP

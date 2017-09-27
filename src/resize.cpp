@@ -22,17 +22,41 @@
     SOFTWARE.
 */
 
-#ifndef PRLIB_IMAGEPROCESSING_HPP
-#define PRLIB_IMAGEPROCESSING_HPP
+#include "resize.h"
 
-#include "src/detectors/blurDetection.h"
-#include "Thinning.h"
-#include "warp.h"
-#include "ColorBalance.hpp"
-#include "smooth.h"
-#include "src/deskew/Deskew.hpp"
-#include "src/border_detection/Cropping.hpp"
-#include "src/denoise/denoiseNLM.h"
-#include "rotate.h"
+#include "opencv2/imgproc.hpp"
 
-#endif //PRLIB_IMAGEPROCESSING_HPP
+void prl::resize(const cv::Mat& src, cv::Mat& dst, int scaleX, int scaleY, int maxSize)
+{
+    cv::Size newImageSize;
+
+    if (scaleX > 0 && scaleY > 0)
+    {
+        newImageSize = cv::Size(
+                static_cast<int>(src.cols * scaleX),
+                static_cast<int>(src.rows * scaleY)
+        );
+
+        cv::resize(src, dst, newImageSize, 0, 0, cv::INTER_AREA);
+    }
+    else
+    {
+        int longSide = std::max(src.cols, src.rows);
+
+        int scaleFactorX = 1;
+        int scaleFactorY = 1;
+
+        dst = src.clone();
+
+        while (longSide > maxSize)
+        {
+            cv::pyrDown(dst, dst);
+
+            longSide = std::max(dst.cols, dst.rows);
+            scaleFactorX *= 2;
+            scaleFactorY *= 2;
+        }
+
+        newImageSize = cv::Size(src.cols / scaleFactorX, src.rows / scaleFactorY);
+    }
+}
