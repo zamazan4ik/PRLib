@@ -7,8 +7,8 @@
 #include <stdexcept>
 
 void prl::basicDeblur(const cv::Mat& inputImage, cv::Mat& outputImage,
-                      size_t gaussianKernelSize, double sigmaX, double sigmaY,
-                      double imageWeight)
+                      const size_t gaussianKernelSize, const double sigmaX, const double sigmaY,
+                      const double imageWeight)
 {
     cv::Mat inputImageMat = inputImage;
 

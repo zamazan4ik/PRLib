@@ -6,6 +6,7 @@
 #include <complex>
 #include <vector>
 #include <memory>
+#include <cmath>
 #include <stdexcept>
 
 
