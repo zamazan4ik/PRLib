@@ -111,10 +111,15 @@ target_link_libraries(basicDeblur_sample prlib)
 add_executable(wienerFilter_sample samples/deblur/wienerFilter_sample.cpp)
 target_link_libraries(wienerFilter_sample prlib)
 
+
 # Normalization samples
 add_executable(backgroundNormalization_sample samples/backgroundNormalization_sample.cpp)
 target_link_libraries(backgroundNormalization_sample prlib)
 
+
+# Denoise samples
+add_executable(kuwaharaFilter_sample samples/denoise/kuwaharaFilter_sample.cpp)
+target_link_libraries(kuwaharaFilter_sample prlib)
 
 # Border detection samples
 add_executable(autoCropAbbyy_sample samples/border_detection/autoCropAbbyy_sample.cpp)
