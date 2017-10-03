@@ -19,12 +19,12 @@ set(CMAKE_CXX_STANDARD 14)
 
 #set(CMAKE_INTERPROCEDURAL_OPTIMIZATION TRUE)
 
-set(OpenCV_LIBSS libopencv_ximgproc.a libopencv_xphoto.a libopencv_shape.a libopencv_imgcodecs.a libopencv_ts.a
-        libopencv_videostab.a libopencv_photo.a libopencv_calib3d.a
-        libopencv_video.a libopencv_stitching.a
-        libopencv_videoio.a libopencv_superres.a
-        libopencv_ml.a libopencv_objdetect.a  libopencv_features2d.a
-        libopencv_flann.a libopencv_imgproc.a libopencv_highgui.a libopencv_core.a)
+#set(OpenCV_LIBSS libopencv_ximgproc.a libopencv_xphoto.a libopencv_shape.a libopencv_imgcodecs.a libopencv_ts.a
+#        libopencv_videostab.a libopencv_photo.a libopencv_calib3d.a
+#        libopencv_video.a libopencv_stitching.a
+#        libopencv_videoio.a libopencv_superres.a
+#        libopencv_ml.a libopencv_objdetect.a  libopencv_features2d.a
+#        libopencv_flann.a libopencv_imgproc.a libopencv_highgui.a libopencv_core.a)
 
 file(GLOB_RECURSE HEADERS "src/*/*.h" "src/*.h")
 file(GLOB_RECURSE SOURCES "src/*/*.cpp" "src/*.cpp" "src/*/*.h" "src/*.h")
@@ -104,6 +104,12 @@ add_executable(thinZhangSuen_sample samples/thinning/thinZhangSuen_sample.cpp)
 target_link_libraries(thinZhangSuen_sample prlib)
 
 
+# Deblur samples
+add_executable(basicDeblur_sample samples/deblur/basicDeblur_sample.cpp)
+target_link_libraries(basicDeblur_sample prlib)
+
+add_executable(wienerFilter_sample samples/deblur/wienerFilter_sample.cpp)
+target_link_libraries(wienerFilter_sample prlib)
 
 # Normalization samples
 add_executable(backgroundNormalization_sample samples/backgroundNormalization_sample.cpp)

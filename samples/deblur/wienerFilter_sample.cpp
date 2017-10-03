@@ -1,4 +1,4 @@
-#include "basicDeblur.h"
+#include "wienerFilter.h"
 
 #include <opencv2/core/core.hpp>
 #include <opencv2/highgui/highgui.hpp>
@@ -24,7 +24,7 @@ int main(int argc, char**argv)
     cv::Mat inputImage = cv::imread(inputImageFilename);
     cv::Mat outputImage;
 
-    prl::basicDeblur(inputImage, outputImage);
+    prl::wienerFilter(inputImage, outputImage);
 
     cv::imwrite(outputImageFilename, outputImage);
 }
