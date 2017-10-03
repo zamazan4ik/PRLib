@@ -34,20 +34,20 @@ namespace prl
 void rotate(const cv::Mat& input, cv::Mat& output, double angle)
 {
     angle = std::fmod(angle, 360.0);
-    if (eq_d(angle, 90.0, EQ_DELTA))
+    if (eq_d(angle, 90.0))
     {
         // rotate on 90
         cv::transpose(input, output);
         cv::flip(output, output, 1);
         return;
     }
-    else if (eq_d(angle, 180.0, EQ_DELTA))
+    else if (eq_d(angle, 180.0))
     {
         // rotate on 180
         cv::flip(input, output, -1);
         return;
     }
-    else if (eq_d(angle, 270.0, EQ_DELTA))
+    else if (eq_d(angle, 270.0))
     {
         // rotate on 270
         cv::transpose(input, output);

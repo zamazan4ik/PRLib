@@ -5,10 +5,13 @@
 #ifndef PRLIB_GAMMACORRECTION_H
 #define PRLIB_GAMMACORRECTION_H
 
+#include <opencv2/core/core.hpp>
+
 namespace prl
 {
 
-void gammaCorrection(const cv::Mat& inputImage, cv::Mat& outputImage);
+void gammaCorrection(const cv::Mat& inputImage, cv::Mat& outputImage,
+                     const double k, const double gamma);
 
 }
 

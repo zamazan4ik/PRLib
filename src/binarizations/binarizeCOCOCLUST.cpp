@@ -5,6 +5,7 @@
 #include <vector>
 #include <map>
 #include <cmath>
+#include <memory>
 
 #include <opencv2/highgui/highgui.hpp>
 #include <opencv2/imgproc/imgproc.hpp>
@@ -21,17 +22,17 @@ void prl::binarizeCOCOCLUST(cv::Mat& inputImage, cv::Mat& outputImage, const flo
     // input image must be not empty
     if (inputImage.empty())
     {
-        throw std::invalid_argument("Input image for binarization is empty");
+        throw std::invalid_argument("binarizeCOCOCLUST: Input image for binarization is empty");
     }
     // we work with color images
     if (inputImage.type() != CV_8UC3 && inputImage.type() != CV_8UC1)
     {
-        throw std::invalid_argument("Invalid type of image for binarization (required 8 or 24 bits per pixel)");
+        throw std::invalid_argument("binarizeCOCOCLUST: Invalid type of image for binarization (required 8 or 24 bits per pixel)");
     }
 
     if (T_S <= 0)
     {
-        throw std::invalid_argument("Cluster distance threshold should be greater than 0");
+        throw std::invalid_argument("binarizeCOCOCLUST: Cluster distance threshold should be greater than 0");
     }
 
     cv::Mat imageToProc = inputImage.clone();
@@ -136,7 +137,7 @@ void prl::binarizeCOCOCLUST(cv::Mat& inputImage, cv::Mat& outputImage, const flo
             }
 
             //! Calculate current contour mean points
-            contoursMeanPoints.push_back(std::vector<cv::Point2f>());
+            contoursMeanPoints.emplace_back(std::vector<cv::Point2f>());
             std::vector<cv::Point2f>& currentContourMeanPoints = contoursMeanPoints.back();
             {
                 std::vector<cv::Point2f> tempContour(contour.size() + (halfS << 1));
@@ -164,9 +165,9 @@ void prl::binarizeCOCOCLUST(cv::Mat& inputImage, cv::Mat& outputImage, const flo
                     currentContourMeanPoints.push_back(meanPoint);
                 }
 
-                for (size_t i = 0; i < currentContourMeanPoints.size(); ++i)
+                for (auto& currentContour : currentContourMeanPoints)
                 {
-                    currentContourMeanPoints[i] *= backS;
+                    currentContour *= backS;
                 }
 
                 //! Remove duplicate points
@@ -175,7 +176,7 @@ void prl::binarizeCOCOCLUST(cv::Mat& inputImage, cv::Mat& outputImage, const flo
             }
 
             //! Calculate normal vectors
-            contoursNormalVectors.push_back(std::vector<cv::Point2f>());
+            contoursNormalVectors.emplace_back(std::vector<cv::Point2f>());
             std::vector<cv::Point2f>& currentContourNormalVectors = contoursNormalVectors.back();
             {
                 std::vector<cv::Point2f> tempContourMeanPoints(currentContourMeanPoints.size() + 2);
@@ -211,7 +212,7 @@ void prl::binarizeCOCOCLUST(cv::Mat& inputImage, cv::Mat& outputImage, const flo
 
             //! Calculate color prototypes
             {
-                const size_t nVectorLenght = 5;
+                const size_t nVectorLength = 5;
                 cv::Rect imageRectangle(0, 0,
                                         imageSelectedColorSpace.cols, imageSelectedColorSpace.rows);
                 for (size_t i = 0; i < currentContourNormalVectors.size(); ++i)
@@ -228,19 +229,19 @@ void prl::binarizeCOCOCLUST(cv::Mat& inputImage, cv::Mat& outputImage, const flo
                     }
 
                     // colors in external normal vectors
-                    std::vector<cv::Vec3f> colorsP(nVectorLenght);
+                    std::vector<cv::Vec3f> colorsP(nVectorLength);
                     // colors in internal normal vectors
-                    std::vector<cv::Vec3f> colorsM(nVectorLenght);
+                    std::vector<cv::Vec3f> colorsM(nVectorLength);
 
                     {
                         // points composing external normal vector
-                        std::vector<cv::Point2f> vectP(nVectorLenght);
+                        std::vector<cv::Point2f> vectP(nVectorLength);
                         // points composing internal normal vector
-                        std::vector<cv::Point2f> vectM(nVectorLenght);
+                        std::vector<cv::Point2f> vectM(nVectorLength);
 
                         //! Calculate point colors for internal and external vectors
                         size_t j = 0;
-                        for (j = 0; j < nVectorLenght; ++j)
+                        for (j = 0; j < nVectorLength; ++j)
                         {
 
                             //! Get external vector
@@ -265,7 +266,7 @@ void prl::binarizeCOCOCLUST(cv::Mat& inputImage, cv::Mat& outputImage, const flo
                         }
 
                         //! Store external vector for further usage
-                        if (j == nVectorLenght)
+                        if (j == nVectorLength)
                         {
                             contourNoToNormPVectorsMap[contourNo].push_back(vectP);
                         }
@@ -280,7 +281,7 @@ void prl::binarizeCOCOCLUST(cv::Mat& inputImage, cv::Mat& outputImage, const flo
                     std::vector<float> colorChannel1P, colorChannel1M;
                     std::vector<float> colorChannel2P, colorChannel2M;
 
-                    for (size_t i = 0; i < nVectorLenght; ++i)
+                    for (size_t i = 0; i < nVectorLength; ++i)
                     {
                         colorChannel0P.push_back(colorsP[i][0]);
                         colorChannel0M.push_back(colorsM[i][0]);
@@ -297,12 +298,12 @@ void prl::binarizeCOCOCLUST(cv::Mat& inputImage, cv::Mat& outputImage, const flo
                     std::sort(colorChannel2P.begin(), colorChannel2P.end());
                     std::sort(colorChannel2M.begin(), colorChannel2M.end());
 
-                    colorsPMedian[0] = colorChannel0P[(nVectorLenght - 1) / 2];
-                    colorsMMedian[0] = colorChannel0M[(nVectorLenght - 1) / 2];
-                    colorsPMedian[1] = colorChannel1P[(nVectorLenght - 1) / 2];
-                    colorsMMedian[1] = colorChannel1M[(nVectorLenght - 1) / 2];
-                    colorsPMedian[2] = colorChannel2P[(nVectorLenght - 1) / 2];
-                    colorsMMedian[2] = colorChannel2M[(nVectorLenght - 1) / 2];
+                    colorsPMedian[0] = colorChannel0P[(nVectorLength - 1) / 2];
+                    colorsMMedian[0] = colorChannel0M[(nVectorLength - 1) / 2];
+                    colorsPMedian[1] = colorChannel1P[(nVectorLength - 1) / 2];
+                    colorsMMedian[1] = colorChannel1M[(nVectorLength - 1) / 2];
+                    colorsPMedian[2] = colorChannel2P[(nVectorLength - 1) / 2];
+                    colorsMMedian[2] = colorChannel2M[(nVectorLength - 1) / 2];
 
                     //! Store median to color prototypes array
                     CP.push_back(colorsPMedian);

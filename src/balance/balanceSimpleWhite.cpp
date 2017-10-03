@@ -1,23 +1,26 @@
+#include "balanceSimpleWhite.h"
+
 #include <stdexcept>
 
 #include <opencv2/core/core.hpp>
 #include <opencv2/imgproc/imgproc.hpp>
 
 
-void prl::simpleWhiteBalance(const cv::Mat& inputImage, cv::Mat& outputImage)
+void prl::simpleWhiteBalance(const cv::Mat& inputImage, cv::Mat& outputImage,
+                             const double k)
 {
     cv::Mat inputImageMat = inputImage.clone();
 
     if (inputImageMat.empty())
     {
         throw std::invalid_argument(
-                "SimpleWhiteBalance exception: input image is empty.");
+                "SimpleWhiteBalance: input image is empty.");
     }
 
     if (inputImageMat.channels() != 3)
     {
         throw std::invalid_argument(
-                "SimpleWhiteBalance exception: input image hasn't 3 channels.");
+                "SimpleWhiteBalance: input image hasn't 3 channels.");
     }
 
     cv::Mat outputImageMat;
@@ -52,11 +55,11 @@ void prl::simpleWhiteBalance(const cv::Mat& inputImage, cv::Mat& outputImage)
         }
         vmin[i] = 0;
         vmax[i] = 255;
-        while (hists[i][vmin[i]] < m_k * total)
+        while (hists[i][vmin[i]] < k * total)
         {
             vmin[i] += 1;
         }
-        while (hists[i][vmax[i]] > (1 - m_k) * total)
+        while (hists[i][vmax[i]] > (1 - k) * total)
         {
             vmax[i] -= 1;
         }

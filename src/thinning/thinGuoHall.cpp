@@ -3,6 +3,7 @@
 #include <opencv2/highgui/highgui.hpp>
 #include <opencv2/imgproc/imgproc.hpp>
 
+#include <stdexcept>
 
 /**
  * Perform one thinning iteration.
@@ -52,16 +53,16 @@ void thinGuoHallIteration(cv::Mat& imageUnderProcessing, int iteration)
     imageUnderProcessing &= ~marker;
 }
 
-void prl::ThinningGuoHallImpl(cv::Mat& inputImage, cv::Mat& outputImage)
+void prl::thinGuoHall(cv::Mat& inputImage, cv::Mat& outputImage)
 {
     if (inputImage.empty())
     {
-        throw std::invalid_argument("Input image for thinning is empty"));
+        throw std::invalid_argument("Input image for thinning is empty");
     }
     // we work with color images
     if (inputImage.type() != CV_8UC3 && inputImage.type() != CV_8UC1)
     {
-        throw std::invalid_argument("Invalid type of image for thinning (required 8 or 24 bits per pixel)"));
+        throw std::invalid_argument("Invalid type of image for thinning (required 8 or 24 bits per pixel)");
     }
 
     cv::Mat imageUnderProcess;
@@ -87,8 +88,8 @@ void prl::ThinningGuoHallImpl(cv::Mat& inputImage, cv::Mat& outputImage)
 
     do
     {
-        thinningGuoHallIteration(imageUnderProcess, 0);
-        thinningGuoHallIteration(imageUnderProcess, 1);
+        thinGuoHallIteration(imageUnderProcess, 0);
+        thinGuoHallIteration(imageUnderProcess, 1);
 
         cv::absdiff(imageUnderProcess, prev, diff);
         imageUnderProcess.copyTo(prev);

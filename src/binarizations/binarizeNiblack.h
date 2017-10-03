@@ -18,9 +18,9 @@ namespace prl
 */
 void binarizeNiblack(
 		cv::Mat& imageCopy, cv::Mat& imageNiblack,
-		int windowSize,
-		double thresholdCoefficient,
-		int morphIterationCount);
+		int windowSize = 101,
+		double thresholdCoefficient = 0.01,
+		int morphIterationCount = 2);
 
 }
 #endif // NiblackBinarizerImpl_h__

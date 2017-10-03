@@ -7,7 +7,7 @@
 #include <windows.h>
 #else
 
-#include "CibUnix.h"
+#include "compatibility.h"
 
 #endif
 
@@ -52,9 +52,13 @@
 
 #endif // !M_PI
 
+#include "formatConvert.h"
+#include "utils.h"
+#include "rotate.h"
+
 double FindOrientation(const cv::Mat& input)
 {
-    PIX* pix = ImgOpenCvToLepton(input);
+    PIX* pix = prl::ImgOpenCvToLepton(input);
     if (!pix)
     {
         return 0;
@@ -156,7 +160,7 @@ double FindAngle(const cv::Mat& input_orig)
         for (std::list<std::pair<double, int>>::iterator elem = t_diff.begin();
              elem != t_diff.end(); ++elem)
         {
-            if (eq_d(*it, elem->first, delta))
+            if (prl::eq_d(*it, elem->first, delta))
             {
                 elem->second++;
                 found = true;
@@ -171,7 +175,10 @@ double FindAngle(const cv::Mat& input_orig)
     }
 
     std::pair<double, int> max_elem =
-            *(std::max_element(t_diff.begin(), t_diff.end(), compare_pairs));
+            *(std::max_element(t_diff.begin(), t_diff.end(),
+                               [](const std::pair<double, int>& v1,
+                                  const std::pair<double, int>& v2)
+                               { return v1.second < v2.second; }));
 
     const double cv_angle = max_elem.first * 180 / M_PI;
 
@@ -202,7 +209,7 @@ bool Deskew(cv::Mat& inputImage, cv::Mat& deskewedImage)
 
     if ((angle != 0) && (angle <= DBL_MAX && angle >= -DBL_MAX))
     {
-        deskewedImage = Rotate(inputImage, angle);
+        prl::rotate(inputImage, deskewedImage, angle);
     }
     else
     {
@@ -213,7 +220,7 @@ bool Deskew(cv::Mat& inputImage, cv::Mat& deskewedImage)
 
     if (angle != 0)
     {
-        deskewedImage = Rotate(deskewedImage, angle);
+        prl::rotate(deskewedImage, deskewedImage, angle);
     }
 
     if (deskewedImage.empty())

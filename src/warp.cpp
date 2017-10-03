@@ -26,8 +26,8 @@
 
 #include "opencv2/imgproc.hpp"
 
-void prl::warpCrop(const cv::Mat& sourceImg,
-                   cv::Mat& destImg,
+void prl::warpCrop(const cv::Mat& inputImage,
+                   cv::Mat& outputImage,
                    const int x0, const int y0,
                    const int x1, const int y1,
                    const int x2, const int y2,
@@ -64,7 +64,7 @@ void prl::warpCrop(const cv::Mat& sourceImg,
     if (side1 > bitmapWidth || side2 > bitmapWidth
         || side3 > bitmapHeight || side4 > bitmapHeight)
     {
-        double ratio = bitmapWidth > bitmapHeight ? sourceImg.cols / bitmapWidth : sourceImg.rows / bitmapHeight;
+        double ratio = bitmapWidth > bitmapHeight ? inputImage.cols / bitmapWidth : inputImage.rows / bitmapHeight;
 
         bitmapWidth = cvRound(bitmapWidth * ratio);
         bitmapHeight = cvRound(bitmapHeight * ratio);
@@ -85,7 +85,34 @@ void prl::warpCrop(const cv::Mat& sourceImg,
 
     cv::Mat perspectiveTransform = cv::getPerspectiveTransform(src, dst);
     cv::warpPerspective(
-            sourceImg, destImg, perspectiveTransform, cv::Size(bitmapWidth, bitmapHeight),
+            inputImage, outputImage, perspectiveTransform, cv::Size(bitmapWidth, bitmapHeight),
             cv::INTER_LINEAR,
             borderMode, borderValue);
+}
+
+
+void prl::warpCrop(cv::Mat& inputImage, cv::Mat& outputImage, const std::vector<cv::Point>& points,
+                int borderMode /*= cv::BORDER_CONSTANT*/,
+                const cv::Scalar& borderValue /*= cv::Scalar()*/)
+{
+    if (inputImage.empty())
+    {
+        throw std::invalid_argument("Image for warping is empty");
+    }
+
+    if (points.size() != 4)
+    {
+        throw std::invalid_argument("Size of array of base points for warping isn't equal 4");
+    }
+
+    int x0 = cvRound(points[0].x);
+    int y0 = cvRound(points[0].y);
+    int x1 = cvRound(points[1].x);
+    int y1 = cvRound(points[1].y);
+    int x2 = cvRound(points[2].x);
+    int y2 = cvRound(points[2].y);
+    int x3 = cvRound(points[3].x);
+    int y3 = cvRound(points[3].y);
+
+    warpCrop(inputImage, outputImage, x0, y0, x1, y1, x2, y2, x3, y3, borderMode, borderValue);
 }

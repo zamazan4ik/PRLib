@@ -29,14 +29,43 @@
 
 namespace prl
 {
-void warpCrop(const cv::Mat& sourceImg,
-              cv::Mat& destImg,
+
+/*!
+ * \brief Transform image to crop document.
+ * \param[in] sourceImage Input image.
+ * \param[out] destImage Output image.
+ * \param[in] x0 Top left x coordinate.
+ * \param[in] y0 Top left y coordinate.
+ * \param[in] x1 Top right x coordinate.
+ * \param[in] y1 Top right y coordinate.
+ * \param[in] x2 Bottom right x coordinate.
+ * \param[in] y2 Bottom right y coordinate.
+ * \param[in] x3 Bottom left x coordinate.
+ * \param[in] y3 Bottom left y coordinate.
+ * \details Crop image and do warp transformation to rectangle.
+ * Calculates aspect ratio of source image and keeps it after crop.
+ */
+void warpCrop(const cv::Mat& inputImage,
+              cv::Mat& outputImage,
               const int x0, const int y0,
               const int x1, const int y1,
               const int x2, const int y2,
               const int x3, const int y3,
               const int borderMode = cv::BORDER_CONSTANT,
               const cv::Scalar& borderValue = cv::Scalar());
+
+
+/*!
+ * \brief Transform image to crop document.
+ * \param[in] sourceImage Input image.
+ * \param[out] destImage Output image.
+ * \param[in] points Document contour.
+ * \details Crop image and do warp transformation to rectangle.
+ * Calculates aspect ratio of source image and keeps it after crop.
+ */
+void warpCrop(cv::Mat& inputImage, cv::Mat& outputImage, const std::vector<cv::Point>& points,
+                     int borderMode = cv::BORDER_CONSTANT,
+                     const cv::Scalar& borderValue = cv::Scalar());
 }
 
 #endif //PRLIB_WARP_HPP

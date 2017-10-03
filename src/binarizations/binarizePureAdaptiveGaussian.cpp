@@ -5,23 +5,23 @@
 
 #include <stdexcept>
 
-void prl::binarizePureAdaptiveGaussian(const cv::Mat& inputImage, cv::Mat& outputImage)
+void prl::binarizePureAdaptiveGaussian(const cv::Mat& inputImage, cv::Mat& outputImage,
+                                       const double maxValue, const int blockSize, const int shift)
 {
-    cv::Mat inputImageMat;
-    inputImage.ToMat(inputImageMat);
+    cv::Mat inputImageMat = inputImage;
 
     if (inputImageMat.empty())
     {
         throw std::invalid_argument("Input image for binarization is empty");
     }
 
-    if (!this->m_IsBinarizationByChannelRequired)
+    /*if (!this->m_IsBinarizationByChannelRequired)
     {
         if (inputImageMat.channels() != 1)
         {
             cv::cvtColor(inputImageMat, inputImageMat, CV_BGR2GRAY);
         }
-    }
+    }*/
 
     cv::Mat outputImageMat;
 
@@ -29,7 +29,7 @@ void prl::binarizePureAdaptiveGaussian(const cv::Mat& inputImage, cv::Mat& outpu
     {
         cv::cvtColor(inputImageMat, outputImageMat, CV_BGR2GRAY);
     }
-    else
+    /*else
     {
         if (this->IsNewImageRequired())
         {
@@ -39,13 +39,13 @@ void prl::binarizePureAdaptiveGaussian(const cv::Mat& inputImage, cv::Mat& outpu
         {
             outputImageMat = inputImageMat;
         }
-    }
+    }*/
 
     cv::adaptiveThreshold(
             outputImageMat, outputImageMat,
-            this->m_MaxValue,
+            maxValue,
             cv::ADAPTIVE_THRESH_GAUSSIAN_C, cv::THRESH_BINARY,
-            this->m_BlockSize, this->m_Shift);
+            blockSize, shift);
 
-    outputImage.FromMat(outputImageMat);
+    outputImage = outputImageMat;
 }

@@ -18,8 +18,8 @@ namespace prl
 */
 void binarizeWolfJolion(
 		cv::Mat& imageCopy, cv::Mat& imageWolfJolion,
-		int windowSize,
-		double thresholdCoefficient,
-		int morphIterationCount);
+		int windowSize = 101,
+		double thresholdCoefficient = 0.01,
+		int morphIterationCount = 2);
 }
 #endif // PRLIB_binarizeWolfJolion_h

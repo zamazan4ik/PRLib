@@ -25,12 +25,12 @@ namespace prl
  */
 void binarizeLocalOtsu(
 		cv::Mat& inputImageMat, cv::Mat& outputImageMat,
-		double maxValue,
-		double CLAHEClipLimit,
-		int GaussianBlurKernelSize,
-		double CannyUpperThresholdCoeff,
-		double CannyLowerThresholdCoeff,
-		int CannyMorphIters);
+		double maxValue = 255.0,
+		double CLAHEClipLimit = 0.0,
+		int GaussianBlurKernelSize = 19,
+		double CannyUpperThresholdCoeff = 0.15,
+		double CannyLowerThresholdCoeff = 0.01,
+		int CannyMorphIters = 1);
 
 }
 

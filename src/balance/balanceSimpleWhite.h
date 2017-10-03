@@ -5,10 +5,13 @@
 #ifndef PRLIB_BALANCESIMPLEWHITE_H
 #define PRLIB_BALANCESIMPLEWHITE_H
 
+#include <opencv2/core/core.hpp>
+
 namespace prl
 {
 
-void simpleWhiteBalance(const cv::Mat& inputImage, cv::Mat& outputImage);
+void simpleWhiteBalance(const cv::Mat& inputImage, cv::Mat& outputImage,
+                        const double k);
 
 }
 

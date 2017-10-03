@@ -12,63 +12,58 @@
 #include "imageLibCommon.h"
 
 
-/*!
- * \brief Get default operation param value.
- * \param[inout] params_map Parameters map.
- * \param[in] key Operation code.
- * \return Default value for corresponding operation code.
- */
-FBCITB_ParamsMap::mapped_type prl::GetFBCITBParam(FBCITB_ParamsMap& paramsMap,
-                                             FBCITB_ParamsMap::key_type key)
-{
-    if (paramsMap.find(key) != paramsMap.end())
-    {
-        return paramsMap[key];
-    }
+/*switch (key) {
+case CLAHE_CLIP_LIMIT:
+        resultValue = 2.0;
+break;
+case BILATERAL_FILTER_KERNEL_SIZE:
+        resultValue = 5;
+break;
+case BILATERAL_FILTER_KERNEL_INTENSITY_SIGMA:
+        resultValue = 150.0;
+break;
+case BILATERAL_FILTER_KERNEL_SPATIAL_SIGMA:
+        resultValue = 150.0;
+break;
+case CANNY_GAUSSIAN_BLUR_KERNEL_SIZE:
+        resultValue = 9.0;
+break;
+case CANNY_UPPER_THRESHOLD_COEFF:
+        resultValue = 0.6;
+break;
+case CANNY_LOWER_THRESHOLD_COEFF:
+        resultValue = 0.4;
+break;
+case VARIANCE_MAP_THRESHOLD:
+        resultValue = 200;
+break;
+case COLOR_SPACE:
+        resultValue = CV_RGB2Luv;
+break;
+case BOUNDING_RECT_MAX_AREA_COEFF:
+        resultValue = 0.3;
+break;
+default:
+return 0.0;
+}*/
 
-    double resultValue = 0.0;
-
-    switch (key)
-    {
-        case CLAHE_CLIP_LIMIT:
-            resultValue = 2.0;
-            break;
-        case BILATERAL_FILTER_KERNEL_SIZE:
-            resultValue = 5;
-            break;
-        case BILATERAL_FILTER_KERNEL_SPATIAL_SIGMA:
-        case BILATERAL_FILTER_KERNEL_INTENSITY_SIGMA:
-            resultValue = 150.0;
-            break;
-        case CANNY_GAUSSIAN_BLUR_KERNEL_SIZE:
-            resultValue = 9.0;
-            break;
-        case CANNY_UPPER_THRESHOLD_COEFF:
-            resultValue = 0.6;
-            break;
-        case CANNY_LOWER_THRESHOLD_COEFF:
-            resultValue = 0.4;
-            break;
-        case VARIANCE_MAP_THRESHOLD:
-            resultValue = 200;
-            break;
-        case COLOR_SPACE:
-            resultValue = CV_RGB2Luv;
-            break;
-        case BOUNDING_RECT_MAX_AREA_COEFF:
-            resultValue = 0.3;
-            break;
-        default:
-            return 0.0;
-    }
-
-    paramsMap[key] = resultValue;
-
-    return resultValue;
-}
-
-void prl::binarizeFBCITB(cv::Mat& inputImage, cv::Mat& outputImage, long operations,
-                    const FBCITB_ParamsMap& inputParamsMap)
+void prl::binarizeFBCITB(
+        cv::Mat& inputImage, cv::Mat& outputImage,
+        bool useCanny, bool useVariancesMap,
+        bool useCLAHE, bool useBilateral,
+        bool useOtherColorspace,
+        bool useMorphology,
+        bool useCannyOnVariances,
+        double varianceMapThreshold,
+        double CLAHEClipLimit,
+        double gaussianBlurKernelSize,
+        double cannyUpperThresholdCoeff,
+        double cannyLowerThresholdCoeff,
+        double boundingRectangleMaxArea,
+        int bilateralKernelSize,
+        double bilateralKernelIntensitySigma,
+        double bilateralKernelSpatialSigma,
+        double boundingRectMaxAreaCoeff)
 {
     if (inputImage.empty())
     {
@@ -87,36 +82,32 @@ void prl::binarizeFBCITB(cv::Mat& inputImage, cv::Mat& outputImage, long operati
         }
     }
 
-    FBCITB_ParamsMap paramsMap(inputParamsMap);
-
     //! if Canny detector and local variance operations are not used then use both.
-    bool isCannyRequired = (operations & USE_CANNY) != 0;
-    bool isVariancesMapRequired = (operations & USE_VARIANCES) != 0;
+    bool isCannyRequired = useCanny;
+    bool isVariancesMapRequired = useVariancesMap;
     if (!isCannyRequired && !isVariancesMapRequired)
     {
-        operations |= USE_CANNY | USE_VARIANCES;
+        useCanny = useVariancesMap = true;
     }
 
     cv::Mat imageToProc = inputImage.clone();
     //Mat image_to_show = image_to_proc.clone();
 
-    if ((operations & USE_OTHER_COLOR_SPACE) != 0)
+/*    if ((operations & USE_OTHER_COLOR_SPACE) != 0)
     {
         // change color space
         cv::cvtColor(imageToProc, imageToProc,
                      static_cast<int>(GetFBCITBParam(paramsMap, COLOR_SPACE)));
-    }
+    }*/
 
-    if ((operations & USE_CLAHE) != 0)
+    if (useCLAHE)
     {
         //! contrast enhancement
-        EnhanceLocalContrastByCLAHE(imageToProc, imageToProc,
-                                    GetFBCITBParam(paramsMap, CLAHE_CLIP_LIMIT), false);
+        EnhanceLocalContrastByCLAHE(imageToProc, imageToProc, CLAHEClipLimit, false);
     }
 
-    if ((operations & USE_BILATERAL) != 0)
+    if (useBilateral)
     {
-
         //! bilateral filtration
         std::vector<cv::Mat> channelsForBilateralFiltration(imageToProc.channels());
         std::vector<cv::Mat> tempChannelsForBilateralFiltration(imageToProc.channels());
@@ -125,12 +116,9 @@ void prl::binarizeFBCITB(cv::Mat& inputImage, cv::Mat& outputImage, long operati
         cv::split(imageToProc, tempChannelsForBilateralFiltration);
 
         //! set parameters of filtration
-        int kernelSize = static_cast<int>(GetFBCITBParam(paramsMap,
-                                                         BILATERAL_FILTER_KERNEL_SIZE));
-        double intensitySigma = GetFBCITBParam(paramsMap,
-                                               BILATERAL_FILTER_KERNEL_INTENSITY_SIGMA);
-        double spatialSigma = GetFBCITBParam(paramsMap,
-                                             BILATERAL_FILTER_KERNEL_SPATIAL_SIGMA);
+        int kernelSize = static_cast<int>(bilateralKernelSize);
+        double intensitySigma = bilateralKernelIntensitySigma;
+        double spatialSigma = bilateralKernelSpatialSigma;
 
         for (size_t i = 0; i < channelsForBilateralFiltration.size(); ++i)
         {
@@ -142,29 +130,25 @@ void prl::binarizeFBCITB(cv::Mat& inputImage, cv::Mat& outputImage, long operati
         cv::merge(tempChannelsForBilateralFiltration, imageToProc);
     }
 
-
     cv::Mat resultCanny;
 
-    if ((operations & USE_CANNY) != 0)
+    if (useCanny)
     {
-
         //! use Canny detector
-
-        int kernelSize = static_cast<int>(GetFBCITBParam(paramsMap,
-                                                         CANNY_GAUSSIAN_BLUR_KERNEL_SIZE));
-        double upperCoeff = GetFBCITBParam(paramsMap, CANNY_UPPER_THRESHOLD_COEFF);
-        double lowerCoeff = GetFBCITBParam(paramsMap, CANNY_LOWER_THRESHOLD_COEFF);
+        int kernelSize = static_cast<int>(gaussianBlurKernelSize);
+        double upperCoeff = cannyUpperThresholdCoeff;
+        double lowerCoeff = cannyLowerThresholdCoeff;
         CannyEdgeDetection(imageToProc, resultCanny, kernelSize, upperCoeff, lowerCoeff, 1);
     }
 
     //! get map of local variance
     cv::Mat varianceMap;
 
-    if ((operations & USE_VARIANCES) != 0)
+    if (useVariancesMap)
     {
         Mat2LocalVarianceMap(inputImage, varianceMap);
 
-        varianceMap = (varianceMap > GetFBCITBParam(paramsMap, VARIANCE_MAP_THRESHOLD));
+        varianceMap = (varianceMap > varianceMapThreshold);
 
         //cv::dilate(variance_map, variance_map, cv::Mat(), cv::Point(-1, -1), 2);
         //cv::erode(variance_map, variance_map, cv::Mat(), cv::Point(-1, -1), 2);
@@ -175,11 +159,10 @@ void prl::binarizeFBCITB(cv::Mat& inputImage, cv::Mat& outputImage, long operati
         cv::split(varianceMap, varianceMapChannels);
         varianceMap = varianceMapChannels[0] & varianceMapChannels[1] & varianceMapChannels[2];
 
-        if ((operations & USE_CANNY_ON_VARIANCES) != 0)
+        if (useCannyOnVariances)
         {
             cv::Canny(varianceMap, varianceMap, 64, 128);
         }
-
     }
 
     if (isCannyRequired && isVariancesMapRequired)
@@ -187,12 +170,11 @@ void prl::binarizeFBCITB(cv::Mat& inputImage, cv::Mat& outputImage, long operati
         varianceMap &= resultCanny;
     }
 
-
     std::vector<std::vector<cv::Point> > contours;
     std::vector<cv::Vec4i> hierarchy;
 
     //! contours detection
-    if ((operations & USE_VARIANCES) != 0)
+    if (useVariancesMap)
     {
         cv::findContours(varianceMap, contours, hierarchy, CV_RETR_TREE,
                          CV_CHAIN_APPROX_SIMPLE, cv::Point(0, 0));
@@ -216,8 +198,8 @@ void prl::binarizeFBCITB(cv::Mat& inputImage, cv::Mat& outputImage, long operati
 
     std::vector<std::vector<cv::Point> > tempContours;
 
-    double boundingRectMaxAreaCoeff = GetFBCITBParam(paramsMap, BOUNDING_RECT_MAX_AREA_COEFF);
-    int boundingRectMaxArea = static_cast<int>(boundingRectMaxAreaCoeff * imageToProc.cols *
+    double m_boundingRectMaxAreaCoeff = boundingRectangleMaxArea;
+    int boundingRectMaxArea = static_cast<int>(m_boundingRectMaxAreaCoeff * imageToProc.cols *
                                                imageToProc.rows);
 
     //! get bounding rectangles
@@ -330,9 +312,9 @@ void prl::binarizeFBCITB(cv::Mat& inputImage, cv::Mat& outputImage, long operati
         std::vector<uchar> B_EB_3;
 
         //! get median for each color channel
-        for (size_t pointNo = 0; pointNo < B.size(); ++pointNo)
+        for (const auto& pointPerChannel : B)
         {
-            cv::Vec3b point_color = imageToProc.at<cv::Vec3b>(B[pointNo]);
+            auto point_color = imageToProc.at<cv::Vec3b>(pointPerChannel);
 
             B_EB_1.push_back(point_color[0]);
             B_EB_2.push_back(point_color[1]);
@@ -387,7 +369,7 @@ void prl::binarizeFBCITB(cv::Mat& inputImage, cv::Mat& outputImage, long operati
     }
 
     //! morphology operations
-    if (operations & USE_MORPHOLOGY)
+    if (useMorphology)
     {
         //cv::dilate(resultImage, resultImage, cv::Mat(), cv::Point(-1, -1), 2);
         //cv::erode(resultImage, resultImage, cv::Mat(), cv::Point(-1, -1), 2);

@@ -39,43 +39,6 @@ bool GetDocumentContour(
         int* successMethodNumber = NULL);
 
 /*!
- * \brief Transform image to crop document.
- * \param[in] sourceImage Input image.
- * \param[out] destImage Output image.
- * \param[in] points Document contour.
- * \details Crop image and do warp transformation to rectangle. 
- * Calculates aspect ratio of source image and keeps it after crop.
- */
-void warpCropAI(
-        cv::Mat& sourceImage,
-        cv::Mat& destImage,
-        const std::vector<cv::Point2f>& points,
-        int borderMode = cv::BORDER_CONSTANT, const cv::Scalar& borderValue = cv::Scalar());
-
-/*!
- * \brief Transform image to crop document.
- * \param[in] sourceImage Input image.
- * \param[out] destImage Output image.
- * \param[in] x0 Top left x coordinate.
- * \param[in] y0 Top left y coordinate.
- * \param[in] x1 Top right x coordinate.
- * \param[in] y1 Top right y coordinate.
- * \param[in] x2 Bottom right x coordinate.
- * \param[in] y2 Bottom right y coordinate.
- * \param[in] x3 Bottom left x coordinate.
- * \param[in] y3 Bottom left y coordinate.
- * \details Crop image and do warp transformation to rectangle. 
- * Calculates aspect ratio of source image and keeps it after crop.
- */
-void warpCropAI(
-        cv::Mat& sourceImage, cv::Mat& destImage,
-        int x0, int y0,
-        int x1, int y1,
-        int x2, int y2,
-        int x3, int y3,
-        int borderMode = cv::BORDER_CONSTANT, const cv::Scalar& borderValue = cv::Scalar());
-
-/*!
  * \brief Crop scanned document.
  * \param[in] sourceImage Input image.
  * \param[out] croppedImage Cropped image.

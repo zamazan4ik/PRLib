@@ -4,6 +4,9 @@
 #include <cmath>
 #include <algorithm>
 
+#include <opencv2/core/core.hpp>
+#include <opencv2/imgproc/imgproc.hpp>
+
 static const double PI              = 3.14159265;
 static const double GAUSSIAN_SIGMA  = 4.0;
 static const double ECCEN_TUNING    = 1.0;
@@ -13,25 +16,176 @@ static const double SHARPNESS_Q     = 8.0;
 static const int    SECTOR_N        = 8;
 
 
-kuwaharaFilter::kuwaharaFilter()
-{
-    map_circle_width = (int) (2 * ceil(2 * SIGMA_R) + 1);
-    local_circle_width = (int) (2 * ceil(2 * SIGMA_R) + 1);
 
-    div_circle_initialize();
+// TODO: remove global variables
+int map_circle_width, local_circle_width;
+double ***div_circle;
+std::vector<cv::Mat> div_circle_weight;
+
+
+// Prototypes
+cv::Mat anisotropic_kuwahara(const cv::Mat& src_img);
+cv::Mat computationKernel(const cv::Mat src_image, const cv::Mat& eigenVec_ori_cos,
+                          const cv::Mat& eigenVec_ori_sin, const cv::Mat& amo_anisotropy);
+
+
+cv::Mat getGaussianKernel2D(int ksize, double sigma)
+{
+    double p_max = 0.0, p_temp = 0.0;
+
+    sigma *= 2.0;
+
+    cv::Mat kernel(ksize, ksize, CV_64FC1);
+    kernel.setTo(0);
+
+    for (int i = 0; i < ksize; i++)
+    {
+        for (int j = 0; j < ksize; j++)
+        {
+            p_temp = (1.0 / (2 * PI * sigma)) *
+                     std::exp((-1) * (std::pow(i - ksize / 2, 2.0) +
+                                      std::pow(j - ksize / 2, 2.0)) / (std::pow(2 * sigma, 2)));
+
+            kernel.at<double>(i, j) = p_temp;
+
+            if (p_temp > p_max)
+            {
+                p_max = p_temp;
+            }
+        }
+    }
+
+    kernel /= p_max;
+
+    return kernel;
 }
 
 
-cv::Mat kuwaharaFilter::imageFilter(const cv::Mat& input_img, size_t iterations)
+void div_circle_initialize()
 {
-    cv::Mat src_img = input_img.clone();
+
+    double map_angle = 0.0, w_min = 0.0, w_max = 0.0;
+
+    cv::Mat gau_kernel = getGaussianKernel2D(map_circle_width, SIGMA_R);
+    cv::Mat div_rotate;
+    cv::Point2d map_centroid;
+
+    int c_i = 0, c_j = 0, map_i = 0, map_j = 0;
+
+
+    div_circle = new double** [SECTOR_N];
+    for (int s = 0; s < SECTOR_N; s++)
+    {
+        div_circle_weight[s].create(map_circle_width, map_circle_width, CV_64FC1);
+        div_circle_weight[s].setTo(0);
+
+        div_circle[s] = new double* [map_circle_width];
+        for (int c_i = 0; c_i < map_circle_width; c_i++)
+        {
+            div_circle[s][c_i] = new double[map_circle_width];
+        }
+    }
+
+    for (int s = 0; s < SECTOR_N; s++)
+    {
+        if (s <= 1)
+        {
+            for (int c_i = 0; c_i < map_circle_width; c_i++)
+            {
+                for (int c_j = 0; c_j < map_circle_width; c_j++)
+                {
+                    map_i = c_i - map_circle_width / 2;
+                    map_j = c_j - map_circle_width / 2;
+
+                    if (std::sqrt(std::pow(map_i, 2.0) + std::pow(map_j, 2.0)) < map_circle_width / 2)
+                    {
+                        map_angle = atan2(map_i, map_j);
+
+                        if (map_angle >= (2.0 * s - 1) * PI / SECTOR_N && map_angle <= (2.0 * s + 1) * PI / SECTOR_N)
+                        {
+                            div_circle_weight[s].at<double>(c_i, c_j) = 1.0;
+                        }
+
+                    }
+
+                }
+            }
+            cv::GaussianBlur(div_circle_weight[s], div_circle_weight[s], cv::Size(13, 13), SIGMA_S);
+
+            // multiply per element
+            cv::multiply(div_circle_weight[s], gau_kernel, div_circle_weight[s]);
+
+
+            // calculate the max & min value of map_circle
+            cv::minMaxLoc(div_circle_weight[s], &w_min, &w_max);
+
+            // Normalize
+            div_circle_weight[s] = div_circle_weight[s] / w_max;
+        }
+        else
+        {
+            map_centroid.x = map_circle_width / 2;
+            map_centroid.y = map_circle_width / 2;
+
+            if (s % 2 == 0)
+            {
+                div_rotate = cv::getRotationMatrix2D(map_centroid, s * (-360.0 / SECTOR_N), 1.0);
+                cv::warpAffine(div_circle_weight[0], div_circle_weight[s], div_rotate, div_circle_weight[s].size());
+            }
+
+            else
+            {
+                div_rotate = cv::getRotationMatrix2D(map_centroid, (s - 1) * (-360.0 / SECTOR_N), 1.0);
+                cv::warpAffine(div_circle_weight[1], div_circle_weight[s], div_rotate, div_circle_weight[s].size());
+            }
+        }
+
+        for (int c_i = 0; c_i < map_circle_width; c_i++)
+        {
+            for (int c_j = 0; c_j < map_circle_width; c_j++)
+            {
+                div_circle[s][c_i][c_j] = div_circle_weight[s].at<double>(c_i, c_j);
+            }
+        }
+    }
+
+    gau_kernel.release();
+    div_rotate.release();
+    map_centroid.~Point_();
+}
+
+
+
+/*kuwaharaFilter::kuwaharaFilter()
+{
+    //map_circle_width = (int) (2 * ceil(2 * SIGMA_R) + 1);
+    //local_circle_width = (int) (2 * ceil(2 * SIGMA_R) + 1);
+
+    div_circle_initialize();
+}*/
+
+
+void prl::denoiseKuwahara(const cv::Mat& inputImage, cv::Mat& outputImage, size_t iterations)
+{
+    //Init
+
+    map_circle_width = (int) (2 * std::ceil(2 * SIGMA_R) + 1);
+    local_circle_width = (int) (2 * std::ceil(2 * SIGMA_R) + 1);
+
+    div_circle_initialize();
+
+
+
+
+    cv::Mat src_img = inputImage.clone();
 
     if (src_img.type() != CV_64FC3)
     {
         src_img.convertTo(src_img, CV_64FC3);
         src_img /= 255.0;
     }
-    cv::resizeMat(src_img, 0.8);
+    // TODO: WTF?
+    //resizeMat(src_img, 0.8);
 
     cv::Mat filtered_img = src_img.clone().setTo(0);
 
@@ -44,22 +198,22 @@ cv::Mat kuwaharaFilter::imageFilter(const cv::Mat& input_img, size_t iterations)
         src_clone = filtered_img.clone();
     }
 
-    return filtered_img;
+    outputImage = filtered_img;
 }
 
-void kuwaharaFilter::tensorComputation(const cv::Mat& src_img, cv::Mat& eigenVec_ori_cos, cv::Mat& eigenVec_ori_sin,
-                                       cv::Mat& amo_anisotropy)
+void tensorComputation(const cv::Mat& src_img, cv::Mat& eigenVec_ori_cos, cv::Mat& eigenVec_ori_sin,
+                       cv::Mat& amo_anisotropy)
 {
     cv::Mat src_gau = src_img.clone().setTo(0);
-    cv::GaussianBlur(src_img, src_gau, Size(3, 3), GAUSSIAN_SIGMA);
+    cv::GaussianBlur(src_img, src_gau, cv::Size(3, 3), GAUSSIAN_SIGMA);
 
     cv::Mat src_dx_split[3], src_dy_split[3], src_gau_split[3];
     cv::split(src_gau, src_gau_split);
 
     for (size_t i = 0; i < 3; i++)
     {
-        src_dx_split[i] = Mat(src_img.rows, src_img.cols, CV_64FC1).setTo(0);
-        src_dy_split[i] = Mat(src_img.rows, src_img.cols, CV_64FC1).setTo(0);
+        src_dx_split[i] = cv::Mat(src_img.rows, src_img.cols, CV_64FC1).setTo(0);
+        src_dy_split[i] = cv::Mat(src_img.rows, src_img.cols, CV_64FC1).setTo(0);
 
         cv::Sobel(src_gau_split[i], src_dx_split[i], CV_64FC1, 1, 0, 1);
         cv::Sobel(src_gau_split[i], src_dy_split[i], CV_64FC1, 0, 1, 1);
@@ -70,9 +224,7 @@ void kuwaharaFilter::tensorComputation(const cv::Mat& src_img, cv::Mat& eigenVec
     cv::merge(src_dx_split, 3, src_dx);
     cv::merge(src_dy_split, 3, src_dy);
 
-
     cv::Mat struct_tensor, eigen_val, eigen_vec;
-
 
     double lambda_one = 0.0, lambda_two = 0.0;
 
@@ -85,7 +237,7 @@ void kuwaharaFilter::tensorComputation(const cv::Mat& src_img, cv::Mat& eigenVec
         {
             struct_tensor = cv::Mat(2, 2, CV_64FC1).setTo(0);
 
-            cv::Vec3d dx_temp = src_dx.at<cv::Vec3d>(i, j), dy_temp = src_dy.at<Vec3d>(i, j);
+            cv::Vec3d dx_temp = src_dx.at<cv::Vec3d>(i, j), dy_temp = src_dy.at<cv::Vec3d>(i, j);
 
             for (size_t k = 0; k < 3; k++)
             {
@@ -112,7 +264,7 @@ void kuwaharaFilter::tensorComputation(const cv::Mat& src_img, cv::Mat& eigenVec
 }
 
 
-Mat kuwaharaFilter::anisotropic_kuwahara(const cv::Mat& src_img)
+cv::Mat anisotropic_kuwahara(const cv::Mat& src_img)
 {
     cv::Mat eigenVec_ori_cos = cv::Mat(src_img.rows, src_img.cols, CV_64FC1).setTo(0);
     cv::Mat eigenVec_ori_sin = cv::Mat(src_img.rows, src_img.cols, CV_64FC1).setTo(0);
@@ -137,8 +289,8 @@ Mat kuwaharaFilter::anisotropic_kuwahara(const cv::Mat& src_img)
 }
 
 
-cv::Mat kuwaharaFilter::computationKernel(const cv::Mat src_image, const cv::Mat& eigenVec_ori_cos,
-                                          const cv::Mat& eigenVec_ori_sin, const cv::Mat& amo_anisotropy)
+cv::Mat computationKernel(const cv::Mat src_image, const cv::Mat& eigenVec_ori_cos,
+                          const cv::Mat& eigenVec_ori_sin, const cv::Mat& amo_anisotropy)
 {
     cv::Mat filtered_image = src_image.clone().setTo(0);
 
@@ -265,7 +417,7 @@ cv::Mat kuwaharaFilter::computationKernel(const cv::Mat src_image, const cv::Mat
                 }
             }
 
-            filtered_image.at<double>(i, j) = std::max(std::min(div_mean[min_index], 1), 0);
+            filtered_image.at<double>(i, j) = std::max<double>(std::min<double>(div_mean[min_index], 1), 0);
         }
     }
 
@@ -278,132 +430,3 @@ cv::Mat kuwaharaFilter::computationKernel(const cv::Mat src_image, const cv::Mat
 
     return filtered_image;
 }
-
-
-void kuwaharaFilter::div_circle_initialize()
-{
-
-    double map_angle = 0.0, w_min = 0.0, w_max = 0.0;
-
-    cv::Mat gau_kernel = getGaussianKernel2D(map_circle_width, SIGMA_R);
-    cv::Mat div_rotate;
-
-    cv::Point2d map_centroid;
-
-    int c_i = 0, c_j = 0, map_i = 0, map_j = 0;
-
-
-    div_circle = new double** [SECTOR_N];
-    for (int s = 0; s < SECTOR_N; s++)
-    {
-
-        div_circle_weight[s].create(map_circle_width, map_circle_width, CV_64FC1);
-        div_circle_weight[s].setTo(0);
-
-        div_circle[s] = new double* [map_circle_width];
-        for (int c_i = 0; c_i < map_circle_width; c_i++)
-        {
-            div_circle[s][c_i] = new double[map_circle_width];
-        }
-    }
-
-    for (int s = 0; s < SECTOR_N; s++)
-    {
-        if (s <= 1)
-        {
-            for (int c_i = 0; c_i < map_circle_width; c_i++)
-            {
-                for (int c_j = 0; c_j < map_circle_width; c_j++)
-                {
-                    map_i = c_i - map_circle_width / 2;
-                    map_j = c_j - map_circle_width / 2;
-
-                    if (std::sqrt(std::pow(map_i, 2.0) + std::pow(map_j, 2.0)) < map_circle_width / 2)
-                    {
-                        map_angle = atan2(map_i, map_j);
-
-                        if (map_angle >= (2.0 * s - 1) * PI / SECTOR_N && map_angle <= (2.0 * s + 1) * PI / SECTOR_N)
-                        {
-                            div_circle_weight[s].at<double>(c_i, c_j) = 1.0;
-                        }
-
-                    }
-
-                }
-            }
-            cv::GaussianBlur(div_circle_weight[s], div_circle_weight[s], Size(13, 13), SIGMA_S);
-
-            // multiply per element
-            cv::multiply(div_circle_weight[s], gau_kernel, div_circle_weight[s]);
-
-
-            // calculate the max & min value of map_circle
-            cv::minMaxLoc(div_circle_weight[s], &w_min, &w_max);
-
-            // Normalize
-            cv::div_circle_weight[s] = div_circle_weight[s] / w_max;
-        }
-        else
-        {
-            map_centroid.x = map_circle_width / 2;
-            map_centroid.y = map_circle_width / 2;
-
-            if (s % 2 == 0)
-            {
-                div_rotate = cv::getRotationMatrix2D(map_centroid, s * (-360.0 / SECTOR_N), 1.0);
-                cv::warpAffine(div_circle_weight[0], div_circle_weight[s], div_rotate, div_circle_weight[s].size());
-            }
-
-            else
-            {
-                div_rotate = cv::getRotationMatrix2D(map_centroid, (s - 1) * (-360.0 / SECTOR_N), 1.0);
-                cv::warpAffine(div_circle_weight[1], div_circle_weight[s], div_rotate, div_circle_weight[s].size());
-            }
-        }
-
-        for (int c_i = 0; c_i < map_circle_width; c_i++)
-        {
-            for (int c_j = 0; c_j < map_circle_width; c_j++)
-            {
-                div_circle[s][c_i][c_j] = div_circle_weight[s].at<double>(c_i, c_j);
-            }
-        }
-    }
-
-    gau_kernel.release();
-    div_rotate.release();
-    map_centroid.~Point_();
-}
-
-
-cv::Mat kuwaharaFilter::getGaussianKernel2D(int ksize, double sigma)
-{
-    double p_max = 0.0, p_temp = 0.0;
-
-    sigma *= 2.0;
-
-    cv::Mat kernel = cv::Mat(ksize, ksize, CV_64FC1).setTo(0);
-
-    for (int i = 0; i < ksize; i++)
-    {
-        for (int j = 0; j < ksize; j++)
-        {
-            p_temp = (1.0 / (2 * PI * sigma)) *
-                     exp((-1) * (pow(i - ksize / 2, 2.0) + pow(j - ksize / 2, 2.0)) / (pow(2 * sigma, 2)));
-
-            kernel.at<double>(i, j) = p_temp;
-
-            if (p_temp > p_max)
-            {
-                p_max = p_temp;
-            }
-        }
-    }
-
-    kernel /= p_max;
-
-    return kernel;
-}
-
-
-

@@ -18,9 +18,9 @@ namespace prl
 */
 void binarizeNICK(
 		cv::Mat& imageCopy, cv::Mat& imageNICK,
-		int windowSize,
-		double thresholdCoefficient,
-		int morphIterationCount);
+		int windowSize = 21,
+		double thresholdCoefficient = -0.01,
+		int morphIterationCount = 0);
 
 }
 #endif // NICKBinarizerImpl_h__

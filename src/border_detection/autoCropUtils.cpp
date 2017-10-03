@@ -4,16 +4,12 @@
 #include <opencv2/imgproc/imgproc.hpp>
 #include <opencv2/features2d/features2d.hpp>
 
-
-#include "tstring.h"
-
 #include <iostream>
 #include <vector>
 #include <algorithm>
 #include <stdexcept>
 
-using namespace std;
-
+#include "imageLibCommon.h"
 
 //////////////////////////////////////////////////////////////////////////
 
@@ -43,7 +39,7 @@ double dotDegree(cv::Point& common, cv::Point& a, cv::Point& b)
 }
 
 //! Function checks whether polygon rectangle
-int CheckRectangle(vector<cv::Point>& contour, MarkerRectangle* rectangle)
+int CheckRectangle(std::vector<cv::Point>& contour, MarkerRectangle* rectangle)
 {
     //! Check count of corners
     if (contour.size() != 4)
@@ -102,7 +98,7 @@ int CheckRectangle(vector<cv::Point>& contour, MarkerRectangle* rectangle)
 
 /////////////////////////////////////////////////////////////////
 
-bool IsQuadrangularConvex(vector<cv::Point>& resultContour)
+bool IsQuadrangularConvex(std::vector<cv::Point>& resultContour)
 {
     if (resultContour.empty())
     {
@@ -200,7 +196,7 @@ bool IsQuadrangularConvex(vector<cv::Point>& resultContour)
 //	return false;
 //}
 
-bool findDocumentContour(cv::Mat& source, vector<cv::Point2f>& resultContour)
+bool findDocumentContour(cv::Mat& source, std::vector<cv::Point2f>& resultContour)
 {
     if (source.empty())
     {
@@ -549,4 +545,9 @@ void binarizeByLocalVariancesWithoutFilters(cv::Mat& image, cv::Mat& result)
     }
 
     result = result1 & result2;
+}
+
+bool isQuadrangle(const std::vector<cv::Point>& contour)
+{
+    return contour.size() == 4;
 }

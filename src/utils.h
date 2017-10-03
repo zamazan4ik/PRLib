@@ -5,12 +5,12 @@
 #ifndef PRLIB_UTILS_HPP
 #define PRLIB_UTILS_HPP
 
+#include <opencv2/core/core.hpp>
+
 namespace prl
 {
 
-static const double EQ_DELTA = 1e-7;
-
-bool eq_d(const double v1, const double v2, const double delta = EQ_DELTA);
+bool eq_d(const double v1, const double v2, const double delta = 1e-7);
 
 double compareImages(const cv::Mat& image1, const cv::Mat& image2);
 

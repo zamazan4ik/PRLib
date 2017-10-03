@@ -11,7 +11,12 @@
 #include <vector>
 #include <cmath>
 
+#include "resize.h"
 #include "autoCropUtils.h"
+#include "warp.h"
+
+namespace prl
+{
 
 /*!
  * \brief Scale contour proportionally to image
@@ -43,7 +48,7 @@ void ScaleContour(std::vector<cv::Point2f>& contour, cv::Size& fromImageSize, cv
  * \param[inout] pt Contour.
  * \return true if ordering is successful.
  */
-bool cropVerticesOrdering(std::vector<Point2f>& pt)
+bool cropVerticesOrdering(std::vector<cv::Point2f>& pt)
 {
     if (pt.empty())
     {
@@ -186,7 +191,7 @@ bool linesOfTextDetection(cv::Mat& imgSource, std::vector<cv::Point2f>& resultCo
     if (vertices.size() >= 3 * 2 * 2)
     {
         points = vertices;
-        RotatedRect box = minAreaRect(cv::Mat(points));
+        cv::RotatedRect box = minAreaRect(cv::Mat(points));
 
         //! Expand box to whitespaces from text
         box.size.width += imgSource.cols / 40.f;
@@ -265,7 +270,7 @@ bool linesOfTextDetection(cv::Mat& imgSource, std::vector<cv::Point2f>& resultCo
  * \param[out] resultContour Resulting contour.
  * \return true if contour is detected.
  */
-bool featureDetection(cv::Mat& imgSource, vector<cv::Point2f>& resultContour)
+bool featureDetection(cv::Mat& imgSource, std::vector<cv::Point2f>& resultContour)
 {
     if (imgSource.empty())
     {
@@ -275,8 +280,8 @@ bool featureDetection(cv::Mat& imgSource, vector<cv::Point2f>& resultContour)
     std::vector<cv::KeyPoint> keypoints;
 
 #ifndef OPENCV3
-    cv::FastFeatureDetector detector = cv::FastFeatureDetector();
-    detector.detect(imgSource, keypoints);
+    cv::Ptr<cv::FastFeatureDetector> detector = cv::FastFeatureDetector::create();
+    detector->detect(imgSource, keypoints);
 #else
     cv::Ptr<cv::FastFeatureDetector> detector = cv::FastFeatureDetector::create();
     detector->detect(imgSource, keypoints);
@@ -337,7 +342,7 @@ bool featureDetection(cv::Mat& imgSource, vector<cv::Point2f>& resultContour)
     std::vector<cv::Point2f> points;
     points = listOfBestPoints;
 
-    cv::RotatedRect box = minAreaRect(Mat(points));
+    cv::RotatedRect box = cv::minAreaRect(cv::Mat(points));
 
     //! Expand box to have whitespace around text
     box.size.width += static_cast<float>(imgSource.cols) / 40.0f;
@@ -402,11 +407,6 @@ bool GetDocumentContour(
         throw std::invalid_argument("Image for document contour detection is empty");
     }
 
-    if (successMethodNumber != nullptr)
-    {
-        *successMethodNumber = GCM_ALL_METHODS_FAILED;
-    }
-
     cv::Mat imageToProc;
     bool isContourDetected;
 
@@ -423,7 +423,6 @@ bool GetDocumentContour(
         );
 
         cv::resize(sourceImage, imageToProc, newImageSize, 0, 0, cv::INTER_AREA);
-
     }
     else
     {
@@ -471,7 +470,7 @@ bool GetDocumentContour(
         cv::Canny(resultCanny, resultCannyTmp, lower, upper);
         cv::dilate(
                 resultCannyTmp, resultCanny,
-                cv::getStructuringElement(cv::MORPH_RECT, Size(2, 2)),
+                cv::getStructuringElement(cv::MORPH_RECT, cv::Size(2, 2)),
                 cv::Point(-1, -1), 2);
     }
 
@@ -481,11 +480,6 @@ bool GetDocumentContour(
     {
         // We have detected borders
         //findContoursDrawResult(image_to_proc.clone(), result_variances.clone(), "temp", true);
-
-        if (successMethodNumber != nullptr)
-        {
-            *successMethodNumber = GCM_CANNY_SUCCESS;
-        }
 
         ScaleContour(resultContour, newImageSize, sourceImageSize);
         cropVerticesOrdering(resultContour);
@@ -497,8 +491,6 @@ bool GetDocumentContour(
     //! Try detect borders using local variances
 
     cv::Mat resultVariances, resultVariancesBackup;
-
-    LOG_MESSAGE("Local variances starts");
 
     //! Make binarization based on local variances
     {
@@ -516,23 +508,16 @@ bool GetDocumentContour(
         // We have detected borders
         //findContoursDrawResult(image_to_proc.clone(), result_variances.clone(), "temp", true);
 
-        if (successMethodNumber != nullptr)
-        {
-            *successMethodNumber = GCM_LOCAL_VARIANTS_SUCCESS;
-        }
-
         ScaleContour(resultContour, newImageSize, sourceImageSize);
         cropVerticesOrdering(resultContour);
         return true;
     }
 
-    LOG_MESSAGE("Local variances fails");
-
     //////////////////////////////////////////////////////////////////////////
     //! Try combinations (logical "AND" and logical "OR") results of Canny detector and
     //! local variances values binarization results
 
-    LOG_MESSAGE("Local variances and Canny combination (\"AND\") starts");
+    //LOG_MESSAGE("Local variances and Canny combination (\"AND\") starts");
 
     resultVariances = resultVariancesBackup.clone() & resultCanny;
 
@@ -543,22 +528,17 @@ bool GetDocumentContour(
         // we have detected borders
         //findContoursDrawResult(image_to_proc.clone(), result_variances.clone(), "temp", true);
 
-        if (successMethodNumber != nullptr)
-        {
-            *successMethodNumber = GCM_LOCAL_VARIANTS_AND_CANNY_SUCCESS;
-        }
-
         ScaleContour(resultContour, newImageSize, sourceImageSize);
         cropVerticesOrdering(resultContour);
         return true;
     }
 
-    LOG_MESSAGE("Local variances and Canny combination (\"AND\") fails");
+    //LOG_MESSAGE("Local variances and Canny combination (\"AND\") fails");
 
     //////////////////////////////////////////////////////////////////////////
     //! Try Canny border detector
 
-    LOG_MESSAGE("Canny (channels) starts");
+    //LOG_MESSAGE("Canny (channels) starts");
 
     //! Split channels
     std::vector<cv::Mat> colorPlanes(imageToProc.channels());
@@ -592,17 +572,12 @@ bool GetDocumentContour(
         // Canny detector detects border
         //findContoursDrawResult(image_to_proc.clone(), result_variances.clone(), "temp", true);
 
-        if (successMethodNumber != nullptr)
-        {
-            *successMethodNumber = GCM_CANNY_CHANNELS_SUCCESS;
-        }
-
         ScaleContour(resultContour, newImageSize, sourceImageSize);
         cropVerticesOrdering(resultContour);
         return true;
     }
 
-    LOG_MESSAGE("Canny (channels) fails");
+    //LOG_MESSAGE("Canny (channels) fails");
 
     //////////////////////////////////////////////////////////////////////////
 
@@ -621,7 +596,7 @@ bool GetDocumentContour(
     //////////////////////////////////////////////////////////////////////////
     //! Try dilate of results of local variances values binarization
 
-    LOG_MESSAGE("Local variances dilate starts");
+    //LOG_MESSAGE("Local variances dilate starts");
 
     resultVariances = resultVariancesBackup.clone();
 
@@ -634,21 +609,16 @@ bool GetDocumentContour(
         // we have detected borders
         //findContoursDrawResult(image_to_proc.clone(), result_variances.clone(), "temp", true);
 
-        if (successMethodNumber != nullptr)
-        {
-            *successMethodNumber = GCM_LOCAL_VARIANTS_DILATE_SUCCESS;
-        }
-
         ScaleContour(resultContour, newImageSize, sourceImageSize);
         cropVerticesOrdering(resultContour);
         return true;
     }
 
-    LOG_MESSAGE("Local variances dilate fails");
+    //LOG_MESSAGE("Local variances dilate fails");
 
     //////////////////////////////////////////////////////////////////////////
 
-    LOG_MESSAGE("Local variances and Canny combination (\"OR\") starts");
+    //LOG_MESSAGE("Local variances and Canny combination (\"OR\") starts");
 
     resultVariances = resultVariancesBackup.clone() | resultCanny;
 
@@ -658,23 +628,18 @@ bool GetDocumentContour(
     {
         // we have detected borders
 
-        if (successMethodNumber != nullptr)
-        {
-            *successMethodNumber = GCM_LOCAL_VARIANTS_OR_CANNY_SUCCESS;
-        }
-
         ScaleContour(resultContour, newImageSize, sourceImageSize);
         cropVerticesOrdering(resultContour);
         return true;
     }
 
-    LOG_MESSAGE("Local variances and Canny combination (\"OR\") fails");
+    //LOG_MESSAGE("Local variances and Canny combination (\"OR\") fails");
 
 
     //////////////////////////////////////////////////////////////////////////
     //! Try text lines detector
 
-    LOG_MESSAGE("Text lines detector starts");
+    //LOG_MESSAGE("Text lines detector starts");
 
     {
         cv::Mat tmp1(imageToProc.clone());
@@ -685,22 +650,17 @@ bool GetDocumentContour(
     {
         // we have detected borders
 
-        if (successMethodNumber != nullptr)
-        {
-            *successMethodNumber = GCM_TEXT_LINES_DETECTION_SUCCESS;
-        }
-
         ScaleContour(resultContour, newImageSize, sourceImageSize);
         cropVerticesOrdering(resultContour);
         return true;
     }
 
-    LOG_MESSAGE("Text lines detector fails");
+    //LOG_MESSAGE("Text lines detector fails");
 
     //////////////////////////////////////////////////////////////////////////
     //! Try features detector
 
-    LOG_MESSAGE("Feature detector starts");
+    //LOG_MESSAGE("Feature detector starts");
 
     {
         cv::Mat tmp1(imageToProc.clone());
@@ -711,17 +671,12 @@ bool GetDocumentContour(
     {
         // we have detected borders
 
-        if (successMethodNumber != nullptr)
-        {
-            *successMethodNumber = GCM_FEATURE_DETECTION_SUCCESS;
-        }
-
         ScaleContour(resultContour, newImageSize, sourceImageSize);
         cropVerticesOrdering(resultContour);
         return true;
     }
 
-    LOG_MESSAGE("Feature detector fails");
+    //LOG_MESSAGE("Feature detector fails");
 
     return false;
 }
@@ -729,7 +684,7 @@ bool GetDocumentContour(
 bool GetDocumentContour(
         cv::Mat& sourceImage,
         const double scaleX, const double scaleY,
-        vector<cv::Point2f>& resultContour,
+        std::vector<cv::Point2f>& resultContour,
         bool useSimpleOnly /*= false*/,
         int* successMethodNumber /*= NULL*/)
 {
@@ -746,7 +701,7 @@ bool GetDocumentContour(
 bool GetDocumentContour(
         cv::Mat& sourceImage,
         const int nProcessedImageSize,
-        vector<cv::Point2f>& resultContour,
+        std::vector<cv::Point2f>& resultContour,
         bool useSimpleOnly /*= false*/,
         int* successMethodNumber /*= NULL*/)
 {
@@ -760,40 +715,19 @@ bool GetDocumentContour(
     );
 }
 
-void warpCropAI(cv::Mat& sourceImg, cv::Mat& destImg, const vector<cv::Point2f>& points,
-                int borderMode /*= cv::BORDER_CONSTANT*/,
-                const cv::Scalar& borderValue /*= cv::Scalar()*/)
-{
-    if (sourceImg.empty())
-    {
-        throw std::invalid_argument("Image for warping is empty");
-    }
 
-    if (points.size() != 4)
-    {
-        throw std::invalid_argument("Size of array of base points for warping isn't equal 4");
-    }
-
-    int x0 = cvRound(points[0].x);
-    int y0 = cvRound(points[0].y);
-    int x1 = cvRound(points[1].x);
-    int y1 = cvRound(points[1].y);
-    int x2 = cvRound(points[2].x);
-    int y2 = cvRound(points[2].y);
-    int x3 = cvRound(points[3].x);
-    int y3 = cvRound(points[3].y);
-
-    warpCropAI(sourceImg, destImg, x0, y0, x1, y1, x2, y2, x3, y3, borderMode, borderValue);
-}
-
-void warpCropAI(cv::Mat& sourceImg,
-                cv::Mat& destImg,
+/*
+void warpCropAI(cv::Mat& sourceImg, cv::Mat& destImg,
                 int x0, int y0,
                 int x1, int y1,
                 int x2, int y2,
                 int x3, int y3,
-                int borderMode /*= cv::BORDER_CONSTANT*/,
-                const cv::Scalar& borderValue /*= cv::Scalar()*/)
+                int borderMode */
+/*= cv::BORDER_CONSTANT*//*
+,
+                const cv::Scalar& borderValue */
+/*= cv::Scalar()*//*
+)
 {
     if (sourceImg.empty())
     {
@@ -863,29 +797,7 @@ void warpCropAI(cv::Mat& sourceImg,
             cv::INTER_LINEAR,
             borderMode, borderValue);
 }
-
-bool ScannedDocumentImageAutoCrop(const tstring& sourceImageFile, const tstring& croppedImageFile)
-{
-    if (sourceImageFile.empty() || croppedImageFile.empty())
-    {
-        return false;
-    }
-
-    cv::Mat sourceImage = imread(TCharToUtf8(sourceImageFile));
-    cv::Mat croppedImage;
-
-    bool isImageCropped = ScannedDocumentImageAutoCrop(sourceImage, croppedImage);
-
-    if (!isImageCropped)
-    {
-        return false;
-    }
-
-    cv::imwrite(TCharToUtf8(croppedImageFile), croppedImage);
-
-    return isImageCropped;
-
-}
+*/
 
 bool ScannedDocumentImageAutoCrop(cv::Mat& sourceImage, cv::Mat& croppedImage)
 {
@@ -904,7 +816,8 @@ bool ScannedDocumentImageAutoCrop(cv::Mat& sourceImage, cv::Mat& croppedImage)
         default:
             if (sourceImage.empty())
             {
-                throw std::invalid_argument("ScannedDocumentImageAutoCrop: Invalid type of image for cropping (required 8 or 24 bits per pixel)");
+                throw std::invalid_argument(
+                        "ScannedDocumentImageAutoCrop: Invalid type of image for cropping (required 8 or 24 bits per pixel)");
             }
             break;
     }
@@ -914,7 +827,6 @@ bool ScannedDocumentImageAutoCrop(cv::Mat& sourceImage, cv::Mat& croppedImage)
     //! Try to detect border
     if (!GetDocumentContour(sourceImage, -1, -1, resultContour))
     {
-        cout << _TXT("Document border is not detected.") << endl;
         return false;
     }
 
@@ -924,13 +836,15 @@ bool ScannedDocumentImageAutoCrop(cv::Mat& sourceImage, cv::Mat& croppedImage)
         return false;
     }*/
 
+    std::vector<cv::Point> temp(resultContour.begin(), resultContour.end());
+
     //! Crop area
-    warpCropAI(sourceImage, croppedImage, resultContour);
+    warpCrop(sourceImage, croppedImage, temp);
 
     return true;
 }
 
-std::vector<cv::Point> prl::getContourAbbyy(const cv::Mat& src, size_t longSide /*= 256*/)
+std::vector<cv::Point> getContourAbbyy(const cv::Mat& src, size_t longSide /*= 256*/)
 {
     //TODO: https://habrahabr.ru/company/abbyy/blog/200448/
     //1) Resize with Gaussian smoothing to 256 at most
@@ -946,20 +860,21 @@ std::vector<cv::Point> prl::getContourAbbyy(const cv::Mat& src, size_t longSide 
     //2.2) Calculate histograms
     std::vector<cv::MatND> hist(channels.size());
     int c = 0;
-    for(size_t i = 0; i < channels.size(); ++i)
+    for (size_t i = 0; i < channels.size(); ++i)
     {
         //cv::calcHist(channels[i], 1, cv::Mat(), hist[i], 2, {32, 32},std::vector<float>({0.0f, 256.0f}));
-        cv::calcHist(channels[i], {0}, cv::Mat(), hist[i], std::vector<int>({32, 32}), std::vector<float>({0.0f, 256.0f}));
+        cv::calcHist(channels[i], {0}, cv::Mat(), hist[i], std::vector<int>({32, 32}),
+                     std::vector<float>({0.0f, 256.0f}));
     }
 
 
     //3) Do medianBlur
-    for(size_t i = 0; i < 3; ++i)
+    for (size_t i = 0; i < 3; ++i)
     {
         cv::medianBlur(imageToProc, imageToProc, 3);
     }
 
-    for(size_t i = 0; i < 3; ++i)
+    for (size_t i = 0; i < 3; ++i)
     {
         cv::medianBlur(imageToProc, imageToProc, 5);
     }
@@ -992,6 +907,7 @@ std::vector<cv::Point> prl::getContourAbbyy(const cv::Mat& src, size_t longSide 
             result = contoursApproxed[i];
         }
     }
-    result = orderPoints(result);
+    //result = orderPoints(result);
     return result;
+}
 }

@@ -207,4 +207,9 @@ void ExtractLayer(cv::Mat& sourceImage,
                   cv::Mat& destImage,
                   const cv::Scalar& defaultColor = CV_RGB(255, 255, 255));
 
+
+bool IsQuadrangularConvex(std::vector<cv::Point2f>& resultContour);
+
+
+bool cropVerticesOrdering(std::vector<cv::Point>& pt);
 #endif // ImageLibCommon_h__

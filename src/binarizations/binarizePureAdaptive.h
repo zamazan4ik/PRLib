@@ -6,7 +6,8 @@
 namespace prl
 {
 
-void binarizePureAdaptive(const cv::Mat& inputImage, cv::Mat& outputImage);
+void binarizePureAdaptive(const cv::Mat& inputImage, cv::Mat& outputImage,
+                          const double maxValue, const int blockSize, const int shift);
 
 }
 #endif // PRLIB_PureAdaptive_OpenCV_h

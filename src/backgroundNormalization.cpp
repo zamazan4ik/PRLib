@@ -1,50 +1,39 @@
-#include "BackgroundNormalizationFilter_Lepton.h"
-
-using namespace IPL::Filtration;
-
-#include "IPL_Exceptions/IPL_Exceptions.h"
+#include "backgroundNormalization.h"
 
 #include <opencv2/core/core.hpp>
 #include <opencv2/imgproc/imgproc.hpp>
 
-#include "LeptonTools.h"
+#include "formatConvert.h"
+
+#include <leptonica/allheaders.h>
+
+#include <stdexcept>
+#include <include/opencv/opencv2/imgcodecs.hpp>
 
 
-BackgroundNormalizationFilter_Lepton::BackgroundNormalizationFilter_Lepton(ProcessingProfile& profile) :
-	BackgroundNormalizationFilter(profile)
+void prl::backgroundNormalization(const cv::Mat& inputImage, cv::Mat& outputImage)
 {
-}
+    cv::Mat inputImageMat = inputImage;
 
+    if (inputImageMat.empty())
+    {
+        throw std::invalid_argument("Input image for flipping is empty");
+    }
 
-BackgroundNormalizationFilter_Lepton::~BackgroundNormalizationFilter_Lepton(void)
-{
-}
+    cv::Mat outputImageMat;
 
-void IPL::Filtration::BackgroundNormalizationFilter_Lepton::Modify(
-	const RasterImage& inputImage, RasterImage& outputImage)
-{
-	cv::Mat inputImageMat;
-	inputImage.ToMat(inputImageMat);
+    {
+        PIX* pixs = leptCreatePixFromMat(&inputImageMat);
 
-	if (inputImageMat.empty()) {
-		throw IPL::Exceptions::IPL_ProcessingException_InvalidParameter(
-			"Input image for flipping is empty");
-	}
+        /* Normalize for varying background */
+        PIX* pixn = pixBackgroundNormSimple(pixs, nullptr, nullptr);
 
-	cv::Mat outputImageMat;
+        pixDestroy(&pixs);
 
-	{
-		PIX* pixs = leptCreatePixFromMat(&inputImageMat);
-		
-		/* Normalize for varying background */
-		PIX* pixn = pixBackgroundNormSimple(pixs, nullptr, nullptr);
+        outputImageMat = leptCreateMatFromPix(pixn);
 
-		pixDestroy(&pixs);
+        pixDestroy(&pixn);
+    }
 
-		outputImageMat = leptCreateMatFromPix(pixn);
-
-		pixDestroy(&pixn);
-	}
-
-	outputImage.FromMat(outputImageMat);
+    outputImage = outputImageMat;
 }

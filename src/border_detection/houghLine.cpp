@@ -1,4 +1,4 @@
-#include "HoughLine.h"
+#include "houghLine.h"
 
 #include "opencv2/highgui/highgui.hpp"
 #include "opencv2/imgproc/imgproc.hpp"
@@ -206,53 +206,19 @@ std::vector<cv::Point2f> findMaxValidContour(const std::vector<cv::Vec2f>& lines
     return resultVec;
 }
 
-bool findHoughLineContour(cv::Mat& inputImage,
-                          const double scaleX, const double scaleY,
-                          const int nProcessedImageSize,
-                          std::vector<cv::Point2f>& resultContour)
+bool prl::findHoughLineContour(cv::Mat& inputImage,
+                          std::vector<cv::Point>& resultContour)
 {
     if (inputImage.empty())
     {
         throw std::invalid_argument("Input image is empty");
     }
 
-    cv::Mat imageToProc;
+    cv::Mat imageToProc = inputImage.clone();
 
-    //! Store source image size
-    cv::Size inputImageSize(inputImage.size());
-
-    cv::Size newImageSize;
-
-    if (scaleX > 0 && scaleY > 0)
-    {
-        newImageSize = cv::Size(
-                static_cast<int>(inputImage.cols * scaleX),
-                static_cast<int>(inputImage.rows * scaleY)
-        );
-
-        cv::resize(inputImage, imageToProc, newImageSize, 0, 0, cv::INTER_AREA);
-    }
-    else
-    {
-        int scaleFactorX = 1;
-        int scaleFactorY = 1;
-
-        int longSide = std::max(inputImage.cols, inputImage.rows);
-
-        imageToProc = inputImage.clone();
-
-        while (longSide > nProcessedImageSize)
-        {
-            cv::pyrDown(imageToProc, imageToProc);
-
-            longSide = std::max(imageToProc.cols, imageToProc.rows);
-            scaleFactorX *= 2;
-            scaleFactorY *= 2;
-        }
-
-        newImageSize = cv::Size(inputImage.cols / scaleFactorX, inputImage.rows / scaleFactorY);
-    }
-    // TODO: 1) Median blur 6 times with  kernel sizes 3 and 5 - done
+    // TODO:-1) Resize image for faster border detection
+    //       0) Find most informative channel
+    //       1) Median blur 6 times with  kernel sizes 3 and 5 - done
     //       2) Use binarization (LocalOtsu) - done
     //       3) Canny - done
     //       4) Dilate - done
@@ -271,22 +237,28 @@ bool findHoughLineContour(cv::Mat& inputImage,
         cv::medianBlur(imageToProc, imageToProc, 5);
     }
 
+    cv::imwrite("after_blur.jpg", imageToProc);
+
     // Binarization
-    cv::Mat binarizedImage;
-    prl::binarizeLocalOtsu(imageToProc, binarizedImage);
+    //cv::Mat binarizedImage;
+    //prl::binarizeLocalOtsu(imageToProc, binarizedImage);
 
     // Canny
-    cv::Mat resultCanny = binarizedImage;
+    cv::Mat resultCanny;
     double upper = 50;
     double lower = 25;
     cv::Canny(imageToProc, resultCanny, lower, upper);
 
+    cv::imwrite("after_canny.jpg", resultCanny);
+
     // Dilate
-    cv::dilate(resultCanny, resultCanny, cv::Mat(), cv::Point(-1, -1), 3);
+    //cv::dilate(resultCanny, resultCanny, cv::Mat(), cv::Point(-1, -1), 2);
+
+    cv::imwrite("after_dilate.jpg", resultCanny);
 
     std::vector<cv::Vec2f> lines;
     const int thresholdHough = 50;
-    cv::HoughLines(resultCanny, lines, 1, CV_PI / 180, thresholdHough, 0, 0);
+    cv::HoughLines(resultCanny, lines, 1, CV_PI / 180.0, thresholdHough, 0, 0);
 
     //Can't create quadrilateral with less than 4 lines
     if (lines.size() < 4)
@@ -305,65 +277,8 @@ bool findHoughLineContour(cv::Mat& inputImage,
         return false;
     }
 
-    resultContour = resultVec;
-
-    float xScale = static_cast<float>(inputImageSize.width) /
-                   static_cast<float>(newImageSize.width);
-    float yScale = static_cast<float>(inputImageSize.height) /
-                   static_cast<float>(newImageSize.height);
-
-    for (auto& contour : resultContour)
-    {
-        contour.x *= xScale;
-        contour.y *= yScale;
-    }
+    resultContour = std::vector<cv::Point>(resultVec.begin(), resultVec.end());
 
     return true;
 }
 
-
-bool prl::houghLineContourDetector(
-        cv::Mat* inputImage,
-        const double scaleX, const double scaleY,
-        const int nProcessedImageSize,
-        int* points)
-{
-    if (inputImage == nullptr)
-    {
-        throw std::invalid_argument("Input image pointer equals NULL");
-    }
-
-    if (inputImage->empty())
-    {
-        throw std::invalid_argument("Input image is empty");
-    }
-
-    if (points == nullptr)
-    {
-        throw std::invalid_argument("Output array should be allocated");
-    }
-
-    std::vector<cv::Point2f> resultContour;
-
-    bool resultCode = findHoughLineContour(
-            *inputImage,
-            scaleX, scaleY,
-            nProcessedImageSize,
-            resultContour);
-
-    if (!resultCode || resultContour.empty() || resultContour.size() != 4)
-    {
-        return false;
-    }
-
-    //////////////////////////////////////////////////////////////////////////
-
-    size_t pointNumber = 0;
-    for (const auto& point : resultContour)
-    {
-        points[pointNumber++] = static_cast<int>(point.x);
-        points[pointNumber++] = static_cast<int>(point.y);
-    }
-
-    return true;
-}

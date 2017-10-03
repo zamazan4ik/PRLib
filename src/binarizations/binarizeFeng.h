@@ -21,12 +21,12 @@ namespace prl
 */
 void binarizeFeng(
 		cv::Mat& imageCopy, cv::Mat& imageFeng,
-		int windowSize,
-		double thresholdCoefficient_alpha1,
-		double thresholdCoefficient_k1,
-		double thresholdCoefficient_k2,
-		double thresholdCoefficient_gamma,
-		int morphIterationCount);
+		int windowSize = 21,
+		double thresholdCoefficient_alpha1 = 0.75,
+		double thresholdCoefficient_k1 = 0.2,
+		double thresholdCoefficient_k2 = 0.03,
+		double thresholdCoefficient_gamma = 2.0,
+		int morphIterationCount = 2);
 
 }
 #endif // PRLIB_FengBinarizerImpl_h

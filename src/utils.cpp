@@ -1,6 +1,7 @@
 //
 // Created by zamazan4ik on 23.09.17.
 //
+#include "utils.h"
 
 #include <cmath>
 #include <stdexcept>

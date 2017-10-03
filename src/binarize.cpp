@@ -24,8 +24,6 @@
 
 #include "binarize.h"
 
-#include "src/binarizations/SauvolaBinarization.h"
-
 #include "opencv2/imgproc.hpp"
 #include "opencv2/ximgproc.hpp"
 
@@ -44,12 +42,6 @@ void prl::binarize(const cv::Mat& src, cv::Mat& dst,
             //TODO: rewrite constants in Niblack binarization
             cv::ximgproc::niBlackThreshold(src, dst, 255, cv::THRESH_BINARY, 2 * (11) + 1, ((8.0) - 10.0) / 10.0);
             break;
-        case BinarizationMethod::Sauvola:
-        {
-            cv::Mat temp = src.clone();
-            prl::sauvolaBinarization(temp, dst);
-            break;
-        }
         default:
             //TODO: Maybe later we should add more binarization algorithms
             throw std::runtime_error("Binarization algorithm not implemented yet!");

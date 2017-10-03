@@ -6,8 +6,10 @@
 
 #include "utils.h"
 
+namespace prl
+{
 template<typename T, size_t count>
-void prl::applyGammaCorrection(cv::Mat& outputImageMat, const std::vector<unsigned char>& lut)
+void applyGammaCorrection(cv::Mat& outputImageMat, const std::vector<unsigned char>& lut)
 {
 	typedef cv::Vec<T, count> cvVec;
 
@@ -21,28 +23,29 @@ void prl::applyGammaCorrection(cv::Mat& outputImageMat, const std::vector<unsign
 }
 
 
-void prl::gammaCorrection(const cv::Mat& inputImage, cv::Mat& outputImage)
+void gammaCorrection(const cv::Mat& inputImage, cv::Mat& outputImage,
+					 const double k, const double gamma)
 {
-    cv::Mat inputImageMat = inputImage.clone();
+	cv::Mat inputImageMat = inputImage.clone();
 
-    if (inputImageMat.empty())
+	if (inputImageMat.empty())
 	{
-        throw std::invalid_argument(
-            "Invalid parameter for GammaCorrectionFilter_OpenCV");
-    }
+		throw std::invalid_argument(
+				"Invalid parameter for GammaCorrectionFilter_OpenCV");
+	}
 
-    cv::Mat outputImageMat;
+	cv::Mat outputImageMat;
 
 	std::vector<unsigned char> lut(256);
 	for (size_t i = 0; i < lut.size(); ++i)
 	{
-		lut[i] = cv::saturate_cast<uchar>(pow((double)(i / 255.0), m_Gamma) * 255.0);
+		lut[i] = cv::saturate_cast<uchar>(std::pow((double) (i / 255.0), gamma) * 255.0);
 	}
 	outputImageMat = inputImageMat.clone();
 	const int channels = outputImageMat.channels();
 
 	//Converting to 3 channels
-	if(channels == 4)
+	if (channels == 4)
 	{
 		cv::cvtColor(inputImageMat, outputImageMat, CV_BGRA2BGR);
 	}
@@ -50,17 +53,17 @@ void prl::gammaCorrection(const cv::Mat& inputImage, cv::Mat& outputImage)
 	//Applying gamma correction
 	switch (channels)
 	{
-	case 1:
+		case 1:
 		{
 			applyGammaCorrection<uchar, 1>(outputImageMat, lut);
 			break;
 		}
-	case 2:
+		case 2:
 		{
 			applyGammaCorrection<uchar, 2>(outputImageMat, lut);
 			break;
 		}
-	case 3:
+		case 3:
 		{
 			applyGammaCorrection<uchar, 3>(outputImageMat, lut);
 			break;
@@ -68,10 +71,11 @@ void prl::gammaCorrection(const cv::Mat& inputImage, cv::Mat& outputImage)
 	}
 
 	//Step two: we multiply on some coefficient, if it doesn't equal to 1.0
-	if(!eq_d(m_k, 1.0, 1e-9))
+	if (!eq_d(k, 1.0, 1e-9))
 	{
-		outputImageMat *= m_k;
+		outputImageMat *= k;
 	}
 
-    outputImage = outputImageMat.clone();
+	outputImage = outputImageMat.clone();
+}
 }

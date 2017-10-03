@@ -1,26 +1,13 @@
-#ifndef BaseDeblurFilter_OpenCV_h__
-#define BaseDeblurFilter_OpenCV_h__
+#ifndef PRLIB_basicDeblur_h
+#define PRLIB_basicDeblur_h
 
-#include "BaseDeblurFilter.h"
+#include <opencv2/core/core.hpp>
 
-namespace IPL
+namespace prl
 {
-	namespace Filtration
-	{
+	void basicDeblur(const cv::Mat& inputImage, cv::Mat& outputImage,
+					 size_t gaussianKernelSize = 0, double sigmaX = 9.0, double sigmaY = 0.0,
+					 double imageWeight = 0.75);
+}
 
-		class BaseDeblurFilter_OpenCV :
-			public BaseDeblurFilter
-		{
-		public:
-			BaseDeblurFilter_OpenCV(ProcessingProfile& profile);
-			virtual ~BaseDeblurFilter_OpenCV(void);
-
-		protected:
-			//! Implementation of deblur filtration procedure.
-			virtual void Deblur(const RasterImage& inputImage, RasterImage& outputImage);
-		};
-
-	} // namespace Filtration
-} // namespace IPL
-
-#endif // BaseDeblurFilter_OpenCV_h__
+#endif // PRLIB_basicDeblur_h

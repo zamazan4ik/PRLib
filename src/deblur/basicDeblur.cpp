@@ -1,58 +1,46 @@
-#include "BaseDeblurFilter_OpenCV.h"
-
-using namespace IPL::Filtration;
-
-#include "IPL_Exceptions/IPL_Exceptions.h"
+#include "basicDeblur.h"
 
 #include <opencv2/core/core.hpp>
 #include <opencv2/imgproc/imgproc.hpp>
 
 #include <vector>
+#include <stdexcept>
 
-BaseDeblurFilter_OpenCV::BaseDeblurFilter_OpenCV(ProcessingProfile& profile) :
-	BaseDeblurFilter(profile)
+void prl::basicDeblur(const cv::Mat& inputImage, cv::Mat& outputImage,
+                      size_t gaussianKernelSize, double sigmaX, double sigmaY,
+                      double imageWeight)
 {
-}
+    cv::Mat inputImageMat = inputImage;
 
+    if (inputImageMat.empty())
+    {
+        throw std::invalid_argument("Input image for deblurring is empty");
+    }
 
-BaseDeblurFilter_OpenCV::~BaseDeblurFilter_OpenCV(void)
-{
-}
+    cv::Mat outputImageMat;
 
-void IPL::Filtration::BaseDeblurFilter_OpenCV::Deblur(
-	const RasterImage& inputImage, RasterImage& outputImage)
-{
-	cv::Mat inputImageMat;
-	inputImage.ToMat(inputImageMat);
+    std::vector<cv::Mat> channels;
+    cv::split(inputImageMat, channels);
 
-	if (inputImageMat.empty()) {
-		throw IPL::Exceptions::IPL_ProcessingException_InvalidParameter(
-			"Input image for deblurring is empty");
-	}
+    for (cv::Mat& channel : channels)
+    {
+        cv::Mat channelfloat;
+        channel.convertTo(channelfloat, CV_32F);
+        cv::GaussianBlur(
+                channelfloat, channel,
+                cv::Size(gaussianKernelSize, gaussianKernelSize),
+                sigmaX, sigmaY);
+        cv::addWeighted(
+                channelfloat, 2.0 * imageWeight,
+                channel, 2.0 * imageWeight - 2.0,
+                0.0,
+                channel);
 
-	cv::Mat outputImageMat;
+        // convert back to 8bits gray scale
+        channel.convertTo(channel, CV_8U);
+    }
 
-	std::vector<cv::Mat> channels;
-	cv::split(inputImageMat, channels);
+    cv::merge(channels, outputImageMat);
 
-	for (cv::Mat& channel : channels) {
-		cv::Mat channelfloat;
-		channel.convertTo(channelfloat, CV_32F);
-		cv::GaussianBlur(
-			channelfloat, channel, 
-			cv::Size(this->m_GaussianKernelSize, this->m_GaussianKernelSize), 
-			this->m_SigmaX, this->m_SigmaY);
-		cv::addWeighted(
-			channelfloat, 2.0 * this->m_SourceImageWeight, 
-			channel, 2.0 * this->m_SourceImageWeight - 2.0, 
-			0.0, 
-			channel);
-
-		// convert back to 8bits gray scale
-		channel.convertTo(channel, CV_8U);
-	}
-
-	cv::merge(channels, outputImageMat);
-
-	outputImage.FromMat(outputImageMat);
+    outputImage = outputImageMat;
 }

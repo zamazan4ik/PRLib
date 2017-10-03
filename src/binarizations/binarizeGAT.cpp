@@ -5,7 +5,9 @@
 
 #include <stdexcept>
 
-void prl::binarizeGAT(const cv::Mat& inputImage, cv::Mat& outputImage)
+void prl::binarizeGAT(const cv::Mat& inputImage, cv::Mat& outputImage, const int gaussianKernelSize,
+                      const double sigmaX, const double sigmaY,
+                      const double maxValue, const int blockSize, const int shift)
 {
     cv::Mat inputImageMat = inputImage.clone();
 
@@ -23,8 +25,8 @@ void prl::binarizeGAT(const cv::Mat& inputImage, cv::Mat& outputImage)
     cv::Mat tempOutputImageMat;
 
     cv::GaussianBlur(inputImageMat, tempOutputImageMat,
-                     cv::Size(this->m_KernelSize, this->m_KernelSize),
-                     this->m_SigmaX, this->m_SigmaY);
+                     cv::Size(gaussianKernelSize, gaussianKernelSize),
+                     sigmaX, sigmaY);
 
     if (inputImageMat.channels() != 1)
     {
@@ -33,9 +35,9 @@ void prl::binarizeGAT(const cv::Mat& inputImage, cv::Mat& outputImage)
 
     cv::adaptiveThreshold(
             outputImageMat, outputImageMat,
-            this->m_MaxValue,
+            maxValue,
             cv::ADAPTIVE_THRESH_MEAN_C, cv::THRESH_BINARY,
-            this->m_BlockSize, this->m_Shift);
+            blockSize, shift);
 
     outputImage = outputImageMat.clone();
 }

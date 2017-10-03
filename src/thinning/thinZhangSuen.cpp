@@ -89,8 +89,8 @@ void prl::thinZhangSuen(cv::Mat& inputImage, cv::Mat& outputImage)
 
     do
     {
-        thinningZhangSuenIteration(imageUnderProcess, 0);
-        thinningZhangSuenIteration(imageUnderProcess, 1);
+        thinZhangSuenIteration(imageUnderProcess, 0);
+        thinZhangSuenIteration(imageUnderProcess, 1);
 
         cv::absdiff(imageUnderProcess, prev, diff);
         imageUnderProcess.copyTo(prev);

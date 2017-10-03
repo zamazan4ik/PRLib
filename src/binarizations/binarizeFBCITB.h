@@ -15,11 +15,11 @@ namespace prl
 enum class OPERATIONS
 {
     // for contours detection
-            USE_CANNY = 1,    //!< Use Canny edge detector.
+    USE_CANNY = 1,    //!< Use Canny edge detector.
     USE_VARIANCES = 2,    //!< Use local variance values map.
 
     // Additional operation
-            USE_CANNY_ON_VARIANCES = 32,   //!< Apply Canny edge detector to local variance values map.
+    USE_CANNY_ON_VARIANCES = 32,   //!< Apply Canny edge detector to local variance values map.
     USE_OTHER_COLOR_SPACE = 64,   //!< Change processed image color space.
     USE_CLAHE = 128,  //!< Use contrast enhancement.
     USE_BILATERAL = 256,  //!< Use bilateral filtration.
@@ -62,8 +62,21 @@ typedef std::map<int, double> FBCITB_ParamsMap;
  */
 void binarizeFBCITB(
         cv::Mat& inputImage, cv::Mat& outputImage,
-        long operations = USE_CANNY,
-        const FBCITB_ParamsMap& paramsMap = FBCITB_ParamsMap());
+        bool useCanny = true, bool useVariancesMap = true,
+        bool useCLAHE = true, bool useBilateral = true,
+        bool useOtherColorspace = false,
+        bool useMorphology = true,
+        bool useCannyOnVariances = true,
+        double varianceMapThreshold = 200.0,
+        double CLAHEClipLimit = 2.0,
+        double gaussianBlurKernelSize = 9.0,
+        double cannyUpperThresholdCoeff = 0.6,
+        double cannyLowerThresholdCoeff = 0.4,
+        double boundingRectangleMaxArea = 0.3,
+        int bilateralKernelSize = 5,
+        double bilateralKernelIntensitySigma = 150.0,
+        double bilateralKernelSpatialSigma = 150.0,
+        double boundingRectMaxAreaCoeff = 0.3);
 
 }
 #endif // PRLIB_FBCITB_Binarizator_h

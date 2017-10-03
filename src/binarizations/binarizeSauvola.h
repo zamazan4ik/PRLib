@@ -18,8 +18,8 @@ namespace prl
 */
 void binarizeSauvola(
 		cv::Mat& imageCopy, cv::Mat& imageSauvola,
-		int windowSize,
-		double thresholdCoefficient,
-		int morphIterationCount);
+		int windowSize = 101,
+		double thresholdCoefficient = 0.01,
+		int morphIterationCount = 2);
 }
 #endif // PRLIB_binarizeSauvola_h

@@ -1,24 +1,28 @@
+#include "balanceColor.h"
+
 #include <stdexcept>
 
 #include <opencv2/core/core.hpp>
 #include <opencv2/imgproc/imgproc.hpp>
 
+#include "utils.h"
 
-void prl::colorBalance(const cv::Mat& inputImage, cv::Mat& outputImage)
+void prl::colorBalance(const cv::Mat& inputImage, cv::Mat& outputImage,
+                  double colorBalanceGamma, double saturationGamma)
 {
-    if (inputImage.IsEmpty())
+    if (inputImage.empty())
     {
         throw std::invalid_argument("ColorBalance: Input image for filtration is empty");
     }
 
-    if (inputImage.ChannelsCount() != 3 && inputImage.ChannelsCount() != 4)
+    if (inputImage.channels() != 3 && inputImage.channels() != 4)
     {
         throw std::invalid_argument("ColorBalance: image should be colored");
     }
 
     cv::Mat imageCopy = inputImage.clone();
 
-    if (inputImage.ChannelsCount() == 4)
+    if (inputImage.channels() == 4)
     {
         cv::cvtColor(imageCopy, imageCopy, CV_BGRA2BGR);
     }
@@ -29,8 +33,8 @@ void prl::colorBalance(const cv::Mat& inputImage, cv::Mat& outputImage)
     srcChans[0].convertTo(srcChans[0], CV_32FC1, 1.0 / 255.0);
     srcChans[2].convertTo(srcChans[2], CV_32FC1, 1.0 / 255.0);
 
-    cv::pow(srcChans[0], 1.0 / this->m_ColorBalanceGamma, srcChans[0]);
-    cv::pow(srcChans[2], 1.0 * this->m_ColorBalanceGamma, srcChans[2]);
+    cv::pow(srcChans[0], 1.0 / colorBalanceGamma, srcChans[0]);
+    cv::pow(srcChans[2], 1.0 * colorBalanceGamma, srcChans[2]);
 
     srcChans[0].convertTo(srcChans[0], CV_8UC1, 255.0);
     srcChans[2].convertTo(srcChans[2], CV_8UC1, 255.0);
@@ -39,7 +43,7 @@ void prl::colorBalance(const cv::Mat& inputImage, cv::Mat& outputImage)
 
     cv::merge(srcChans, convertedTmp);
 
-    if (this->m_SaturationGamma != 1.0)
+    if (!eq_d(saturationGamma, 1.0))
     {
         cv::Mat hsvImg;
 
@@ -49,7 +53,7 @@ void prl::colorBalance(const cv::Mat& inputImage, cv::Mat& outputImage)
 
         srcChans[1].convertTo(srcChans[1], CV_32FC1, 1.0 / 255.0);
 
-        cv::pow(srcChans[1], 1.0 * this->m_SaturationGamma, srcChans[1]);
+        cv::pow(srcChans[1], 1.0 * saturationGamma, srcChans[1]);
 
         srcChans[1].convertTo(srcChans[1], CV_8UC1, 255.0);
 

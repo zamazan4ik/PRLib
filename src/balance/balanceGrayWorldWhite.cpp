@@ -1,10 +1,15 @@
+#include "balanceGrayWorldWhite.h"
+
 #include <stdexcept>
+#include <cmath>
 
 #include <opencv2/core/core.hpp>
 #include <opencv2/imgproc/imgproc.hpp>
 
+namespace prl
+{
 
-void prl::getAverageValues(const cv::Mat& src, double* ml, double* ma, double* mb, const double p)
+void getAverageValues(const cv::Mat& src, double* ml, double* ma, double* mb, const double p)
 {
     for (int i = 0; i < src.rows; ++i)
     {
@@ -27,18 +32,19 @@ void prl::getAverageValues(const cv::Mat& src, double* ml, double* ma, double* m
 }
 
 
-void prl::grayWorldWhiteBalance(const cv::Mat& inputImage, cv::Mat& outputImage)
+void grayWorldWhiteBalance(const cv::Mat& inputImage, cv::Mat& outputImage,
+                           const double pNorm, const bool withMax)
 {
     cv::Mat inputImageMat = inputImage.clone();
 
     if (inputImageMat.empty())
     {
-        throw std::invalid_argument("GrayWorldWhiteBalance exception: input image is empty");
+        throw std::invalid_argument("GrayWorldWhiteBalance: input image is empty");
     }
 
     if (inputImageMat.channels() != 3)
     {
-        throw std::invalid_argument("GrayWorldWhiteBalance exception: input image hasn't 3 channels");
+        throw std::invalid_argument("GrayWorldWhiteBalance: input image hasn't 3 channels");
     }
 
     cv::Mat outputImageMat;
@@ -46,11 +52,11 @@ void prl::grayWorldWhiteBalance(const cv::Mat& inputImage, cv::Mat& outputImage)
 
     double ma = 0.0, mb = 0.0, ml = 0.0;
 
-    getAverageValues(inputImageMat, &ml, &ma, &mb, m_pNorm);
+    getAverageValues(inputImageMat, &ml, &ma, &mb, pNorm);
 
     double r = (ma + mb + ml) / 3.0;
 
-    if (m_withMax)
+    if (withMax)
     {
         r = std::max(ma, std::max(mb, ml));
     }
@@ -60,7 +66,8 @@ void prl::grayWorldWhiteBalance(const cv::Mat& inputImage, cv::Mat& outputImage)
     double r_div_mb = r / mb;
 
     auto itout = outputImageMat.begin<cv::Vec3b>();
-    for (auto it = inputImageMat.begin<cv::Vec3b>(), itend = inputImageMat.end<cv::Vec3b>(); it != itend; ++it, ++itout)
+    for (auto it = inputImageMat.begin<cv::Vec3b>(), itend = inputImageMat.end<cv::Vec3b>();
+         it != itend; ++it, ++itout)
     {
         cv::Vec3b v1 = *it;
 
@@ -93,4 +100,5 @@ void prl::grayWorldWhiteBalance(const cv::Mat& inputImage, cv::Mat& outputImage)
     }
 
     outputImage = outputImageMat.clone();
+}
 }

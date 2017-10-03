@@ -3,14 +3,13 @@
 
 #include "opencv2/core/core.hpp"
 
+#include <vector>
+
 namespace prl
 {
 
-bool houghLineContourDetector(
-        cv::Mat* inputImage,
-        const double scaleX, const double scaleY,
-        const int nProcessedImageSize,
-        int* points);
+bool findHoughLineContour(cv::Mat& inputImage,
+                           std::vector<cv::Point>& resultContour);
 
 }
 #endif // PRLIB_HoughLine_h__

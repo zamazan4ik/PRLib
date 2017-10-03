@@ -5,7 +5,8 @@
 
 #include <stdexcept>
 
-void prl::binarizePureAdaptive(const cv::Mat& inputImage, cv::Mat& outputImage)
+void prl::binarizePureAdaptive(const cv::Mat& inputImage, cv::Mat& outputImage,
+                               const double maxValue, const int blockSize, const int shift)
 {
     cv::Mat inputImageMat = inputImage.clone();
 
@@ -28,9 +29,9 @@ void prl::binarizePureAdaptive(const cv::Mat& inputImage, cv::Mat& outputImage)
 
     cv::adaptiveThreshold(
             outputImageMat, outputImageMat,
-            this->m_MaxValue,
+            maxValue,
             cv::ADAPTIVE_THRESH_MEAN_C, cv::THRESH_BINARY,
-            this->m_BlockSize, this->m_Shift);
+            blockSize, shift);
 
     outputImage = outputImageMat;
 }

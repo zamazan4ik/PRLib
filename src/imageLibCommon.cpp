@@ -113,8 +113,8 @@ void EqualizeLayerHists(cv::Mat& inputImage, cv::Mat& outputImage)
 
 //! This function searches local minimal and maximal values in histogram
 void GetHistExtremums(cv::Mat& hist,
-                      vector<int>& histLocalMinPositions,
-                      vector<int>& histLocalMaxPositions,
+                      std::vector<int>& histLocalMinPositions,
+                      std::vector<int>& histLocalMaxPositions,
                       float delta)
 {
     if (hist.empty())
@@ -145,8 +145,8 @@ void GetHistExtremums(cv::Mat& hist,
         }
     }
 
-    float minValue = numeric_limits<float>::infinity();
-    float maxValue = -numeric_limits<float>::infinity();
+    float minValue = std::numeric_limits<float>::infinity();
+    float maxValue = -std::numeric_limits<float>::infinity();
     //int minValuePos = 0;
     //int maxValuePos = 0;
 
@@ -189,7 +189,7 @@ void GetHistExtremums(cv::Mat& hist,
 }
 
 //! Get histograms for each channel of color image
-void GetColorLayersHists(cv::Mat& inputImage, vector<cv::Mat>& histsArray, int histSize)
+void GetColorLayersHists(cv::Mat& inputImage, std::vector<cv::Mat>& histsArray, int histSize)
 {
     if (inputImage.empty())
     {
@@ -321,8 +321,8 @@ void EnhanceLocalContrastByCLAHE_1(cv::Mat& src, cv::Mat& dst, double CLAHEClipL
 }
 
 //! Adaptive histogram enhancing for multiple channel image.
-void EnhanceLocalContrastByCLAHE_MCh(cv::Mat& src, cv::Mat& dst, double CLAHEClipLimit,
-                                     bool equalizeHistFlag)
+void EnhanceLocalContrastByCLAHE_MCh(cv::Mat& src, cv::Mat& dst, const double CLAHEClipLimit,
+                                     const bool equalizeHistFlag)
 {
     if (src.empty())
     {
@@ -440,7 +440,7 @@ void Mat2LocalVarianceMap(const cv::Mat& image, cv::Mat& varianceMap, const int 
     varianceMap += imageToProc;
 }
 
-bool IsContourClosed(vector<cv::Point>& contour, int maxDistance)
+bool IsContourClosed(std::vector<cv::Point>& contour, int maxDistance)
 {
     if (contour.empty())
     {
@@ -455,12 +455,12 @@ bool IsContourClosed(vector<cv::Point>& contour, int maxDistance)
     );
 }
 
-bool IsContourUnclosed(vector<cv::Point>& contour, int maxDistance)
+bool IsContourUnclosed(std::vector<cv::Point>& contour, int maxDistance)
 {
     return !IsContourClosed(contour, maxDistance);
 }
 
-int ContourChildrenCount(int contourNo, vector<cv::Vec4i>& hierarchy, bool includeSubchildren)
+int ContourChildrenCount(int contourNo, std::vector<cv::Vec4i>& hierarchy, bool includeSubchildren)
 {
     if (hierarchy.empty())
     {
@@ -502,7 +502,7 @@ int ContourChildrenCount(int contourNo, vector<cv::Vec4i>& hierarchy, bool inclu
     return childrenCount;
 }
 
-bool IsContourCorrect(vector<cv::Point>& contour, cv::Mat& image, size_t contourMinSize,
+bool IsContourCorrect(std::vector<cv::Point>& contour, cv::Mat& image, size_t contourMinSize,
                       float contourAreaCoeff,
                       float aspectRatioRangeMin, float aspectRatioRangeMax)
 {
@@ -537,7 +537,7 @@ bool IsContourCorrect(vector<cv::Point>& contour, cv::Mat& image, size_t contour
     return true;
 }
 
-bool IsContourUncorrect(vector<cv::Point>& contour, cv::Mat& image, size_t contourMinSize,
+bool IsContourUncorrect(std::vector<cv::Point>& contour, cv::Mat& image, size_t contourMinSize,
                         float contourAreaCoeff, float aspectRatioRangeMin,
                         float aspectRatioRangeMax)
 {
@@ -581,13 +581,13 @@ void RemoveCloseSizeChildren(
         double area1 = cv::contourArea(contours[i], true);
         double area2 = cv::contourArea(contours[childNo], true);
 
-        double areaDiff = abs(abs(area1) - abs(area2));
+        double areaDiff = std::abs(std::abs(area1) - std::abs(area2));
 
         bool isContour1ClockWised = area1 > 0;
         bool isContour2ClockWised = area2 > 0;
 
         bool haveCountoursDiffentClockWising = !(isContour1ClockWised && isContour2ClockWised);
-        bool isAreasDiffSmall = (areaDiff <= abs(area1 * 0.2));
+        bool isAreasDiffSmall = (areaDiff <= std::abs(area1 * 0.2));
 
         if (isAreasDiffSmall && haveCountoursDiffentClockWising)
         {
@@ -607,18 +607,18 @@ void RemoveCloseSizeChildren(
     }
 }
 
-bool IsContourClockwised(vector<cv::Point>& contour)
+bool IsContourClockwised(std::vector<cv::Point>& contour)
 {
     return (cv::contourArea(contour, true) > 0);
 }
 
 void CheckHierarhyLevelRecursively(
         int currentContourNumber,
-        std::vector<vector<cv::Point> >& contours,
+        std::vector<std::vector<cv::Point> >& contours,
         std::vector<int>& approvingList,
         std::vector<cv::Vec4i>& hierarchy);
 
-void RemoveChildrenContours(vector<vector<cv::Point> >& contours, vector<cv::Vec4i>& hierarchy)
+void RemoveChildrenContours(std::vector<std::vector<cv::Point> >& contours, std::vector<cv::Vec4i>& hierarchy)
 {
     if (contours.empty())
     {
@@ -658,7 +658,7 @@ void RemoveChildrenContours(vector<vector<cv::Point> >& contours, vector<cv::Vec
     //hierarchy.clear();
 }
 
-int ContourSubChildrenCount(int contourNo, vector<cv::Vec4i>& hierarchy)
+int ContourSubChildrenCount(int contourNo, std::vector<cv::Vec4i>& hierarchy)
 {
     if (hierarchy.empty())
     {
@@ -694,7 +694,7 @@ int ContourSubChildrenCount(int contourNo, vector<cv::Vec4i>& hierarchy)
 
 void CheckHierarhyLevelRecursively(
         int currentContourNumber,
-        std::vector<vector<cv::Point> >& contours,
+        std::vector<std::vector<cv::Point> >& contours,
         std::vector<int>& approvingList,
         std::vector<cv::Vec4i>& hierarchy)
 {
@@ -796,4 +796,85 @@ void ScaleToRange(
     double beta = -minValue * alpha + rangeMin;
 
     src.convertTo(dst, dstType, alpha, beta);
+}
+
+bool IsQuadrangularConvex(std::vector<cv::Point2f>& resultContour)
+{
+    if (resultContour.empty())
+    {
+        return false;
+    }
+
+    //! Find convex hull of points
+    std::vector<cv::Point2f> convexHullPoints;
+    cv::convexHull(cv::Mat(resultContour), convexHullPoints, false);
+
+    return (convexHullPoints.size() == 4);
+}
+
+/*!
+ * \brief Contour points ordering.
+ * \param[inout] pt Contour.
+ * \return true if ordering is successful.
+ */
+bool cropVerticesOrdering(std::vector<cv::Point>& pt)
+{
+    if (pt.empty())
+    {
+        throw std::invalid_argument("Contour for ordering is empty");
+    }
+
+    //! This should be 4 for rectangles, but it allows to be extended to more complex cases
+    int verticesNumber = static_cast<int>(pt.size());
+    if (verticesNumber != 4)
+    {
+        throw std::invalid_argument("Points number in input contour isn't equal 4");
+    }
+
+    //! Find convex hull of points
+    std::vector<cv::Point> points;
+    points = pt;
+
+    // indices of convex vertices
+    std::vector<int> indices;
+    cv::convexHull(points, indices, false);
+
+    //! Find top left point, as starting point. This is the nearest to (0.0) point
+    int minDistanceIdx = 0;
+    double minDistanceSqr =
+            pt[indices[0]].x * pt[indices[0]].x +
+            pt[indices[0]].y * pt[indices[0]].y;
+
+    for (int i = 1; i < verticesNumber; ++i)
+    {
+        double distanceSqr =
+                pt[indices[i]].x * pt[indices[i]].x +
+                pt[indices[i]].y * pt[indices[i]].y;
+
+        if (distanceSqr < minDistanceSqr)
+        {
+            minDistanceIdx = i;
+            minDistanceSqr = distanceSqr;
+        }
+    }
+
+    //! Now starting point index in source array is in indices[minDistanceIdx]
+    //! convex hull vertices are sorted clockwise in indices array, so transfer them to result
+    //! beginning from starting point to the end of array...
+    std::vector<cv::Point> ret(verticesNumber);
+    int idx = 0;
+    for (int i = minDistanceIdx; i < verticesNumber; ++i, ++idx)
+    {
+        ret[idx] = cv::Point(pt[indices[i]].x, pt[indices[i]].y);
+    }
+
+    //! ... and from the begin of array up to starting point
+    for (int i = 0; i < minDistanceIdx; ++i, ++idx)
+    {
+        ret[idx] = cv::Point(pt[indices[i]].x, pt[indices[i]].y);
+    }
+
+    pt = ret;
+
+    return true;
 }

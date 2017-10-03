@@ -37,17 +37,17 @@ namespace prl
  */
 void binarizeNativeAdaptive(
 		cv::Mat& inputImageMat, cv::Mat& outputImageMat,
-		bool isGaussianBlurReqiured,
-		int medianBlurKernelSize,
-		int GaussianBlurKernelSize,
-		double GaussianBlurSigma,
-		bool isAdaptiveThresholdCalculatedByGaussian,
-		double adaptiveThresholdingMaxValue,
-		int adaptiveThresholdingBlockSize,
-		double adaptiveThresholdingShift,
-		int bilateralFilterBlockSize,
-		double bilateralFilterColorSigma,
-		double bilateralFilterSpaceSigma);
+		bool isGaussianBlurReqiured = 0,
+		int medianBlurKernelSize = 5,
+		int GaussianBlurKernelSize = 7,
+		double GaussianBlurSigma = 150.0,
+		bool isAdaptiveThresholdCalculatedByGaussian = true,
+		double adaptiveThresholdingMaxValue = 255.0,
+		int adaptiveThresholdingBlockSize = 19,
+		double adaptiveThresholdingShift = 9,
+		int bilateralFilterBlockSize = 0,
+		double bilateralFilterColorSigma = 150.0,
+		double bilateralFilterSpaceSigma = 150.0);
 
 }
 #endif // PRLIB_binarizeNativeAdaptive_h
