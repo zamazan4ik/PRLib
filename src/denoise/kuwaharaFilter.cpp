@@ -7,6 +7,8 @@
 #include <opencv2/core/core.hpp>
 #include <opencv2/imgproc/imgproc.hpp>
 
+#include "imageLibCommon.h"
+
 static const double PI              = 3.14159265;
 static const double GAUSSIAN_SIGMA  = 4.0;
 static const double ECCEN_TUNING    = 1.0;
@@ -27,38 +29,6 @@ std::vector<cv::Mat> div_circle_weight;
 cv::Mat anisotropic_kuwahara(const cv::Mat& src_img);
 cv::Mat computationKernel(const cv::Mat src_image, const cv::Mat& eigenVec_ori_cos,
                           const cv::Mat& eigenVec_ori_sin, const cv::Mat& amo_anisotropy);
-
-
-cv::Mat getGaussianKernel2D(int ksize, double sigma)
-{
-    double p_max = 0.0, p_temp = 0.0;
-
-    sigma *= 2.0;
-
-    cv::Mat kernel(ksize, ksize, CV_64FC1);
-    kernel.setTo(0);
-
-    for (int i = 0; i < ksize; i++)
-    {
-        for (int j = 0; j < ksize; j++)
-        {
-            p_temp = (1.0 / (2 * PI * sigma)) *
-                     std::exp((-1) * (std::pow(i - ksize / 2, 2.0) +
-                                      std::pow(j - ksize / 2, 2.0)) / (std::pow(2 * sigma, 2)));
-
-            kernel.at<double>(i, j) = p_temp;
-
-            if (p_temp > p_max)
-            {
-                p_max = p_temp;
-            }
-        }
-    }
-
-    kernel /= p_max;
-
-    return kernel;
-}
 
 
 void div_circle_initialize()

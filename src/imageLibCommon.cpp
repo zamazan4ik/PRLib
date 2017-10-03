@@ -878,3 +878,35 @@ bool cropVerticesOrdering(std::vector<cv::Point>& pt)
 
     return true;
 }
+
+
+cv::Mat getGaussianKernel2D(const int ksize, double sigma)
+{
+    double p_max = 0.0, p_temp = 0.0;
+
+    sigma *= 2.0;
+
+    cv::Mat kernel(ksize, ksize, CV_64FC1);
+    kernel.setTo(0);
+
+    for (int i = 0; i < ksize; i++)
+    {
+        for (int j = 0; j < ksize; j++)
+        {
+            p_temp = (1.0 / (2 * CV_PI * sigma)) *
+                     std::exp((-1) * (std::pow(i - ksize / 2, 2.0) +
+                                      std::pow(j - ksize / 2, 2.0)) / (std::pow(2 * sigma, 2)));
+
+            kernel.at<double>(i, j) = p_temp;
+
+            if (p_temp > p_max)
+            {
+                p_max = p_temp;
+            }
+        }
+    }
+
+    kernel /= p_max;
+
+    return kernel;
+}
