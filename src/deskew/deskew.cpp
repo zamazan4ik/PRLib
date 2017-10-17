@@ -34,9 +34,9 @@
 
 #include <algorithm>
 #include <functional>
-#include <cctype>
 #include <list>
 #include <map>
+#include <vector>
 
 #include <leptonica/pix.h>
 
@@ -132,7 +132,7 @@ double FindAngle(const cv::Mat& input_orig)
     const int nb_lines = static_cast<int>(lines.size());
     if (!nb_lines)
     {
-        return 0;
+        return 0.0;
     }
 
     std::vector<double> cv_angles = std::vector<double>(nb_lines);
@@ -153,12 +153,11 @@ double FindAngle(const cv::Mat& input_orig)
     const double delta = 0.01; //difference is less than 1 deg.
     std::list<std::pair<double, int> > t_diff;
 
-    for (std::vector<double>::iterator it = cv_angles.begin(); it != cv_angles.end(); ++it)
+    for (auto it = cv_angles.begin(); it != cv_angles.end(); ++it)
     {
         bool found = false;
         // bypass list
-        for (std::list<std::pair<double, int>>::iterator elem = t_diff.begin();
-             elem != t_diff.end(); ++elem)
+        for (auto elem = t_diff.begin(); elem != t_diff.end(); ++elem)
         {
             if (prl::eq_d(*it, elem->first, delta))
             {

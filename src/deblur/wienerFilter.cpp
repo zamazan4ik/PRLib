@@ -3,11 +3,11 @@
 #include <opencv2/opencv.hpp>
 #include <opencv2/highgui/highgui.hpp>
 
-#include <complex>
-#include <vector>
-#include <memory>
 #include <cmath>
+#include <complex>
+#include <memory>
 #include <stdexcept>
+#include <vector>
 
 
 void prl::wienerFilter(cv::Mat& inputImage, cv::Mat& outputImage,

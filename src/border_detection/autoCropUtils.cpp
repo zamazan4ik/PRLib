@@ -4,10 +4,10 @@
 #include <opencv2/imgproc/imgproc.hpp>
 #include <opencv2/features2d/features2d.hpp>
 
-#include <iostream>
-#include <vector>
 #include <algorithm>
+#include <iostream>
 #include <stdexcept>
+#include <vector>
 
 #include "imageLibCommon.h"
 

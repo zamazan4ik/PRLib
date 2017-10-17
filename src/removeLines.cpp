@@ -45,6 +45,6 @@ void prl::removeLines(const cv::Mat& inputImage, cv::Mat& outputImage)
     outputImage = bw.clone();
     outputImage = outputImage - horizontal;
     outputImage = outputImage - vertical;
-    
+
     cv::bitwise_not(outputImage, outputImage);
 }

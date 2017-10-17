@@ -22,9 +22,11 @@
     SOFTWARE.
 */
 
-#include "src/detectors/blurDetection.h"
+#include "blurDetection.h"
 
 #include "opencv2/imgproc.hpp"
+
+// https://stackoverflow.com/questions/7765810/is-there-a-way-to-detect-if-an-image-is-blurry
 
 // OpenCV port of 'LAPM' algorithm (Nayar89)
 double LAPM_Algo(const cv::Mat& src)

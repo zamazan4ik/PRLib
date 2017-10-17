@@ -4,12 +4,11 @@
 #include <opencv2/imgproc/imgproc.hpp>
 #include <opencv2/features2d/features2d.hpp>
 
+#include <algorithm>
+#include <cmath>
 #include <iostream>
 #include <stdexcept>
-#include <algorithm>
-#include <stdexcept>
 #include <vector>
-#include <cmath>
 
 #include "resize.h"
 #include "autoCropUtils.h"

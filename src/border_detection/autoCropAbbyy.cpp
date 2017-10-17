@@ -2,14 +2,13 @@
 
 #include <opencv2/imgproc/imgproc.hpp>
 
+#include <vector>
 
 #include "houghLine.h"
 #include "resize.h"
 #include "autoCropUtils.h"
 #include "imageLibCommon.h"
 #include "warp.h"
-
-#include <vector>
 
 
 bool prl::getContourAbbyy(cv::Mat& src, std::vector<cv::Point>& resultContour)

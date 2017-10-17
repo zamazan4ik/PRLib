@@ -3,13 +3,11 @@
 #include <opencv2/core/core.hpp>
 #include <opencv2/imgproc/imgproc.hpp>
 
-#include "formatConvert.h"
-
 #include <leptonica/allheaders.h>
 
 #include <stdexcept>
-#include <include/opencv/opencv2/imgcodecs.hpp>
 
+#include "formatConvert.h"
 
 void prl::backgroundNormalization(const cv::Mat& inputImage, cv::Mat& outputImage)
 {

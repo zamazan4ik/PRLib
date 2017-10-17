@@ -22,16 +22,12 @@
     SOFTWARE.
 */
 
-#include "src/denoise/denoiseNLM.h"
+#include "denoiseNLM.h"
 
 #include "opencv2/xphoto.hpp"
 #include "opencv2/photo.hpp"
 
-void prl::denoise(const cv::Mat& src, cv::Mat& dst)
+void prl::denoise(const cv::Mat& inputImage, cv::Mat& outputImage)
 {
-    //Too slow
-    //cv::xphoto::dctDenoising(src, dst, 15.0);
-
-    // OpenCV-contrib required
-    //cv::fastNlMeansDenoisingColored(src, dst, 5.5);
+    cv::fastNlMeansDenoisingColored(inputImage, outputImage, 5.5);
 }

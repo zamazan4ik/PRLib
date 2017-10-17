@@ -1,7 +1,7 @@
 #include "balanceGrayWorldWhite.h"
 
-#include <stdexcept>
 #include <cmath>
+#include <stdexcept>
 
 #include <opencv2/core/core.hpp>
 #include <opencv2/imgproc/imgproc.hpp>
@@ -16,9 +16,9 @@ void getAverageValues(const cv::Mat& src, double* ml, double* ma, double* mb, co
         for (int j = 0; j < src.cols; ++j)
         {
             cv::Vec3b v1 = src.at<cv::Vec3b>(i, j);
-            double lc = pow(v1.val[0], p);
-            double ac = pow(v1.val[1], p);
-            double bc = pow(v1.val[2], p);
+            double lc = std::pow(v1.val[0], p);
+            double ac = std::pow(v1.val[1], p);
+            double bc = std::pow(v1.val[2], p);
 
             *ma += ac;
             *mb += bc;
@@ -26,9 +26,9 @@ void getAverageValues(const cv::Mat& src, double* ml, double* ma, double* mb, co
         }
     }
 
-    *ml = pow(*ml / (src.cols * src.rows), 1.0 / p);
-    *ma = pow(*ma / (src.cols * src.rows), 1.0 / p);
-    *mb = pow(*mb / (src.cols * src.rows), 1.0 / p);
+    *ml = std::pow(*ml / (src.cols * src.rows), 1.0 / p);
+    *ma = std::pow(*ma / (src.cols * src.rows), 1.0 / p);
+    *mb = std::pow(*mb / (src.cols * src.rows), 1.0 / p);
 }
 
 

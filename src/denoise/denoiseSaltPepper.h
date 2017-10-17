@@ -5,7 +5,7 @@
 
 namespace prl
 {
-void denoiseSaltPepper(const cv::Mat& inputImage, cv::Mat outputImage, int kernelSize, int times);
+void denoiseSaltPepper(const cv::Mat& inputImage, cv::Mat& outputImage, int kernelSize, int times);
 }
 
 #endif //PRLIB_DENOISESALTPEPPER_H
