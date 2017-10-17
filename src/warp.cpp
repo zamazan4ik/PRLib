@@ -24,6 +24,9 @@
 
 #include "warp.h"
 
+#include <algorithm>
+#include <cmath>
+
 #include "opencv2/imgproc.hpp"
 
 void prl::warpCrop(const cv::Mat& inputImage,
@@ -32,42 +35,21 @@ void prl::warpCrop(const cv::Mat& inputImage,
                    const int x1, const int y1,
                    const int x2, const int y2,
                    const int x3, const int y3,
+                   double ratio,
                    const int borderMode /*= cv::BORDER_CONSTANT*/,
                    const cv::Scalar& borderValue /*= cv::Scalar()*/)
 {
-    const double side1 = sqrt((x1 - x0) * (x1 - x0) + (y1 - y0) * (y1 - y0));
-    const double side2 = sqrt((x3 - x2) * (x3 - x2) + (y3 - y2) * (y3 - y2));
-    const double side3 = sqrt((x3 - x0) * (x3 - x0) + (y3 - y0) * (y3 - y0));
-    const double side4 = sqrt((x2 - x1) * (x2 - x1) + (y2 - y1) * (y2 - y1));
+    const double side1 = std::sqrt((x1 - x0) * (x1 - x0) + (y1 - y0) * (y1 - y0));
+    const double side2 = std::sqrt((x3 - x2) * (x3 - x2) + (y3 - y2) * (y3 - y2));
+    const double side3 = std::sqrt((x3 - x0) * (x3 - x0) + (y3 - y0) * (y3 - y0));
+    const double side4 = std::sqrt((x2 - x1) * (x2 - x1) + (y2 - y1) * (y2 - y1));
 
-    double aspect12 = side1 / side2;
-    double aspect34 = side3 / side4;
+    long bitmapWidth = cvRound(std::max(side1, side2));
+    long bitmapHeight = cvRound(std::max(side3, side4));
 
-    if (aspect12 < 1.0)
+    if (ratio > 0.0)
     {
-        aspect12 = 1.0 / aspect12;
-    }
-
-    if (aspect34 < 1.0)
-    {
-        aspect34 = 1.0 / aspect34;
-    }
-
-    long bitmapWidth = cvRound(std::max(side1, side2) * aspect34);
-    long bitmapHeight = cvRound(std::max(side3, side4) * aspect12);
-
-    // bitmapWidth/bitmapHeight can be easily more than input w/h.
-    // It leads to using more memory than expected.
-    // We have to limit the cropped image size by the source image's size.
-    // Special case: we can get size more than max texture size (80 thousands).
-
-    if (side1 > bitmapWidth || side2 > bitmapWidth
-        || side3 > bitmapHeight || side4 > bitmapHeight)
-    {
-        double ratio = bitmapWidth > bitmapHeight ? inputImage.cols / bitmapWidth : inputImage.rows / bitmapHeight;
-
-        bitmapWidth = cvRound(bitmapWidth * ratio);
-        bitmapHeight = cvRound(bitmapHeight * ratio);
+        bitmapWidth = cvRound(bitmapHeight / ratio);
     }
 
     float srcBuff[] = {static_cast<float>(x0), static_cast<float>(y0),
@@ -91,9 +73,11 @@ void prl::warpCrop(const cv::Mat& inputImage,
 }
 
 
-void prl::warpCrop(cv::Mat& inputImage, cv::Mat& outputImage, const std::vector<cv::Point>& points,
-                int borderMode /*= cv::BORDER_CONSTANT*/,
-                const cv::Scalar& borderValue /*= cv::Scalar()*/)
+void prl::warpCrop(cv::Mat& inputImage, cv::Mat& outputImage,
+                   const std::vector<cv::Point>& points,
+                   double ratio,
+                   int borderMode /*= cv::BORDER_CONSTANT*/,
+                   const cv::Scalar& borderValue /*= cv::Scalar()*/)
 {
     if (inputImage.empty())
     {
@@ -114,5 +98,5 @@ void prl::warpCrop(cv::Mat& inputImage, cv::Mat& outputImage, const std::vector<
     int x3 = cvRound(points[3].x);
     int y3 = cvRound(points[3].y);
 
-    warpCrop(inputImage, outputImage, x0, y0, x1, y1, x2, y2, x3, y3, borderMode, borderValue);
+    warpCrop(inputImage, outputImage, x0, y0, x1, y1, x2, y2, x3, y3, ratio, borderMode, borderValue);
 }

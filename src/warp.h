@@ -42,6 +42,7 @@ namespace prl
  * \param[in] y2 Bottom right y coordinate.
  * \param[in] x3 Bottom left x coordinate.
  * \param[in] y3 Bottom left y coordinate.
+ * \param[in] ratio Expected Height/Width ratio
  * \details Crop image and do warp transformation to rectangle.
  * Calculates aspect ratio of source image and keeps it after crop.
  */
@@ -51,6 +52,7 @@ void warpCrop(const cv::Mat& inputImage,
               const int x1, const int y1,
               const int x2, const int y2,
               const int x3, const int y3,
+              double ratio = -1.0,
               const int borderMode = cv::BORDER_CONSTANT,
               const cv::Scalar& borderValue = cv::Scalar());
 
@@ -60,12 +62,15 @@ void warpCrop(const cv::Mat& inputImage,
  * \param[in] sourceImage Input image.
  * \param[out] destImage Output image.
  * \param[in] points Document contour.
+ * \param[in] ratio Expected Height/Width ratio
  * \details Crop image and do warp transformation to rectangle.
  * Calculates aspect ratio of source image and keeps it after crop.
  */
-void warpCrop(cv::Mat& inputImage, cv::Mat& outputImage, const std::vector<cv::Point>& points,
-                     int borderMode = cv::BORDER_CONSTANT,
-                     const cv::Scalar& borderValue = cv::Scalar());
+void warpCrop(cv::Mat& inputImage, cv::Mat& outputImage,
+              const std::vector<cv::Point>& points,
+              double ratio = -1.0,
+              int borderMode = cv::BORDER_CONSTANT,
+              const cv::Scalar& borderValue = cv::Scalar());
 }
 
 #endif //PRLIB_WARP_HPP
