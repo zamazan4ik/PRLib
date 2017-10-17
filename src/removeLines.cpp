@@ -16,6 +16,7 @@ void prl::removeLines(const cv::Mat& inputImage, cv::Mat& outputImage)
     }
 
     cv::Mat bw;
+    // TODO: Try to use another binarization here
     cv::adaptiveThreshold(~gray, bw, 255, CV_ADAPTIVE_THRESH_MEAN_C, CV_THRESH_BINARY, 15, -2);
 
     // Create the images that will use to extract the horizonta and vertical lines
