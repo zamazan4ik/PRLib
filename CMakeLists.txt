@@ -22,14 +22,14 @@ endforeach()
 find_package(Leptonica)
 find_package(OpenCV)
 
-include_directories(${Leptonica_INCLUDE_DIRS})
+include_directories(${LEPTONICA_INCLUDE_DIR})
 include_directories(${OpenCV_INCLUDE_DIRS})
 
 add_library(prlib STATIC ${SOURCES})
 
 target_link_libraries(prlib
         ${OpenCV_LIBS}
-        ${Leptonica_LIBRARIES})
+        ${LEPTONICA_LIBRARY})
 
 # Samples
 
