@@ -17,35 +17,39 @@
 namespace prl
 {
 
-bool GetDocumentContour(
-        cv::Mat &sourceImage,
+bool documentContour(
+        cv::Mat& inputImage,
         const double scaleX, const double scaleY,
-        std::vector<cv::Point2f> &resultContour)
+        std::vector<cv::Point2f>& resultContour)
 {
     cv::Mat imageToProc;
 
     //! Store source image size
-    cv::Size sourceImageSize(sourceImage.size());
+    cv::Size sourceImageSize(inputImage.size());
 
     cv::Size newImageSize;
 
-    if (scaleX > 0 && scaleY > 0) {
+    if (scaleX > 0 && scaleY > 0)
+    {
         newImageSize = cv::Size(
-                static_cast<int>(sourceImage.cols * scaleX),
-                static_cast<int>(sourceImage.rows * scaleY)
+                static_cast<int>(inputImage.cols * scaleX),
+                static_cast<int>(inputImage.rows * scaleY)
         );
 
-        cv::resize(sourceImage, imageToProc, newImageSize, 0, 0, cv::INTER_AREA);
+        cv::resize(inputImage, imageToProc, newImageSize, 0, 0, cv::INTER_AREA);
 
-    } else {
-        int longSide = std::max(sourceImage.cols, sourceImage.rows);
+    }
+    else
+    {
+        int longSide = std::max(inputImage.cols, inputImage.rows);
 
         int scaleFactorX = 1;
         int scaleFactorY = 1;
 
-        imageToProc = sourceImage.clone();
+        imageToProc = inputImage.clone();
 
-        while (longSide / 2 >= nProcessedImageSize) {
+        while (longSide / 2 >= 256)
+        {
             cv::pyrDown(imageToProc, imageToProc);
 
             longSide = std::max(imageToProc.cols, imageToProc.rows);
@@ -53,7 +57,7 @@ bool GetDocumentContour(
             scaleFactorY *= 2;
         }
 
-        newImageSize = cv::Size(sourceImage.cols / scaleFactorX, sourceImage.rows / scaleFactorY);
+        newImageSize = cv::Size(inputImage.cols / scaleFactorX, inputImage.rows / scaleFactorY);
     }
 
 
@@ -77,7 +81,7 @@ bool GetDocumentContour(
 
     const size_t CountTry = 2;
     size_t DilateCoeff = 2;
-    for(size_t i = 0; i < CountTry; ++i)
+    for (size_t i = 0; i < CountTry; ++i)
     {
         isContourDetected = findDocumentContour(resultCanny, resultContour);
         if (isContourDetected)
@@ -90,11 +94,11 @@ bool GetDocumentContour(
 
         cv::dilate(
                 resultCanny, resultCanny,
-                cv::getStructuringElement(cv::MORPH_RECT, cv::Size(2,2)),
+                cv::getStructuringElement(cv::MORPH_RECT, cv::Size(2, 2)),
                 cv::Point(-1, -1), DilateCoeff);
         cv::erode(
                 resultCanny, resultCanny,
-                cv::getStructuringElement(cv::MORPH_RECT, cv::Size(2,2)),
+                cv::getStructuringElement(cv::MORPH_RECT, cv::Size(2, 2)),
                 cv::Point(-1, -1), DilateCoeff);
 
         ++DilateCoeff;
@@ -103,25 +107,25 @@ bool GetDocumentContour(
     return false;
 }
 
-bool ScannedDocumentImageAutoCrop(cv::Mat& sourceImage, cv::Mat& croppedImage)
+bool autoCrop(cv::Mat& inputImage, cv::Mat& outputImage)
 {
-    if (sourceImage.empty())
+    if (inputImage.empty())
     {
-        throw std::invalid_argument("ScannedDocumentImageAutoCrop: Image for cropping is empty");
+        throw std::invalid_argument("autoCrop: Image for cropping is empty");
     }
 
-    switch (sourceImage.type())
+    switch (inputImage.type())
     {
         case CV_8UC3:
             break;
         case CV_8UC1:
-            cvtColor(sourceImage, sourceImage, CV_GRAY2BGR);
+            cv::cvtColor(inputImage, inputImage, CV_GRAY2BGR);
             break;
         default:
-            if (sourceImage.empty())
+            if (inputImage.empty())
             {
                 throw std::invalid_argument(
-                        "ScannedDocumentImageAutoCrop: Invalid type of image for cropping (required 8 or 24 bits per pixel)");
+                        "autoCrop: Invalid type of image for cropping (required 8 or 24 bits per pixel)");
             }
             break;
     }
@@ -129,21 +133,15 @@ bool ScannedDocumentImageAutoCrop(cv::Mat& sourceImage, cv::Mat& croppedImage)
     std::vector<cv::Point2f> resultContour;
 
     //! Try to detect border
-    if (!GetDocumentContour(sourceImage, -1, -1, resultContour))
+    if (!documentContour(inputImage, -1, -1, resultContour))
     {
         return false;
     }
 
-    //! Sort points
-    /*if (!cropVerticesOrdering(resultContour)) {
-        cout << _TXT("Document border contour points is not sorted.") << endl;
-        return false;
-    }*/
-
     std::vector<cv::Point> temp(resultContour.begin(), resultContour.end());
 
     //! Crop area
-    warpCrop(sourceImage, croppedImage, temp);
+    warpCrop(inputImage, outputImage, temp);
 
     return true;
 }

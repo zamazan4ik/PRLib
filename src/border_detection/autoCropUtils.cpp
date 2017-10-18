@@ -112,16 +112,15 @@ bool IsQuadrangularConvex(std::vector<cv::Point>& resultContour)
     return (convexHullPoints.size() == 4);
 }
 
-bool findDocumentContour(cv::Mat &source, std::vector<cv::Point2f> &resultContour)
+bool findDocumentContour(cv::Mat& source, std::vector<cv::Point2f>& resultContour)
 {
-    if (source.empty()) {
+    if (source.empty())
+    {
         throw std::invalid_argument("Input image for contours detection is empty");
     }
 
     std::vector<std::vector<cv::Point> > contours;
     std::vector<cv::Vec4i> hierarchy;
-
-    cv::cvtColor(source, draw, cv::ColorConversionCodes::COLOR_GRAY2BGR);
 
     cv::findContours(
             source.clone(), contours, hierarchy,
@@ -144,14 +143,15 @@ bool findDocumentContour(cv::Mat &source, std::vector<cv::Point2f> &resultContou
         //! Approximate contour by polygon
         contoursPolygons[i] = contours[i];
         double approxEps = 1.0;
-        while(contoursPolygons[i].size() > 4)
+        while (contoursPolygons[i].size() > 4)
         {
             cv::approxPolyDP(cv::Mat(contours[i]), contoursPolygons[i], approxEps, true);
             approxEps += 1.0;
             contours[i] = contoursPolygons[i];
         }
 
-        if(contoursPolygons[i].size() < 4)  continue;
+        if (contoursPolygons[i].size() < 4)
+        { continue; }
 
         double contArea = cv::contourArea(contoursPolygons[i]);
 
@@ -161,43 +161,52 @@ bool findDocumentContour(cv::Mat &source, std::vector<cv::Point2f> &resultContou
         double side3 = cv::norm(contoursPolygons[i][2] - contoursPolygons[i][3]);
         double side4 = cv::norm(contoursPolygons[i][3] - contoursPolygons[i][0]);
 
-        if(side1 < side3)  std::swap(side1, side3);
-        if(side2 < side4)  std::swap(side2, side4);
+        if (side1 < side3)
+        { std::swap(side1, side3); }
+        if (side2 < side4)
+        { std::swap(side2, side4); }
 
-        if(side3 / side1 < 0.85)  continue;
-        if(side4 / side2 < 0.85)  continue;
+        if (side3 / side1 < 0.85)
+        { continue; }
+        if (side4 / side2 < 0.85)
+        { continue; }
 
         // Sides check - end
 
         // Angles check
+        double angle1 = angleBetweenLinesInDegree(contoursPolygons[i][0], contoursPolygons[i][1],
+                                                  contoursPolygons[i][2], contoursPolygons[i][3]);
+        double angle2 = angleBetweenLinesInDegree(contoursPolygons[i][1], contoursPolygons[i][2],
+                                                  contoursPolygons[i][3], contoursPolygons[i][0]);
 
-        double angle1 = angleBetweenLinesInDegree(contoursPolygons[i][0], contoursPolygons[i][1], contoursPolygons[i][2], contoursPolygons[i][3]);
-        double angle2 = angleBetweenLinesInDegree(contoursPolygons[i][1], contoursPolygons[i][2], contoursPolygons[i][3], contoursPolygons[i][0]);
-
-        if(angle1 < 160.0)  continue;
-        if(angle2 < 160.0)  continue;
+        if (angle1 < 160.0)
+        { continue; }
+        if (angle2 < 160.0)
+        { continue; }
         // Angles check - end
 
 
         bool isContoursPolygonTooSmall = contArea < minArea;
         bool isContoursPolygonTooBig = contArea > source.cols * source.rows;
         bool hasContoursPolygon4Corners = contoursPolygons[i].size() == 4;
-        if (isContoursPolygonTooBig || isContoursPolygonTooSmall || !hasContoursPolygon4Corners )
+        if (isContoursPolygonTooBig || isContoursPolygonTooSmall || !hasContoursPolygon4Corners)
         {
             continue;
         }
 
         double contourArea = cv::contourArea(contoursPolygons[i]);
 
-        if (contourArea > minArea) {
+        if (contourArea > minArea)
+        {
             minArea = contourArea;
             maxCurve = contoursPolygons[i];
         }
-
     }
 
-    if (!maxCurve.empty() && IsQuadrangularConvex(maxCurve)) {
-        for (size_t i = 0; i < 4; ++i) {
+    if (!maxCurve.empty() && IsQuadrangularConvex(maxCurve))
+    {
+        for (size_t i = 0; i < 4; ++i)
+        {
             resultContour.push_back(
                     cv::Point2f(
                             static_cast<float>(maxCurve[i].x),

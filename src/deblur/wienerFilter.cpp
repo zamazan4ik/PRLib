@@ -96,7 +96,7 @@ void prl::wienerFilter(cv::Mat& inputImage, cv::Mat& outputImage,
                 }
 
                 kernelTempMatrix[index] = value;
-                sumKernelElements += abs(value);
+                sumKernelElements += std::abs(value);
             }
         }
 
