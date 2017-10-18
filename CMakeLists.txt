@@ -1,4 +1,4 @@
-cmake_minimum_required(VERSION 3.6.0)
+cmake_minimum_required(VERSION 3.2.0)
 project(prlib)
 
 include_directories(src/*/* src/binarizations src/balance src/border_detection src/deblur src/denoise src/deskew
