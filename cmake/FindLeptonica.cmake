@@ -12,7 +12,7 @@ IF (NOT WIN32)
   include(FindPkgConfig)
   if ( PKG_CONFIG_FOUND )
 
-     pkg_check_modules (LEPTONICA lept)
+     pkg_check_modules (LEPTONICA lept>=1.40)
 
   endif(PKG_CONFIG_FOUND)
 endif (NOT WIN32)
