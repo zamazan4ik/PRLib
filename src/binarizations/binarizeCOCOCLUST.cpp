@@ -24,6 +24,7 @@
 
 #include "binarizeCOCOCLUST.h"
 
+#include <algorithm>
 #include <cmath>
 #include <functional>
 #include <map>
@@ -35,6 +36,7 @@
 #include <opencv2/imgproc/imgproc.hpp>
 #include <opencv2/features2d/features2d.hpp>
 
+#include "imageLibCommon.h"
 
 void prl::binarizeCOCOCLUST(cv::Mat& inputImage, cv::Mat& outputImage, const float T_S,
                          double CLAHEClipLimit,
