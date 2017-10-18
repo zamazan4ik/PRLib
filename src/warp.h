@@ -22,8 +22,8 @@
     SOFTWARE.
 */
 
-#ifndef PRLIB_WARP_HPP
-#define PRLIB_WARP_HPP
+#ifndef PRLIB_WARP
+#define PRLIB_WARP
 
 #include <opencv2/core/core.hpp>
 
@@ -73,4 +73,4 @@ void warpCrop(cv::Mat& inputImage, cv::Mat& outputImage,
               const cv::Scalar& borderValue = cv::Scalar());
 }
 
-#endif //PRLIB_WARP_HPP
+#endif //PRLIB_WARP

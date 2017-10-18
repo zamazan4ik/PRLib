@@ -30,12 +30,7 @@
 namespace prl
 {
 
-enum class BlurDetectionAlgo
-{
-    LAPM, LAPV, TENG, GLVN
-};
-
-bool isBlurred(const cv::Mat& src, BlurDetectionAlgo algo);
+bool isBlurred(const cv::Mat& inputImage);
 
 }
 #endif //PRLIB_BLURDETECTION_HPP

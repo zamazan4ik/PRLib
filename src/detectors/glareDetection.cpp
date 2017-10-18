@@ -24,7 +24,7 @@
 
 #include "glareDetection.h"
 
-bool prl::isGlared(const cv::Mat& src)
+bool prl::isGlared(const cv::Mat& inputImage)
 {
     
 }

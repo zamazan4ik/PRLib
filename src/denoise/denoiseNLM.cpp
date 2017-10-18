@@ -24,7 +24,7 @@
 
 #include "denoiseNLM.h"
 
-#include "opencv2/photo.hpp"
+#include <opencv2/photo/photo.hpp>
 
 void prl::denoise(const cv::Mat& inputImage, cv::Mat& outputImage)
 {

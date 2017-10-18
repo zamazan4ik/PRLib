@@ -22,14 +22,14 @@
     SOFTWARE.
 */
 
-#ifndef PRLIB_ROTATE_HPP
-#define PRLIB_ROTATE_HPP
+#ifndef PRLIB_ROTATE
+#define PRLIB_ROTATE
 
 #include <opencv2/core/core.hpp>
 
 namespace prl
 {
-void rotate(const cv::Mat& input, cv::Mat& output, double angle);
+void rotate(const cv::Mat& inputImage, cv::Mat& outputImage, double angle);
 }
 
-#endif //PRLIB_ROTATE_HPP
+#endif //PRLIB_ROTATE

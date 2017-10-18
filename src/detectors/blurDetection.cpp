@@ -24,7 +24,7 @@
 
 #include "blurDetection.h"
 
-#include "opencv2/imgproc.hpp"
+#include <opencv2/imgproc/imgproc.hpp>
 
 // https://stackoverflow.com/questions/7765810/is-there-a-way-to-detect-if-an-image-is-blurry
 
@@ -82,19 +82,8 @@ double GLVN_Algo(const cv::Mat& src)
     return focusMeasure;
 }
 
-bool prl::isBlurred(const cv::Mat& src, prl::BlurDetectionAlgo algo)
+bool prl::isBlurred(const cv::Mat& inputImage)
 {
     //TODO: find constants for blurring check for every algorithm. Write supertest, powered by all algorithms
-    switch (algo)
-    {
-        case BlurDetectionAlgo::LAPM:
-            return LAPM_Algo(src);
-        case BlurDetectionAlgo::LAPV:
-            return LAPV_Algo(src);
-        case BlurDetectionAlgo::TENG:
-            return TENG_Algo(src, 5);
-        case BlurDetectionAlgo::GLVN:
-            return GLVN_Algo(src);
-    }
 }
 
