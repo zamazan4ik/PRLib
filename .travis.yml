@@ -12,7 +12,7 @@ compiler:
 
 before_install:
   - eval "${MATRIX_EVAL}"
-  - if [ "$TRAVIS_OS_NAME" = "linux" ]; then sudo apt-get update; sudo apt-get install libopencv-dev; fi
+  - if [ "$TRAVIS_OS_NAME" = "linux" ]; then sudo apt-get update; sudo apt-get install libopencv-dev libleptonica-dev; fi
 #  - if [ "$TRAVIS_OS_NAME" = "linux" ] && [ "${MATRIX_EVAL}" = "CC=gcc-4.9 && CXX=g++-4.9" ]; then echo -n | openssl s_client -connect scan.coverity.com:443 | sed -ne '/-BEGIN CERTIFICATE-/,/-END CERTIFICATE-/p' | sudo tee -a /etc/ssl/certs/ca-; fi
 #  - if [ "$TRAVIS_OS_NAME" = "linux" ] && [ "${MATRIX_EVAL}" = "CC=gcc-4.9 && CXX=g++-4.9" ]; then pip install --user cpp-coveralls; fi
 #  - if [ "$TRAVIS_OS_NAME" = "linux" ] && [ "${MATRIX_EVAL}" = "CC=clang-4.0 && CXX=clang++-4.0" ]; then wget -q -O - http://files.viva64.com/etc/pubkey.txt | sudo apt-key add - ; sudo wget -O /etc/apt/sources.list.d/viva64.list http://files.viva64.com/etc/viva64.list ; sudo apt-get update ; sudo apt-get install pvs-studio ; fi
