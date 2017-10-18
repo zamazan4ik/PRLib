@@ -3,18 +3,24 @@ PRLib - Pre-Recognition Library.
 The main aim of the library - prepare image for recogntion. Image processing can really help to improve recognition quality.
 
 *Features:*
-* Binarization (Global Otsu, Sauvola, Niblack, Adaptive)
-* Deskew
-* Denoise (Non-local Means Denoising algorithm)
-* Thinning (Zhang-Suen, Guo-Hall)
+* Auto crop image
+* Background normalization
+* Binarization (Global Otsu, Local Otsu, Sauvola, Feng, Niblack, Wolf-Jolion, NICK, FBCITB, Adaptive)
 * Blur detection (LAPM, LAPV, TENG, GLVN)
-* Deblur (Gaussian-based)
-* White balance (Simple, Grayworld)
-* Border detection (Canny-based)
-* Removing perspective warp
+* Color balance
 * Crop
+* Deblur (Gaussian-based)
+* Denoise (Non-local Means Denoising algorithm, Salt-Pepper)
+* Deskew
+* Find angle and orientation of an image
+* Gamma correction
+* Hole punch removal
+* Line removal
+* Perspective warp removal
+* Thinning (Zhang-Suen, Guo-Hall)
+* White balance (Simple, Grayworld)
 
-*Dependencies:* OpenCV + OpenCV contrib, Leptonica.
+*Dependencies:* OpenCV, Leptonica.
 
 *How to build:*
 1) Go to the directory with source code
