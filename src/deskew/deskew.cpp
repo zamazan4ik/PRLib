@@ -67,9 +67,9 @@
 #include "rotate.h"
 #include "utils.h"
 
-double findOrientation(const cv::Mat& inputImage)
+double findOrientation(cv::Mat& inputImage)
 {
-    PIX* pix = prl::ImgOpenCvToLepton(inputImage);
+    PIX* pix = prl::leptCreatePixFromMat(&inputImage);
     if (!pix)
     {
         return 0;
