@@ -161,7 +161,12 @@ bool autoCrop(cv::Mat& inputImage, cv::Mat& outputImage)
         return false;
     }
 
-    std::vector<cv::Point> temp(resultContour.begin(), resultContour.end());
+    std::vector<cv::Point> temp;
+    temp.reserve(resultContour.size());
+    for(const auto& point : resultContour)
+    {
+        temp.emplace_back(point.x, point.y);
+    }
 
     //! Crop area
     warpCrop(inputImage, outputImage, temp);
