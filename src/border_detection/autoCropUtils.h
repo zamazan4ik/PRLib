@@ -67,6 +67,11 @@ bool isQuadrangle(const std::vector<cv::Point>& contour);
 
 void ScaleContour(std::vector<cv::Point2f>& contour, cv::Size& fromImageSize, cv::Size& toImageSize);
 
+/*!
+ * \brief Contour points ordering.
+ * \param[inout] pt Contour.
+ * \return true if ordering is successful.
+ */
 bool cropVerticesOrdering(std::vector<cv::Point2f>& pt);
 
 

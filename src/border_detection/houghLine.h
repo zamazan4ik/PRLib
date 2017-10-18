@@ -9,7 +9,7 @@ namespace prl
 {
 
 bool findHoughLineContour(cv::Mat& inputImage,
-                           std::vector<cv::Point>& resultContour);
+                          std::vector<cv::Point>& resultContour);
 
 }
 #endif // PRLIB_HoughLine_h__

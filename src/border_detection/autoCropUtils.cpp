@@ -112,106 +112,21 @@ bool IsQuadrangularConvex(std::vector<cv::Point>& resultContour)
     return (convexHullPoints.size() == 4);
 }
 
-
-//bool findDocumentContour(cv::Mat &source, vector<cv::Point2f> &resultContour)
-//{
-//	if (source.empty()) {
-//		throw IPL::Exceptions::IPL_ProcessingException_InvalidParameter(
-//			_TXT("Input image for contours detection is empty"));
-//	}
-//
-//	vector<vector<cv::Point> > contours;
-//	vector<cv::Vec4i> hierarchy;
-//
-//	cv::findContours(
-//		source, contours, hierarchy, 
-//		CV_RETR_CCOMP, CV_CHAIN_APPROX_SIMPLE, 
-//		cv::Point(0, 0));
-//
-//	double maxArea = source.cols * source.rows * 0.2;
-//
-//	//! Approximate contours to polygons + get bounding rectangles and circles
-//	vector<vector<cv::Point> > contoursPolygons(contours.size());
-//	vector<cv::RotatedRect> minRect(contours.size());
-//
-//	vector<MarkerRectangle> markerRectangles;
-//
-//	float maxRotatedRectArea = 0;
-//	int maxRotatedRectAreaPos = -1;
-//
-//	const double lengthCriteria = (source.cols + source.rows) * 1.8;
-//
-//	for (size_t i = 0; i < contours.size(); ++i) {
-//		//convexHull( Mat(contours[i]), contours[i], false );
-//
-//		//! Approximate contour by polygon
-//		cv::approxPolyDP(cv::Mat(contours[i]), contoursPolygons[i], contours[i].size() * 0.2, true);
-//
-//		//! Get minimal area rectangle for contour
-//		minRect[i] = cv::minAreaRect(cv::Mat(contoursPolygons[i]));
-//
-//		//if (minRect[i].size.area() < maxArea) {
-//		//	continue;
-//		//}
-//
-//		bool isContoursPolygonTooBig = 
-//			arcLength(contoursPolygons[i], true) > lengthCriteria;
-//		bool isContoursPolygonTooSmall = arcLength(contoursPolygons[i], true) < 100;
-//		bool hasContoursPolygon4Conrners = contoursPolygons[i].size() == 4;
-//		if ( isContoursPolygonTooBig || isContoursPolygonTooSmall ||
-//			!hasContoursPolygon4Conrners ) {
-//
-//				continue;
-//		}
-//
-//		MarkerRectangle markerRectangle;
-//
-//		//! Check whether approximation polygon rectangle
-//		int checkRectangleResult = CheckRectangle(contoursPolygons[i], &markerRectangle);
-//
-//		bool isGoodRectangle = (checkRectangleResult == GOOD_RECTANGLE);
-//		bool isRectangleBig = (minRect[i].size.area() > maxArea);
-//		if (isGoodRectangle && isRectangleBig) {
-//
-//			markerRectangles.push_back(markerRectangle);
-//
-//			//! If position of the biggest minimal area rectangle then save it
-//			if (minRect[i].size.area() > maxRotatedRectArea) {
-//				maxRotatedRectAreaPos = static_cast<int>(markerRectangles.size()) - 1;
-//			}
-//		}
-//	}
-//
-//	if (maxRotatedRectAreaPos >= 0) {
-//		resultContour.clear();
-//
-//		//! Copy rectangle to output array
-//		for (size_t i = 0; i < 4; ++i) {
-//			resultContour.push_back(markerRectangles[maxRotatedRectAreaPos].outerCorners[i]);
-//		}
-//
-//		return true;
-//	}
-//
-//	return false;
-//}
-
-bool findDocumentContour(cv::Mat& source, std::vector<cv::Point2f>& resultContour)
+bool findDocumentContour(cv::Mat &source, std::vector<cv::Point2f> &resultContour)
 {
-    if (source.empty())
-    {
+    if (source.empty()) {
         throw std::invalid_argument("Input image for contours detection is empty");
     }
 
     std::vector<std::vector<cv::Point> > contours;
     std::vector<cv::Vec4i> hierarchy;
 
+    cv::cvtColor(source, draw, cv::ColorConversionCodes::COLOR_GRAY2BGR);
+
     cv::findContours(
-            source, contours, hierarchy,
+            source.clone(), contours, hierarchy,
             CV_RETR_CCOMP, CV_CHAIN_APPROX_SIMPLE,
             cv::Point(0, 0));
-
-    double maxArea = static_cast<double>(source.cols * source.rows) * 0.2;
 
     //! Approximate contours to polygons + get bounding rectangles and circles
     std::vector<std::vector<cv::Point> > contoursPolygons(contours.size());
@@ -220,41 +135,69 @@ bool findDocumentContour(cv::Mat& source, std::vector<cv::Point2f>& resultContou
     float maxRotatedRectArea = 0;
     int maxRotatedRectAreaPos = -1;
 
-    const double lengthCriteria = static_cast<double>(source.cols + source.rows) * 1.8;
-
-    double minArea = static_cast<double>(source.cols * source.rows) * 0.1;
+    double minArea = static_cast<double>(source.cols * source.rows) * 0.05;
 
     std::vector<cv::Point> maxCurve;
 
     for (size_t i = 0; i < contours.size(); ++i)
     {
         //! Approximate contour by polygon
-        cv::approxPolyDP(cv::Mat(contours[i]), contoursPolygons[i], contours[i].size() * 0.2, true);
+        contoursPolygons[i] = contours[i];
+        double approxEps = 1.0;
+        while(contoursPolygons[i].size() > 4)
+        {
+            cv::approxPolyDP(cv::Mat(contours[i]), contoursPolygons[i], approxEps, true);
+            approxEps += 1.0;
+            contours[i] = contoursPolygons[i];
+        }
 
-        bool isContoursPolygonTooBig =
-                arcLength(contoursPolygons[i], true) > lengthCriteria;
-        bool isContoursPolygonTooSmall = arcLength(contoursPolygons[i], true) < 100;
-        bool hasContoursPolygon4Conrners = contoursPolygons[i].size() == 4;
-        if (isContoursPolygonTooBig || isContoursPolygonTooSmall ||
-            !hasContoursPolygon4Conrners)
+        if(contoursPolygons[i].size() < 4)  continue;
+
+        double contArea = cv::contourArea(contoursPolygons[i]);
+
+        // Sides check
+        double side1 = cv::norm(contoursPolygons[i][0] - contoursPolygons[i][1]);
+        double side2 = cv::norm(contoursPolygons[i][1] - contoursPolygons[i][2]);
+        double side3 = cv::norm(contoursPolygons[i][2] - contoursPolygons[i][3]);
+        double side4 = cv::norm(contoursPolygons[i][3] - contoursPolygons[i][0]);
+
+        if(side1 < side3)  std::swap(side1, side3);
+        if(side2 < side4)  std::swap(side2, side4);
+
+        if(side3 / side1 < 0.85)  continue;
+        if(side4 / side2 < 0.85)  continue;
+
+        // Sides check - end
+
+        // Angles check
+
+        double angle1 = angleBetweenLinesInDegree(contoursPolygons[i][0], contoursPolygons[i][1], contoursPolygons[i][2], contoursPolygons[i][3]);
+        double angle2 = angleBetweenLinesInDegree(contoursPolygons[i][1], contoursPolygons[i][2], contoursPolygons[i][3], contoursPolygons[i][0]);
+
+        if(angle1 < 160.0)  continue;
+        if(angle2 < 160.0)  continue;
+        // Angles check - end
+
+
+        bool isContoursPolygonTooSmall = contArea < minArea;
+        bool isContoursPolygonTooBig = contArea > source.cols * source.rows;
+        bool hasContoursPolygon4Corners = contoursPolygons[i].size() == 4;
+        if (isContoursPolygonTooBig || isContoursPolygonTooSmall || !hasContoursPolygon4Corners )
         {
             continue;
         }
 
         double contourArea = cv::contourArea(contoursPolygons[i]);
 
-        if (contourArea > minArea)
-        {
+        if (contourArea > minArea) {
             minArea = contourArea;
             maxCurve = contoursPolygons[i];
         }
 
     }
 
-    if (!maxCurve.empty() && IsQuadrangularConvex(maxCurve))
-    {
-        for (size_t i = 0; i < 4; ++i)
-        {
+    if (!maxCurve.empty() && IsQuadrangularConvex(maxCurve)) {
+        for (size_t i = 0; i < 4; ++i) {
             resultContour.push_back(
                     cv::Point2f(
                             static_cast<float>(maxCurve[i].x),
@@ -550,4 +493,85 @@ void binarizeByLocalVariancesWithoutFilters(cv::Mat& image, cv::Mat& result)
 bool isQuadrangle(const std::vector<cv::Point>& contour)
 {
     return contour.size() == 4;
+}
+
+bool cropVerticesOrdering(std::vector<cv::Point2f>& pt)
+{
+    if (pt.empty())
+    {
+        throw std::invalid_argument("Contour for ordering is empty");
+    }
+
+    //! This should be 4 for rectangles, but it allows to be extended to more complex cases
+    int verticesNumber = static_cast<int>(pt.size());
+    if (verticesNumber != 4)
+    {
+        throw std::invalid_argument("Points number in input contour isn't equal 4");
+    }
+
+    //! Find convex hull of points
+    std::vector<cv::Point2f> points;
+    points = pt;
+
+    // indices of convex vertices
+    std::vector<int> indices;
+    cv::convexHull(points, indices, false);
+
+    //! Find top left point, as starting point. This is the nearest to (0.0) point
+    int minDistanceIdx = 0;
+    double minDistanceSqr =
+            pt[indices[0]].x * pt[indices[0]].x +
+            pt[indices[0]].y * pt[indices[0]].y;
+
+    for (int i = 1; i < verticesNumber; ++i)
+    {
+        double distanceSqr =
+                pt[indices[i]].x * pt[indices[i]].x +
+                pt[indices[i]].y * pt[indices[i]].y;
+
+        if (distanceSqr < minDistanceSqr)
+        {
+            minDistanceIdx = i;
+            minDistanceSqr = distanceSqr;
+        }
+    }
+
+    //! Now starting point index in source array is in indices[minDistanceIdx]
+    //! convex hull vertices are sorted clockwise in indices array, so transfer them to result
+    //! beginning from starting point to the end of array...
+    std::vector<cv::Point2f> ret(verticesNumber);
+    int idx = 0;
+    for (int i = minDistanceIdx; i < verticesNumber; ++i, ++idx)
+    {
+        ret[idx] = cv::Point2f(pt[indices[i]].x, pt[indices[i]].y);
+    }
+
+    //! ... and from the begin of array up to starting point
+    for (int i = 0; i < minDistanceIdx; ++i, ++idx)
+    {
+        ret[idx] = cv::Point2f(pt[indices[i]].x, pt[indices[i]].y);
+    }
+
+    pt = ret;
+
+    return true;
+}
+
+void ScaleContour(std::vector<cv::Point2f>& contour, cv::Size& fromImageSize, cv::Size& toImageSize)
+{
+    if (contour.empty())
+    {
+        throw std::invalid_argument("Contour for scaling is empty");
+    }
+
+    float xScale = static_cast<float>(toImageSize.width) /
+                   static_cast<float>(fromImageSize.width);
+    float yScale = static_cast<float>(toImageSize.height) /
+                   static_cast<float>(fromImageSize.height);
+
+    for (size_t i = 0; i < contour.size(); ++i)
+    {
+        contour[i].x *= xScale;
+        contour[i].y *= yScale;
+    }
 }

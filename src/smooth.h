@@ -25,7 +25,7 @@
 #ifndef PRLIB_SMOOTHING_HPP
 #define PRLIB_SMOOTHING_HPP
 
-#include "opencv2/core.hpp"
+#include <opencv2/core/core.hpp>
 
 namespace prl
 {

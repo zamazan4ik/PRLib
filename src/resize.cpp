@@ -24,7 +24,7 @@
 
 #include "resize.h"
 
-#include "opencv2/imgproc.hpp"
+#include <opencv2/imgproc/imgproc.hpp>
 
 void prl::resize(const cv::Mat& src, cv::Mat& dst, int scaleX, int scaleY, int maxSize)
 {

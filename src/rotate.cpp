@@ -23,11 +23,12 @@
 */
 
 #include "rotate.h"
-#include "utils.h"
 
 #include <cmath>
 
-#include "opencv2/imgproc.hpp"
+#include <opencv2/imgproc/imgproc.hpp>
+
+#include "utils.h"
 
 namespace prl
 {

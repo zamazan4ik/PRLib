@@ -4,9 +4,9 @@
 #include "opencv2/imgproc/imgproc.hpp"
 
 #include <algorithm>
-#include <vector>
 #include <cmath>
 #include <stdexcept>
+#include <vector>
 
 #include "binarizeLocalOtsu.h"
 #include "imageLibCommon.h"

@@ -25,7 +25,7 @@
 #ifndef PRLIB_RESIZE_HPP
 #define PRLIB_RESIZE_HPP
 
-#include "opencv2/core.hpp"
+#include <opencv2/core/core.hpp>
 
 namespace prl
 {

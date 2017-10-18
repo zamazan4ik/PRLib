@@ -65,5 +65,4 @@ void prl::removeHolePunch(const cv::Mat& inputImage, cv::Mat& outputImage)
     {
         cv::circle(outputImage, keypoint.pt, keypoint.size / 2.0 + 3, cv::Scalar(255,255,255), CV_FILLED);
     }
-
 }
