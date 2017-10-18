@@ -1,18 +1,33 @@
 #include "autoCropUtils.h"
 
-#include <opencv2/highgui/highgui.hpp>
-#include <opencv2/imgproc/imgproc.hpp>
-#include <opencv2/features2d/features2d.hpp>
-
 #include <algorithm>
 #include <iostream>
 #include <stdexcept>
 #include <vector>
 
+#include <opencv2/highgui/highgui.hpp>
+#include <opencv2/imgproc/imgproc.hpp>
+#include <opencv2/features2d/features2d.hpp>
+
 #include "imageLibCommon.h"
 
-//////////////////////////////////////////////////////////////////////////
 
+double angleBetweenLinesInDegree(cv::Point line1Start, cv::Point line1End,
+                                 cv::Point line2Start, cv::Point line2End)
+{
+    double angle1 = atan2(line1Start.y - line1End.y, line1Start.x - line1End.x);
+    double angle2 = atan2(line2Start.y - line2End.y, line2Start.x - line2End.x);
+    double result = (angle2 - angle1) * 180 / 3.14;
+    if (result < 0)
+    {
+        result += 360;
+    }
+    if (result > 180.0)
+    {
+        result = 360.0 - result;
+    }
+    return result;
+}
 
 //! Calculate degree between two vectors
 double dotDegree(cv::Point& common, cv::Point& a, cv::Point& b)
