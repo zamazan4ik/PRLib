@@ -15,18 +15,15 @@ set(CMAKE_CXX_STANDARD 11)
 file(GLOB_RECURSE HEADERS "src/*/*.h" "src/*.h")
 file(GLOB_RECURSE SOURCES "src/*/*.cpp" "src/*.cpp" "src/*/*.h" "src/*.h")
 
-message(STATUS ${CMAKE_MODULE_PATH})
-
 foreach(_header ${HEADERS})
     file(COPY ${_header} DESTINATION ${CMAKE_BINARY_DIR}/include)
 endforeach()
 
 find_package(Leptonica)
 find_package(OpenCV)
-#find_package(PkgConfig REQUIRED)
-#pkg_check_modules(Leptonica REQUIRED lept>=${MINIMUM_LEPTONICA_VERSION})
 
 include_directories(${Leptonica_INCLUDE_DIRS})
+include_directories(${OpenCV_INCLUDE_DIRS})
 
 add_library(prlib STATIC ${SOURCES})
 
