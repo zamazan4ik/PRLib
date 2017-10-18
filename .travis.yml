@@ -1,0 +1,176 @@
+dist: trusty
+language: cpp
+sudo: true
+
+os:
+ - linux
+ - osx
+
+compiler:
+ - gcc
+ - clang
+
+before_install:
+  - eval "${MATRIX_EVAL}"
+  - if [ "$TRAVIS_OS_NAME" = "linux" ]; then sudo apt-get update; sudo apt-get install libopencv-dev; fi
+#  - if [ "$TRAVIS_OS_NAME" = "linux" ] && [ "${MATRIX_EVAL}" = "CC=gcc-4.9 && CXX=g++-4.9" ]; then echo -n | openssl s_client -connect scan.coverity.com:443 | sed -ne '/-BEGIN CERTIFICATE-/,/-END CERTIFICATE-/p' | sudo tee -a /etc/ssl/certs/ca-; fi
+#  - if [ "$TRAVIS_OS_NAME" = "linux" ] && [ "${MATRIX_EVAL}" = "CC=gcc-4.9 && CXX=g++-4.9" ]; then pip install --user cpp-coveralls; fi
+#  - if [ "$TRAVIS_OS_NAME" = "linux" ] && [ "${MATRIX_EVAL}" = "CC=clang-4.0 && CXX=clang++-4.0" ]; then wget -q -O - http://files.viva64.com/etc/pubkey.txt | sudo apt-key add - ; sudo wget -O /etc/apt/sources.list.d/viva64.list http://files.viva64.com/etc/viva64.list ; sudo apt-get update ; sudo apt-get install pvs-studio ; fi
+
+script:
+ - cmake .
+ - make
+ #- if [ "$TRAVIS_OS_NAME" = "linux" ] && [ "${MATRIX_EVAL}" = "CC=gcc-4.9 && CXX=g++-4.9" ]; then cppcheck --error-exitcode=1 example/ ; fi
+ #- if [ "$TRAVIS_OS_NAME" = "linux" ] && [ "${MATRIX_EVAL}" = "CC=clang-4.0 && CXX=clang++-4.0" ]; then cmake -DCMAKE_CXX_COMPILER=/usr/share/clang/scan-build-4.0/libexec/c++-analyzer . ; fi
+ #- if [ "$TRAVIS_OS_NAME" = "linux" ] && [ "${MATRIX_EVAL}" = "CC=clang-4.0 && CXX=clang++-4.0" ]; then scan-build-4.0 -analyze-headers make ; fi
+
+
+env:
+  global:
+   # The next declaration is the encrypted COVERITY_SCAN_TOKEN, created
+   #   via the "travis encrypt" command using the project repo's public key
+   #- secure: "KKyL4TuyDAJAr6WU6Z00odxzhW+glgehhVk74Rgf9ubU2e4v2M2ypKkno3jX4hU9kxjeCXLALZPy1eg524UGCJxIhNxxvMSIel8r4ldVk/+va5Dc8ASEnGGm5482bZupH4uxJi+DpNZe0hmxMfVtxoy6fEVy6yw5HH0h0OSGGadCo8Kg7lnLIlz8JjIDmqEzuzG7iwpcAJStEktaGYagUnQEAq5iAb1/JNtGEoPEMvSnHwk4UIndnZk8jbxff1Zerki1twBXsr5MkKM3OW0nkuhL0bbayZTniblZ62ACiT6rDdMW8F+oXAkv1SqoE0PjwsbiQwxYQtEByKC0CV0UqUq6brqxPu1arJrJpzlm6X+kJFolQauNKLO6KFL7OC1BhkGdtcDNhru7a1Ybr84jFENINh8aOtnGamHeunra3iX8JV+q33X9INHh+gIKOrDaUzvniUjM2x9uSv5kGEhjgd4+pTjVfZoNWj4xnZ2W1buuhfbuB7/sQXIgAsFsjLVS4TpRMRn2dsHPkqaWwfqL8NlEVsuHp7847GZ/0TGshiYc1St8/gX4kgvh2FZc6gtHBSwvzcwagNTucaKkjBTXajiCj57njFCBCuX36pd6+Z/Rmn8hQevF1r25OJ5xF8ECPMy6NS9pd8yliuFe6/jqDYngPN9bxAWCFh3b4E2NVqI="
+
+#env:
+#  - ENABLE_MULTITHREAD=ON
+#  - ENABLE_MULTITHREAD=OFF
+#  - CXX_STANDARD_LIBRARY=libc++
+#  - CXX_STANDARD_LIBRARY=libstdc++
+#addons:
+#        coverity_scan:
+#          project:
+#            name: "ZaMaZaN4iK/libcsv"
+#            description: "Static analyze from Travis CI"
+#          notification_email: zamazan4ik@tut.by
+#          build_command_prepend: "cmake ."
+#          build_command:   "make"
+#          branch_pattern: master
+
+matrix:
+  include:
+    # works on Precise and Trusty
+    - os: linux
+      addons:
+        apt:
+          sources:
+            - ubuntu-toolchain-r-test
+          packages:
+            - g++-4.9
+            - cppcheck
+      env:
+         - MATRIX_EVAL="CC=gcc-4.9 && CXX=g++-4.9"
+
+    # works on Precise and Trusty
+    - os: linux
+      addons:
+        apt:
+          sources:
+            - ubuntu-toolchain-r-test
+          packages:
+            - g++-5
+      env:
+         - MATRIX_EVAL="CC=gcc-5 && CXX=g++-5"
+
+    # works on Precise and Trusty
+    - os: linux
+      addons:
+        apt:
+          sources:
+            - ubuntu-toolchain-r-test
+          packages:
+            - g++-6
+      env:
+        - MATRIX_EVAL="CC=gcc-6 && CXX=g++-6"
+
+
+
+
+
+    # Clang builds part
+    # works on Precise and Trusty
+    - os: linux
+      addons:
+        apt:
+          sources:
+            - ubuntu-toolchain-r-test
+            - llvm-toolchain-precise-3.6
+          packages:
+            - clang-3.6
+      env:
+        - MATRIX_EVAL="CC=clang-3.6 && CXX=clang++-3.6"
+
+    # works on Precise and Trusty
+    - os: linux
+      addons:
+        apt:
+          sources:
+            - ubuntu-toolchain-r-test
+            - llvm-toolchain-precise-3.7
+          packages:
+            - clang-3.7
+      env:
+        - MATRIX_EVAL="CC=clang-3.7 && CXX=clang++-3.7"
+
+    # works on Precise and Trusty
+    - os: linux
+      addons:
+        apt:
+          sources:
+            - ubuntu-toolchain-r-test
+            - llvm-toolchain-precise-3.8
+          packages:
+            - clang-3.8
+      env:
+        - MATRIX_EVAL="CC=clang-3.8 && CXX=clang++-3.8"
+
+    # works on Trusty
+    - os: linux
+      addons:
+        apt:
+          sources:
+            - llvm-toolchain-trusty-3.9
+          packages:
+            - clang-3.9
+      env:
+        - MATRIX_EVAL="CC=clang-3.9 && CXX=clang++-3.9"
+
+    # works on Trusty
+    - os: linux
+      addons:
+        apt:
+          sources:
+            - llvm-toolchain-trusty-4.0
+          packages:
+            - clang-4.0
+      env:
+        - MATRIX_EVAL="CC=clang-4.0 && CXX=clang++-4.0"
+
+#   Disabled it because it cannot be installed properly
+#
+#    - os: linux
+#      addons:
+#        apt:
+#          sources:
+#            - sourceline: 'deb http://apt.llvm.org/trusty/ llvm-toolchain-trusty-5.0 main'
+#              key_url: 'https://apt.llvm.org/llvm-snapshot.gpg.key'
+#          packages:
+#            - clang-5.0
+#      env:
+#        - MATRIX_EVAL="CC=clang-5.0 && CXX=clang++-5.0"
+
+
+
+    # MacOS builds part
+    # works on MacOS
+    #- os: osx
+    #  env:
+    #    - MATRIX_EVAL="CC=gcc-4.9 && CXX=g++-4.9"
+
+    #- os: osx
+    #  env:
+    #    - MATRIX_EVAL="brew install gcc5 && CC=gcc-5 && CXX=g++-5"
+
+    #- os: osx
+    #  env:
+    #    - MATRIX_EVAL="brew install gcc6 && CC=gcc-6 && CXX=g++-6"
+
