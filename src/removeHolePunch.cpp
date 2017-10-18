@@ -26,6 +26,7 @@ void prl::removeHolePunch(const cv::Mat& inputImage, cv::Mat& outputImage)
     cv::SimpleBlobDetector::Params params;
 
     params.filterByArea = true;
+    // TODO: calculate coefficient depend on image size
     params.minArea = 50;
 
     params.filterByCircularity = true;
