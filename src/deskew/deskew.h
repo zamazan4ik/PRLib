@@ -9,13 +9,13 @@ namespace prl
 /**
  * @brief Deskew image of document.
  * @param inputImage Image for deskewing.
- * @param deskewedImage Deskewed image.
+ * @param outputImage Deskewed image.
  * @return true if processing successful.
  *
  * \note Implementation of this procedure is based on
  * <a href="http://www.leptonica.com/">Leptonica library</a>.
  */
-bool Deskew(cv::Mat& inputImage, cv::Mat& deskewedImage);
+bool deskew(cv::Mat& inputImage, cv::Mat& outputImage);
 
 /**
  * @brief Find orientation of an image.
@@ -25,7 +25,7 @@ bool Deskew(cv::Mat& inputImage, cv::Mat& deskewedImage);
  * \note Implementation of this procedure is based on
  * <a href="http://www.leptonica.com/">Leptonica library</a>.
  */
-double FindOrientation(const cv::Mat& input);
+double findOrientation(const cv::Mat& inputImage);
 
 /**
  * @brief Find angle of an image.
@@ -35,7 +35,7 @@ double FindOrientation(const cv::Mat& input);
  * \note Implementation of this procedure is based on
  * <a href="http://www.leptonica.com/">Leptonica library</a>.
  */
-double FindAngle(const cv::Mat& input_orig);
+double findAngle(const cv::Mat& inputImage);
 }
 
 #endif // PRLIB_deskew_h

@@ -6,22 +6,11 @@
 #if defined(WIN32) || defined(_MSC_VER)
 #include <windows.h>
 #else
-
 #include "compatibility.h"
-
 #endif
-
-#ifdef _MSC_VER
-#	pragma warning(push)
-#	pragma warning(disable : 4305)
-#	pragma warning(disable : 4005)
-#endif // _MSC_VER
 
 #include <leptonica/allheaders.h>
 
-#ifdef _MSC_VER
-#	pragma warning(pop)
-#endif // _MSC_VER
 
 #if defined(_WIN32) || defined(_MSC_VER)
 #include <direct.h>
@@ -38,8 +27,6 @@
 #include <map>
 #include <vector>
 
-#include <leptonica/pix.h>
-
 #include "formatConvert.h"
 
 #ifndef M_PI
@@ -53,12 +40,12 @@
 #endif // !M_PI
 
 #include "formatConvert.h"
-#include "utils.h"
 #include "rotate.h"
+#include "utils.h"
 
-double FindOrientation(const cv::Mat& input)
+double findOrientation(const cv::Mat& inputImage)
 {
-    PIX* pix = prl::ImgOpenCvToLepton(input);
+    PIX* pix = prl::ImgOpenCvToLepton(inputImage);
     if (!pix)
     {
         return 0;
@@ -106,8 +93,8 @@ double FindOrientation(const cv::Mat& input)
     {
         angle = 270.0;
     }
-    else
-    { // if (iOrientation == L_TEXT_ORIENT_UNKNOWN)
+    else // if (iOrientation == L_TEXT_ORIENT_UNKNOWN)
+    {
         angle = 0.0;
     }
 
@@ -117,11 +104,11 @@ double FindOrientation(const cv::Mat& input)
 }
 
 
-double FindAngle(const cv::Mat& input_orig)
+double findAngle(const cv::Mat& inputImage)
 {
     // AA: we need black-&-white image here even if none of threshold algorithms were called before
     //cv::adaptiveThreshold(input, input, 255, CV_ADAPTIVE_THRESH_GAUSSIAN_C, CV_THRESH_BINARY, 15, 5);
-    cv::Mat input = input_orig.clone();
+    cv::Mat input = inputImage.clone();
 
     cv::Size imgSize = input.size();
     cv::bitwise_not(input, input);
@@ -186,7 +173,7 @@ double FindAngle(const cv::Mat& input_orig)
     return cv_angle;
 }
 
-bool Deskew(cv::Mat& inputImage, cv::Mat& deskewedImage)
+bool deskew(cv::Mat& inputImage, cv::Mat& outputImage)
 {
     CV_Assert(!inputImage.empty());
 
@@ -204,25 +191,25 @@ bool Deskew(cv::Mat& inputImage, cv::Mat& deskewedImage)
     //TODO: Should we use here another binarization algorithm?
     cv::threshold(processingImage, processingImage, 128, 255, CV_THRESH_BINARY | CV_THRESH_OTSU);
 
-    double angle = FindAngle(processingImage);
+    double angle = findAngle(processingImage);
 
     if ((angle != 0) && (angle <= DBL_MAX && angle >= -DBL_MAX))
     {
-        prl::rotate(inputImage, deskewedImage, angle);
+        prl::rotate(inputImage, outputImage, angle);
     }
     else
     {
-        deskewedImage = inputImage.clone();
+        outputImage = inputImage.clone();
     }
 
-    angle = FindOrientation(deskewedImage);
+    angle = findOrientation(outputImage);
 
     if (angle != 0)
     {
-        prl::rotate(deskewedImage, deskewedImage, angle);
+        prl::rotate(outputImage, outputImage, angle);
     }
 
-    if (deskewedImage.empty())
+    if (outputImage.empty())
     {
         return false;
     }
