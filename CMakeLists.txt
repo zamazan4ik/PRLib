@@ -1,69 +1,38 @@
 cmake_minimum_required(VERSION 3.6.0)
 project(prlib)
 
-set( CMAKE_CXX_FLAGS  "${CMAKE_CXX_FLAGS}" )
-
-include_directories(include/opencv include/opencv/opencv2 include/spdlog)
-
 include_directories(src/*/* src/binarizations src/balance src/border_detection src/deblur src/denoise src/deskew
                     src/detectors src/thinning)
 
-link_directories(lib/opencv lib/libjpeg lib/libpng lib/libtiff lib/zlib lib/libjasper
-        lib/libwebp lib/libippcv lib/libprotobuf lib/leptonica lib/libgif)
-
-set(CMAKE_BUILD_TYPE Debug)
+include_directories( ${CMAKE_BINARY_DIR} ${PROJECT_SOURCE_DIR}/src)
 
 set(CMAKE_INCLUDE_CURRENT_DIR ON)
 
-set(CMAKE_CXX_STANDARD 14)
+list(APPEND CMAKE_MODULE_PATH "${CMAKE_SOURCE_DIR}/cmake")
 
-#set(CMAKE_INTERPROCEDURAL_OPTIMIZATION TRUE)
-
-#set(OpenCV_LIBSS libopencv_ximgproc.a libopencv_xphoto.a libopencv_shape.a libopencv_imgcodecs.a libopencv_ts.a
-#        libopencv_videostab.a libopencv_photo.a libopencv_calib3d.a
-#        libopencv_video.a libopencv_stitching.a
-#        libopencv_videoio.a libopencv_superres.a
-#        libopencv_ml.a libopencv_objdetect.a  libopencv_features2d.a
-#        libopencv_flann.a libopencv_imgproc.a libopencv_highgui.a libopencv_core.a)
+set(CMAKE_CXX_STANDARD 11)
 
 file(GLOB_RECURSE HEADERS "src/*/*.h" "src/*.h")
 file(GLOB_RECURSE SOURCES "src/*/*.cpp" "src/*.cpp" "src/*/*.h" "src/*.h")
 
+message(STATUS ${CMAKE_MODULE_PATH})
 
 foreach(_header ${HEADERS})
     file(COPY ${_header} DESTINATION ${CMAKE_BINARY_DIR}/include)
 endforeach()
 
-
-
-set(CMAKE_BUILD_TYPE Debug)
-
-#add_subdirectory(samples)
-
-include_directories( ${CMAKE_BINARY_DIR} ${PROJECT_SOURCE_DIR}/src)
-
+find_package(Leptonica)
 find_package(OpenCV)
+#find_package(PkgConfig REQUIRED)
+#pkg_check_modules(Leptonica REQUIRED lept>=${MINIMUM_LEPTONICA_VERSION})
+
+include_directories(${Leptonica_INCLUDE_DIRS})
 
 add_library(prlib STATIC ${SOURCES})
 
 target_link_libraries(prlib
         ${OpenCV_LIBS}
-        -llept
-        #-fPIC
-        #liblibjpeg.a
-        #[[-lzlib
-        -ltiff.a
-        -lippicv.a
-        liblibwebp.a
-        liblibjasper.a
-
-        -ljpeg
-        -lpng
-        -lgif
-
-        -lgomp
-        -fPIC
-        -lpthread]])
+        ${Leptonica_LIBRARIES})
 
 # Samples
 
@@ -143,29 +112,10 @@ target_link_libraries(removeDots_sample prlib)
 add_executable(warp_sample samples/warp_sample.cpp)
 target_link_libraries(warp_sample prlib)
 
-#add_subdirectory(samples)
+# Auto crop sample
+add_executable(autoCrop_sample samples/border_detection/autoCrop_sample.cpp)
+target_link_libraries(autoCrop_sample prlib)
 
-#add_executable(prlib samples/binarizations/binarizeCOCOCLUST_sample.cpp)
-#target_link_libraries(binCOCO prlib)
-
-#[[target_link_libraries(prlib
-        ${OpenCV_LIBSS}
-        libleptonica.a
-
-        #liblibjpeg.a
-        libzlib.a
-        liblibtiff.a
-        libippicv.a
-        liblibwebp.a
-        liblibjasper.a
-
-        libjpeg.a
-        liblibpng.a
-        libgif.a
-
-        -lgomp
-        -fPIC
-        -lpthread)]]
 
 
 
