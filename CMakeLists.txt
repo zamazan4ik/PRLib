@@ -122,8 +122,22 @@ add_executable(kuwaharaFilter_sample samples/denoise/kuwaharaFilter_sample.cpp)
 target_link_libraries(kuwaharaFilter_sample prlib)
 
 # Border detection samples
-add_executable(autoCropAbbyy_sample samples/border_detection/autoCropAbbyy_sample.cpp)
-target_link_libraries(autoCropAbbyy_sample prlib)
+
+# Correct non-uniform illumination samples
+add_executable(correctNUIL_sample samples/correctNUIL_sample.cpp)
+target_link_libraries(correctNUIL_sample prlib)
+
+# Remove hole punches samples
+add_executable(removeHolePunch_sample samples/removeHolePunch_sample.cpp)
+target_link_libraries(removeHolePunch_sample prlib)
+
+# Remove lines samples
+add_executable(removeLines_sample samples/removeLines_sample.cpp)
+target_link_libraries(removeLines_sample prlib)
+
+# Warp sample
+add_executable(warp_sample samples/warp_sample.cpp)
+target_link_libraries(warp_sample prlib)
 
 #add_subdirectory(samples)
 
