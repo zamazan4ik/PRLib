@@ -74,5 +74,7 @@ void ScaleContour(std::vector<cv::Point2f>& contour, cv::Size& fromImageSize, cv
  */
 bool cropVerticesOrdering(std::vector<cv::Point2f>& pt);
 
+bool intersection(cv::Point2f o1, cv::Point2f p1, cv::Point2f o2, cv::Point2f p2,
+                  cv::Point2f& r);
 
 #endif // CIB_SCANNED_DOCUMENT_IMAGE_BORDER_DETECTION_UTILS_H_

@@ -1,11 +1,11 @@
 #include "backgroundNormalization.h"
 
+#include <stdexcept>
+
 #include <opencv2/core/core.hpp>
 #include <opencv2/imgproc/imgproc.hpp>
 
 #include <leptonica/allheaders.h>
-
-#include <stdexcept>
 
 #include "formatConvert.h"
 
