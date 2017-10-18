@@ -25,7 +25,7 @@
 #ifndef PRLIB_GLAREDETECTION_HPP
 #define PRLIB_GLAREDETECTION_HPP
 
-#include "opencv2/core.hpp"
+#include <opencv2/core/core.hpp>
 
 namespace prl
 {

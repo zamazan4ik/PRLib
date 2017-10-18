@@ -1,9 +1,9 @@
 #ifndef PRLIB_HoughLine_h__
 #define PRLIB_HoughLine_h__
 
-#include "opencv2/core/core.hpp"
-
 #include <vector>
+
+#include <opencv2/core/core.hpp>
 
 namespace prl
 {
