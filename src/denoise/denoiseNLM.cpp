@@ -26,7 +26,7 @@
 
 #include <opencv2/photo/photo.hpp>
 
-void prl::denoise(const cv::Mat& inputImage, cv::Mat& outputImage)
+void prl::denoise(const cv::Mat& inputImage, cv::Mat& outputImage, double strength)
 {
-    cv::fastNlMeansDenoisingColored(inputImage, outputImage, 5.5);
+    cv::fastNlMeansDenoisingColored(inputImage, outputImage, strength);
 }
