@@ -85,7 +85,6 @@ matrix:
 
 
 
-
     # Clang builds part
     # works on Precise and Trusty
     - os: linux
