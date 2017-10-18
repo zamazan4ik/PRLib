@@ -135,6 +135,10 @@ target_link_libraries(removeHolePunch_sample prlib)
 add_executable(removeLines_sample samples/removeLines_sample.cpp)
 target_link_libraries(removeLines_sample prlib)
 
+# Remove dots sample
+add_executable(removeDots_sample samples/removeDots_sample.cpp)
+target_link_libraries(removeDots_sample prlib)
+
 # Warp sample
 add_executable(warp_sample samples/warp_sample.cpp)
 target_link_libraries(warp_sample prlib)
