@@ -12,7 +12,7 @@ compiler:
 
 before_install:
   - eval "${MATRIX_EVAL}"
-  - if [ "$TRAVIS_OS_NAME" = "linux" ]; then sudo apt-get update; sudo apt-get install libopencv-dev libleptonica-dev; fi
+#  - if [ "$TRAVIS_OS_NAME" = "linux" ]; then sudo apt-get update; sudo apt-get install libopencv-dev libleptonica-dev; fi
 #  - if [ "$TRAVIS_OS_NAME" = "linux" ] && [ "${MATRIX_EVAL}" = "CC=gcc-4.9 && CXX=g++-4.9" ]; then echo -n | openssl s_client -connect scan.coverity.com:443 | sed -ne '/-BEGIN CERTIFICATE-/,/-END CERTIFICATE-/p' | sudo tee -a /etc/ssl/certs/ca-; fi
 #  - if [ "$TRAVIS_OS_NAME" = "linux" ] && [ "${MATRIX_EVAL}" = "CC=gcc-4.9 && CXX=g++-4.9" ]; then pip install --user cpp-coveralls; fi
 #  - if [ "$TRAVIS_OS_NAME" = "linux" ] && [ "${MATRIX_EVAL}" = "CC=clang-4.0 && CXX=clang++-4.0" ]; then wget -q -O - http://files.viva64.com/etc/pubkey.txt | sudo apt-key add - ; sudo wget -O /etc/apt/sources.list.d/viva64.list http://files.viva64.com/etc/viva64.list ; sudo apt-get update ; sudo apt-get install pvs-studio ; fi
@@ -57,6 +57,8 @@ matrix:
           packages:
             - g++-4.9
             - cppcheck
+            - libopencv-dev
+            - libleptonica-dev
       env:
          - MATRIX_EVAL="CC=gcc-4.9 && CXX=g++-4.9"
 
@@ -68,6 +70,8 @@ matrix:
             - ubuntu-toolchain-r-test
           packages:
             - g++-5
+            - libopencv-dev
+            - libleptonica-dev
       env:
          - MATRIX_EVAL="CC=gcc-5 && CXX=g++-5"
 
@@ -79,6 +83,8 @@ matrix:
             - ubuntu-toolchain-r-test
           packages:
             - g++-6
+            - libopencv-dev
+            - libleptonica-dev
       env:
         - MATRIX_EVAL="CC=gcc-6 && CXX=g++-6"
 
@@ -95,6 +101,8 @@ matrix:
             - llvm-toolchain-precise-3.6
           packages:
             - clang-3.6
+            - libopencv-dev
+            - libleptonica-dev
       env:
         - MATRIX_EVAL="CC=clang-3.6 && CXX=clang++-3.6"
 
@@ -107,6 +115,8 @@ matrix:
             - llvm-toolchain-precise-3.7
           packages:
             - clang-3.7
+            - libopencv-dev
+            - libleptonica-dev
       env:
         - MATRIX_EVAL="CC=clang-3.7 && CXX=clang++-3.7"
 
@@ -119,6 +129,8 @@ matrix:
             - llvm-toolchain-precise-3.8
           packages:
             - clang-3.8
+            - libopencv-dev
+            - libleptonica-dev
       env:
         - MATRIX_EVAL="CC=clang-3.8 && CXX=clang++-3.8"
 
@@ -130,6 +142,8 @@ matrix:
             - llvm-toolchain-trusty-3.9
           packages:
             - clang-3.9
+            - libopencv-dev
+            - libleptonica-dev
       env:
         - MATRIX_EVAL="CC=clang-3.9 && CXX=clang++-3.9"
 
@@ -141,6 +155,8 @@ matrix:
             - llvm-toolchain-trusty-4.0
           packages:
             - clang-4.0
+            - libopencv-dev
+            - libleptonica-dev
       env:
         - MATRIX_EVAL="CC=clang-4.0 && CXX=clang++-4.0"
 
