@@ -1,3 +1,27 @@
+/*
+    MIT License
+
+    Copyright (c) 2017 Alexander Zaitsev
+
+    Permission is hereby granted, free of charge, to any person obtaining a copy
+    of this software and associated documentation files (the "Software"), to deal
+    in the Software without restriction, including without limitation the rights
+    to use, copy, modify, merge, publish, distribute, sublicense, and/or sell
+    copies of the Software, and to permit persons to whom the Software is
+    furnished to do so, subject to the following conditions:
+
+    The above copyright notice and this permission notice shall be included in all
+    copies or substantial portions of the Software.
+
+    THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
+    IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
+    FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE
+    AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
+    LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
+    OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
+    SOFTWARE.
+*/
+
 #ifndef PRLIB_binarizeNativeAdaptive_h
 #define PRLIB_binarizeNativeAdaptive_h
 
@@ -8,8 +32,8 @@ namespace prl
 
 /*!
  * \brief Native adaptive thresholding.
- * \param inputImageMat Image for binarization.
- * \param outputImageMat Resulting image.
+ * \param inputImage Image for binarization.
+ * \param outputImage Resulting image.
  * \param isGaussianBlurReqiured \parblock Flag of usage Gaussian blur.
  * If this flag equals true then Gaussian blur is used.
  * Else median blur is used. \endparblock
@@ -36,7 +60,7 @@ namespace prl
  * -# Bilateral filter.
  */
 void binarizeNativeAdaptive(
-		cv::Mat& inputImageMat, cv::Mat& outputImageMat,
+		cv::Mat& inputImage, cv::Mat& outputImage,
 		bool isGaussianBlurReqiured = 0,
 		int medianBlurKernelSize = 5,
 		int GaussianBlurKernelSize = 7,

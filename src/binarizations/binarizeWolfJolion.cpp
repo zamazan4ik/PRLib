@@ -1,18 +1,42 @@
-#include "binarizeWolfJolion.h"
+/*
+    MIT License
 
-#include <opencv2/imgproc/imgproc.hpp>
+    Copyright (c) 2017 Alexander Zaitsev
+
+    Permission is hereby granted, free of charge, to any person obtaining a copy
+    of this software and associated documentation files (the "Software"), to deal
+    in the Software without restriction, including without limitation the rights
+    to use, copy, modify, merge, publish, distribute, sublicense, and/or sell
+    copies of the Software, and to permit persons to whom the Software is
+    furnished to do so, subject to the following conditions:
+
+    The above copyright notice and this permission notice shall be included in all
+    copies or substantial portions of the Software.
+
+    THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
+    IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
+    FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE
+    AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
+    LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
+    OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
+    SOFTWARE.
+*/
+
+#include "binarizeWolfJolion.h"
 
 #include <algorithm>
 #include <stdexcept>
 
+#include <opencv2/imgproc/imgproc.hpp>
+
 
 void prl::binarizeWolfJolion(
-        cv::Mat& imageCopy, cv::Mat& imageWolfJolion,
+        cv::Mat& imageInput, cv::Mat& outputImage,
         int windowSize,
         double thresholdCoefficient,
         int morphIterationCount)
 {
-    if (imageCopy.empty())
+    if (imageInput.empty())
     {
         throw std::invalid_argument("Input image for binarization is empty");
     }
@@ -23,15 +47,15 @@ void prl::binarizeWolfJolion(
 			( (windowSize > 1) && ((windowSize % 2) == 1) ) ");
     }
 
-    if (imageCopy.channels() != 1)
+    if (imageInput.channels() != 1)
     {
-        cv::cvtColor(imageCopy, imageCopy, CV_BGR2GRAY);
+        cv::cvtColor(imageInput, imageInput, CV_BGR2GRAY);
     }
 
     const int usedFloatType = CV_64FC1;
 
     //! parameters and constants of algorithm
-    int w = std::min(windowSize, std::min(imageCopy.cols, imageCopy.rows));;
+    int w = std::min(windowSize, std::min(imageInput.cols, imageInput.rows));;
     int wSqr = w * w;
     double wSqrBack = 1.0 / static_cast<double>(wSqr);
     const double k = thresholdCoefficient;
@@ -42,18 +66,18 @@ void prl::binarizeWolfJolion(
     cv::Mat localDevianceValues;
     cv::Mat localMeanValues;
 
-    cv::Rect processingRect(w / 2, w / 2, imageCopy.cols - w, imageCopy.rows - w);
+    cv::Rect processingRect(w / 2, w / 2, imageInput.cols - w, imageInput.rows - w);
 
     {
         //! add borders
-        cv::copyMakeBorder(imageCopy, imageCopy, w / 2, w / 2, w / 2, w / 2, cv::BORDER_REPLICATE);
+        cv::copyMakeBorder(imageInput, imageInput, w / 2, w / 2, w / 2, w / 2, cv::BORDER_REPLICATE);
 
 
         cv::Mat integralImage;
         cv::Mat integralImageSqr;
 
         //! get integral image, ...
-        cv::integral(imageCopy, integralImage, integralImageSqr, usedFloatType);
+        cv::integral(imageInput, integralImage, integralImageSqr, usedFloatType);
         //! ... crop it and ...
         integralImage = integralImage(cv::Rect(1, 1, integralImage.cols - 1, integralImage.rows - 1));
         //! get square
@@ -89,7 +113,7 @@ void prl::binarizeWolfJolion(
 
     //! calculate WolfJolion thresholds
     double imageMin;
-    cv::minMaxLoc(imageCopy, &imageMin);
+    cv::minMaxLoc(imageInput, &imageMin);
 
     double devianceMin, devianceMax;
     cv::minMaxLoc(localDevianceValues, &devianceMin, &devianceMax);
@@ -108,17 +132,17 @@ void prl::binarizeWolfJolion(
     thresholdsValues.convertTo(thresholdsValues, CV_8UC1);
 
     //! get binarized image
-    imageWolfJolion = imageCopy(processingRect) > thresholdsValues;
+    outputImage = imageInput(processingRect) > thresholdsValues;
 
     //! apply morphology operation if them required
     if (morphIterationCount > 0)
     {
-        cv::dilate(imageWolfJolion, imageWolfJolion, cv::Mat(), cv::Point(-1, -1), morphIterationCount);
-        cv::erode(imageWolfJolion, imageWolfJolion, cv::Mat(), cv::Point(-1, -1), morphIterationCount);
+        cv::dilate(outputImage, outputImage, cv::Mat(), cv::Point(-1, -1), morphIterationCount);
+        cv::erode(outputImage, outputImage, cv::Mat(), cv::Point(-1, -1), morphIterationCount);
     }
     else if (morphIterationCount < 0)
     {
-        cv::erode(imageWolfJolion, imageWolfJolion, cv::Mat(), cv::Point(-1, -1), -morphIterationCount);
-        cv::dilate(imageWolfJolion, imageWolfJolion, cv::Mat(), cv::Point(-1, -1), -morphIterationCount);
+        cv::erode(outputImage, outputImage, cv::Mat(), cv::Point(-1, -1), -morphIterationCount);
+        cv::dilate(outputImage, outputImage, cv::Mat(), cv::Point(-1, -1), -morphIterationCount);
     }
 }
