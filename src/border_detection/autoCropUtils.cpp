@@ -544,15 +544,15 @@ bool isQuadrangle(const std::vector<cv::Point>& contour)
     return contour.size() == 4;
 }
 
-bool cropVerticesOrdering(std::vector<cv::Point2f>& pt)
+bool cropVerticesOrdering(std::vector<cv::Point2f>& contour)
 {
-    if (pt.empty())
+    if (contour.empty())
     {
         throw std::invalid_argument("Contour for ordering is empty");
     }
 
     //! This should be 4 for rectangles, but it allows to be extended to more complex cases
-    int verticesNumber = static_cast<int>(pt.size());
+    int verticesNumber = static_cast<int>(contour.size());
     if (verticesNumber != 4)
     {
         throw std::invalid_argument("Points number in input contour isn't equal 4");
@@ -560,7 +560,7 @@ bool cropVerticesOrdering(std::vector<cv::Point2f>& pt)
 
     //! Find convex hull of points
     std::vector<cv::Point2f> points;
-    points = pt;
+    points = contour;
 
     // indices of convex vertices
     std::vector<int> indices;
@@ -569,14 +569,14 @@ bool cropVerticesOrdering(std::vector<cv::Point2f>& pt)
     //! Find top left point, as starting point. This is the nearest to (0.0) point
     int minDistanceIdx = 0;
     double minDistanceSqr =
-            pt[indices[0]].x * pt[indices[0]].x +
-            pt[indices[0]].y * pt[indices[0]].y;
+            contour[indices[0]].x * contour[indices[0]].x +
+            contour[indices[0]].y * contour[indices[0]].y;
 
     for (int i = 1; i < verticesNumber; ++i)
     {
         double distanceSqr =
-                pt[indices[i]].x * pt[indices[i]].x +
-                pt[indices[i]].y * pt[indices[i]].y;
+                contour[indices[i]].x * contour[indices[i]].x +
+                contour[indices[i]].y * contour[indices[i]].y;
 
         if (distanceSqr < minDistanceSqr)
         {
@@ -592,21 +592,21 @@ bool cropVerticesOrdering(std::vector<cv::Point2f>& pt)
     int idx = 0;
     for (int i = minDistanceIdx; i < verticesNumber; ++i, ++idx)
     {
-        ret[idx] = cv::Point2f(pt[indices[i]].x, pt[indices[i]].y);
+        ret[idx] = cv::Point2f(contour[indices[i]].x, contour[indices[i]].y);
     }
 
     //! ... and from the begin of array up to starting point
     for (int i = 0; i < minDistanceIdx; ++i, ++idx)
     {
-        ret[idx] = cv::Point2f(pt[indices[i]].x, pt[indices[i]].y);
+        ret[idx] = cv::Point2f(contour[indices[i]].x, contour[indices[i]].y);
     }
 
-    pt = ret;
+    contour = ret;
 
     return true;
 }
 
-void ScaleContour(std::vector<cv::Point2f>& contour, cv::Size& fromImageSize, cv::Size& toImageSize)
+void scaleContour(std::vector<cv::Point2f>& contour, cv::Size& fromImageSize, cv::Size& toImageSize)
 {
     if (contour.empty())
     {

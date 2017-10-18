@@ -26,7 +26,6 @@
 
 #include <algorithm>
 #include <cmath>
-#include <iostream>
 #include <stdexcept>
 #include <vector>
 
@@ -34,8 +33,8 @@
 #include <opencv2/imgproc/imgproc.hpp>
 #include <opencv2/features2d/features2d.hpp>
 
-#include "resize.h"
 #include "autoCropUtils.h"
+#include "resize.h"
 #include "warp.h"
 
 namespace prl
@@ -95,7 +94,7 @@ bool documentContour(
     cv::split(imageToProc, channels);
     imageToProc = channels[mostInfoChannelInd];
 
-    // Canny
+    // Edge detection
     cv::Mat resultCanny;
     double upper = 50;
     double lower = 25;
@@ -110,7 +109,7 @@ bool documentContour(
         isContourDetected = findDocumentContour(resultCanny, resultContour);
         if (isContourDetected)
         {
-            ScaleContour(resultContour, newImageSize, sourceImageSize);
+            scaleContour(resultContour, newImageSize, sourceImageSize);
             cropVerticesOrdering(resultContour);
             return true;
         }

@@ -89,14 +89,16 @@ void binarizeByLocalVariances(cv::Mat& image, cv::Mat& result);
 bool isQuadrangle(const std::vector<cv::Point>& contour);
 
 
-void ScaleContour(std::vector<cv::Point2f>& contour, cv::Size& fromImageSize, cv::Size& toImageSize);
+void scaleContour(std::vector<cv::Point2f>& contour, cv::Size& fromImageSize, cv::Size& toImageSize);
 
 /*!
  * \brief Contour points ordering.
- * \param[inout] pt Contour.
+ * \param[inout] contour Contour.
  * \return true if ordering is successful.
+ * \note Implementation of this function is based on
+ * <a href="https://www.pyimagesearch.com/2014/08/25/4-point-opencv-getperspective-transform-example/">Pyimagesearch</a>.
  */
-bool cropVerticesOrdering(std::vector<cv::Point2f>& pt);
+bool cropVerticesOrdering(std::vector<cv::Point2f>& contour);
 
 bool intersection(cv::Point2f o1, cv::Point2f p1, cv::Point2f o2, cv::Point2f p2,
                   cv::Point2f& r);
