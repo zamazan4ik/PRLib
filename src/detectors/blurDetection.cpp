@@ -85,5 +85,6 @@ double GLVN_Algo(const cv::Mat& src)
 bool prl::isBlurred(const cv::Mat& inputImage)
 {
     //TODO: find constants for blurring check for every algorithm. Write supertest, powered by all algorithms
+    return false;
 }
 
