@@ -24,7 +24,7 @@ int main(int argc, char**argv)
     cv::Mat inputImage = cv::imread(inputImageFilename);
     cv::Mat outputImage;
 
-    prl::thinGuoHall(inputImage, outputImage);
+    //prl::thinGuoHall(inputImage, outputImage);
 
     cv::imwrite(outputImageFilename, outputImage);
 }
