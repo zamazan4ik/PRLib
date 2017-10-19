@@ -67,9 +67,9 @@
 #include "rotate.h"
 #include "utils.h"
 
-double findOrientation(cv::Mat& inputImage)
+double prl::findOrientation(const cv::Mat& inputImage)
 {
-    PIX* pix = prl::leptCreatePixFromMat(&inputImage);
+    PIX* pix = prl::opencvToLeptonica(&inputImage);
     if (!pix)
     {
         return 0;
@@ -128,7 +128,7 @@ double findOrientation(cv::Mat& inputImage)
 }
 
 
-double findAngle(const cv::Mat& inputImage)
+double prl::findAngle(const cv::Mat& inputImage)
 {
     // AA: we need black-&-white image here even if none of threshold algorithms were called before
     //cv::adaptiveThreshold(input, input, 255, CV_ADAPTIVE_THRESH_GAUSSIAN_C, CV_THRESH_BINARY, 15, 5);
@@ -197,7 +197,7 @@ double findAngle(const cv::Mat& inputImage)
     return cv_angle;
 }
 
-bool deskew(cv::Mat& inputImage, cv::Mat& outputImage)
+CV_EXPORTS bool prl::deskew(const cv::Mat& inputImage, cv::Mat& outputImage)
 {
     CV_Assert(!inputImage.empty());
 

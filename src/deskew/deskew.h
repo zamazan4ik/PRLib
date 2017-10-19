@@ -39,7 +39,7 @@ namespace prl
  * \note Implementation of this procedure is based on
  * <a href="http://www.leptonica.com/">Leptonica library</a>.
  */
-bool deskew(cv::Mat& inputImage, cv::Mat& outputImage);
+CV_EXPORTS bool deskew(const cv::Mat& inputImage, cv::Mat& outputImage);
 
 /**
  * @brief Find orientation of an image.
@@ -49,7 +49,7 @@ bool deskew(cv::Mat& inputImage, cv::Mat& outputImage);
  * \note Implementation of this procedure is based on
  * <a href="http://www.leptonica.com/">Leptonica library</a>.
  */
-double findOrientation(const cv::Mat& inputImage);
+CV_EXPORTS double findOrientation(const cv::Mat& inputImage);
 
 /**
  * @brief Find angle of an image.
@@ -59,7 +59,7 @@ double findOrientation(const cv::Mat& inputImage);
  * \note Implementation of this procedure is based on
  * <a href="http://www.leptonica.com/">Leptonica library</a>.
  */
-double findAngle(const cv::Mat& inputImage);
+CV_EXPORTS double findAngle(const cv::Mat& inputImage);
 }
 
 #endif // PRLIB_deskew_h
