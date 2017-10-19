@@ -33,7 +33,7 @@
 #include "leptonica/allheaders.h"
 
 
-Pix* prl::leptCreatePixFromMat(cv::Mat* inputImage)
+Pix* prl::opencvToLeptonica(const cv::Mat* inputImage)
 {
     const unsigned char* imagedata = inputImage->data;
     int width = inputImage->size().width;
@@ -95,7 +95,7 @@ Pix* prl::leptCreatePixFromMat(cv::Mat* inputImage)
     return pix;
 }
 
-cv::Mat prl::leptCreateMatFromPix(Pix* inputImage)
+cv::Mat prl::leptonicaToOpenCV(Pix* inputImage)
 {
     int width = pixGetWidth(inputImage);
     int height = pixGetHeight(inputImage);

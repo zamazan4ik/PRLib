@@ -33,8 +33,8 @@
 
 namespace prl
 {
-PIX* leptCreatePixFromMat(cv::Mat* inputImage);
-cv::Mat leptCreateMatFromPix(PIX* inputImage);
+PIX* opencvToLeptonica(const cv::Mat* inputImage);
+cv::Mat leptonicaToOpenCV(PIX* inputImage);
 }
 
 #endif //PRLIB_FORMATCONVERT_HPP

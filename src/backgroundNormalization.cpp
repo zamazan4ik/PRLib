@@ -45,14 +45,14 @@ void prl::backgroundNormalization(const cv::Mat& inputImage, cv::Mat& outputImag
     cv::Mat outputImageMat;
 
     {
-        PIX* pixs = prl::leptCreatePixFromMat(&inputImageMat);
+        PIX* pixs = prl::opencvToLeptonica(&inputImageMat);
 
         /* Normalize for varying background */
         PIX* pixn = pixBackgroundNormSimple(pixs, nullptr, nullptr);
 
         pixDestroy(&pixs);
 
-        outputImageMat = prl::leptCreateMatFromPix(pixn);
+        outputImageMat = prl::leptonicaToOpenCV(pixn);
 
         pixDestroy(&pixn);
     }
