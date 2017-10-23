@@ -1,0 +1,25 @@
+var searchData=
+[
+  ['removechildrencontours',['RemoveChildrenContours',['../image_lib_common_8cpp.html#a2ef87a6c2dfc0a3ac436cafb48eb04cb',1,'RemoveChildrenContours(std::vector&lt; std::vector&lt; cv::Point &gt; &gt; &amp;contours, std::vector&lt; cv::Vec4i &gt; &amp;hierarchy):&#160;imageLibCommon.cpp'],['../image_lib_common_8h.html#aa3a142ef7f0a4e454823aa0c62fb3dd5',1,'RemoveChildrenContours(std::vector&lt; std::vector&lt; cv::Point &gt;&gt; &amp;contours, std::vector&lt; cv::Vec4i &gt; &amp;hierarchy):&#160;imageLibCommon.h']]],
+  ['removeclosesizechildren',['RemoveCloseSizeChildren',['../image_lib_common_8cpp.html#a27dca074aea2d985db74d81890ed4562',1,'imageLibCommon.cpp']]],
+  ['removedots',['removeDots',['../namespaceprl.html#ade2a42569bb06af854706bc67e419c78',1,'prl']]],
+  ['removedots_2ecpp',['removeDots.cpp',['../remove_dots_8cpp.html',1,'']]],
+  ['removedots_2eh',['removeDots.h',['../remove_dots_8h.html',1,'']]],
+  ['removeholepunch',['removeHolePunch',['../namespaceprl.html#a6c8a522dc3d0b900906da43eaa6d7d24',1,'prl']]],
+  ['removeholepunch_2ecpp',['removeHolePunch.cpp',['../remove_hole_punch_8cpp.html',1,'']]],
+  ['removeholepunch_2eh',['removeHolePunch.h',['../remove_hole_punch_8h.html',1,'']]],
+  ['removelines',['removeLines',['../namespaceprl.html#ab4c7ae723dcb243cf37200c863366dca',1,'prl']]],
+  ['removelines_2ecpp',['removeLines.cpp',['../remove_lines_8cpp.html',1,'']]],
+  ['removelines_2eh',['removeLines.h',['../remove_lines_8h.html',1,'']]],
+  ['resize',['resize',['../namespaceprl.html#abc923b8457dccdb46d4eb54bce9b846e',1,'prl']]],
+  ['resize_2ecpp',['resize.cpp',['../resize_8cpp.html',1,'']]],
+  ['resize_2eh',['resize.h',['../resize_8h.html',1,'']]],
+  ['rgbblue',['rgbBlue',['../struct_r_g_b_q_u_a_d.html#a26981c44b82baaabb9cdf9147c13b84b',1,'RGBQUAD']]],
+  ['rgbgreen',['rgbGreen',['../struct_r_g_b_q_u_a_d.html#abb80bcf0d8dd1a5b636aaa655017d1f9',1,'RGBQUAD']]],
+  ['rgbquad',['RGBQUAD',['../struct_r_g_b_q_u_a_d.html',1,'']]],
+  ['rgbred',['rgbRed',['../struct_r_g_b_q_u_a_d.html#a1bd80a00a260953ea222a10b34035b0c',1,'RGBQUAD']]],
+  ['rgbreserved',['rgbReserved',['../struct_r_g_b_q_u_a_d.html#aea0f944286f2e4ac1b21ca3f0e7328e5',1,'RGBQUAD']]],
+  ['rotate',['rotate',['../namespaceprl.html#a4490cacf49eae13952bdc7943d2f3404',1,'prl']]],
+  ['rotate_2ecpp',['rotate.cpp',['../rotate_8cpp.html',1,'']]],
+  ['rotate_2eh',['rotate.h',['../rotate_8h.html',1,'']]]
+];

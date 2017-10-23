@@ -1,0 +1,20 @@
+var searchData=
+[
+  ['bfoffbits',['bfOffBits',['../struct_b_i_t_m_a_p_f_i_l_e_h_e_a_d_e_r.html#aa2d88c943daaa79c0d9c516e682066c2',1,'BITMAPFILEHEADER']]],
+  ['bfreserved',['bfReserved',['../struct_b_i_t_m_a_p_f_i_l_e_h_e_a_d_e_r.html#a7236a6258a56221782851503c06b9a74',1,'BITMAPFILEHEADER']]],
+  ['bfsize',['bfSize',['../struct_b_i_t_m_a_p_f_i_l_e_h_e_a_d_e_r.html#ac188c0f3fcc322491b6a65105dfdebf5',1,'BITMAPFILEHEADER']]],
+  ['bftype',['bfType',['../struct_b_i_t_m_a_p_f_i_l_e_h_e_a_d_e_r.html#a784452060cd4a05f8216898dff3e2939',1,'BITMAPFILEHEADER']]],
+  ['bibitcount',['biBitCount',['../struct_b_i_t_m_a_p_i_n_f_o_h_e_a_d_e_r.html#a32a07f458a6b45596ff7f758cda17a7c',1,'BITMAPINFOHEADER']]],
+  ['biclrimportant',['biClrImportant',['../struct_b_i_t_m_a_p_i_n_f_o_h_e_a_d_e_r.html#a1f53a10225929b1552f6ab2a9ccbd18f',1,'BITMAPINFOHEADER']]],
+  ['biclrused',['biClrUsed',['../struct_b_i_t_m_a_p_i_n_f_o_h_e_a_d_e_r.html#a34843e5d97cc30a9d09fae3a792171d8',1,'BITMAPINFOHEADER']]],
+  ['bicompression',['biCompression',['../struct_b_i_t_m_a_p_i_n_f_o_h_e_a_d_e_r.html#acea6c2730aa457026a7025a45a977c41',1,'BITMAPINFOHEADER']]],
+  ['biheight',['biHeight',['../struct_b_i_t_m_a_p_i_n_f_o_h_e_a_d_e_r.html#ad7cec7f6db669cc6fe281ec7340f2606',1,'BITMAPINFOHEADER']]],
+  ['biplanes',['biPlanes',['../struct_b_i_t_m_a_p_i_n_f_o_h_e_a_d_e_r.html#a180479d0098537048181f589b0232917',1,'BITMAPINFOHEADER']]],
+  ['bisize',['biSize',['../struct_b_i_t_m_a_p_i_n_f_o_h_e_a_d_e_r.html#a2a8981d5feede8174da37ea22ef705b4',1,'BITMAPINFOHEADER']]],
+  ['bisizeimage',['biSizeImage',['../struct_b_i_t_m_a_p_i_n_f_o_h_e_a_d_e_r.html#a4f0e159e9297d118bc37aa8232eb98bf',1,'BITMAPINFOHEADER']]],
+  ['biwidth',['biWidth',['../struct_b_i_t_m_a_p_i_n_f_o_h_e_a_d_e_r.html#a3461cf43c1bee234c372d189cd700368',1,'BITMAPINFOHEADER']]],
+  ['bixpelspermeter',['biXPelsPerMeter',['../struct_b_i_t_m_a_p_i_n_f_o_h_e_a_d_e_r.html#a39911a8f7168aa824678d087351b8c19',1,'BITMAPINFOHEADER']]],
+  ['biypelspermeter',['biYPelsPerMeter',['../struct_b_i_t_m_a_p_i_n_f_o_h_e_a_d_e_r.html#a37f02612992e905cec5d708c91d6fc52',1,'BITMAPINFOHEADER']]],
+  ['bmicolors',['bmiColors',['../struct_b_i_t_m_a_p_i_n_f_o.html#a7378600dc5b678ee9f8e00b7c6eed48f',1,'BITMAPINFO']]],
+  ['bmiheader',['bmiHeader',['../struct_b_i_t_m_a_p_i_n_f_o.html#ac936b34e599a2df6ff4de69bf0611b2a',1,'BITMAPINFO']]]
+];
