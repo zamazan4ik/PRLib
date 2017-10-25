@@ -1,0 +1,22 @@
+var searchData=
+[
+  ['canny_5fgaussian_5fblur_5fkernel_5fsize',['CANNY_GAUSSIAN_BLUR_KERNEL_SIZE',['../namespaceprl.html#ac801f21a62616a360edd449ee24c9f1ca0ca791652bbd596e0c62eb0278ce23e8',1,'prl']]],
+  ['canny_5flower_5fthreshold_5fcoeff',['CANNY_LOWER_THRESHOLD_COEFF',['../namespaceprl.html#ac801f21a62616a360edd449ee24c9f1ca746e9b100fd6f0302f118f063ff6b410',1,'prl']]],
+  ['canny_5fupper_5fthreshold_5fcoeff',['CANNY_UPPER_THRESHOLD_COEFF',['../namespaceprl.html#ac801f21a62616a360edd449ee24c9f1cadd084238b94ca0a81da034d42df55054',1,'prl']]],
+  ['cannyedgedetection',['CannyEdgeDetection',['../image_lib_common_8cpp.html#ab4585847ba328fc856c9a2b738717e06',1,'CannyEdgeDetection(cv::Mat &amp;imageToProc, cv::Mat &amp;resultCanny, int GaussianBlurKernelSize, double CannyUpperThresholdCoeff, double CannyLowerThresholdCoeff, int CannyMorphIters):&#160;imageLibCommon.cpp'],['../image_lib_common_8h.html#a154c1b8de2f8a5980fdcb5cd019a0a28',1,'CannyEdgeDetection(cv::Mat &amp;imageToProc, cv::Mat &amp;resultCanny, int GaussianBlurKernelSize=9, double CannyUpperThresholdCoeff=1, double CannyLowerThresholdCoeff=0.5, int CannyMorphIters=1):&#160;imageLibCommon.cpp']]],
+  ['checkhierarhylevelrecursively',['CheckHierarhyLevelRecursively',['../image_lib_common_8cpp.html#aa33f6d9783b96ada02aaf78099d2ae1e',1,'imageLibCommon.cpp']]],
+  ['checkrectangle',['CheckRectangle',['../auto_crop_utils_8cpp.html#a3e25613c30d00a9c74f04581a7f592b0',1,'CheckRectangle(std::vector&lt; cv::Point &gt; &amp;contour, MarkerRectangle *rectangle):&#160;autoCropUtils.cpp'],['../auto_crop_utils_8h.html#a3e25613c30d00a9c74f04581a7f592b0',1,'CheckRectangle(std::vector&lt; cv::Point &gt; &amp;contour, MarkerRectangle *rectangle):&#160;autoCropUtils.cpp']]],
+  ['clahe_5fclip_5flimit',['CLAHE_CLIP_LIMIT',['../namespaceprl.html#ac801f21a62616a360edd449ee24c9f1caf69a6e95a176a9b15ad5284c357c67eb',1,'prl']]],
+  ['color_5fspace',['COLOR_SPACE',['../namespaceprl.html#ac801f21a62616a360edd449ee24c9f1ca005087d01ddd9fd29876a6d793f2b7b2',1,'prl']]],
+  ['colorbalance',['colorBalance',['../namespaceprl.html#ac7dba5a98da50aae8506c8df990ccf94',1,'prl']]],
+  ['compareimages',['compareImages',['../namespaceprl.html#ab3ddfc37391baad6995dfd52e775a6ce',1,'prl']]],
+  ['compatibility_2eh',['compatibility.h',['../compatibility_8h.html',1,'']]],
+  ['computationkernel',['computationKernel',['../kuwahara_filter_8cpp.html#af5558af5c78148172518ff815d726d73',1,'kuwaharaFilter.cpp']]],
+  ['contourchildrencount',['ContourChildrenCount',['../image_lib_common_8cpp.html#add417102317787628483fe4af4d0930a',1,'ContourChildrenCount(const int contourNo, std::vector&lt; cv::Vec4i &gt; &amp;hierarchy, bool includeSubchildren):&#160;imageLibCommon.cpp'],['../image_lib_common_8h.html#aef7c20c119e288b100ee59819b0db3e0',1,'ContourChildrenCount(const int contourNumber, std::vector&lt; cv::Vec4i &gt; &amp;hierarchy, bool includeSubchildren=false):&#160;imageLibCommon.cpp']]],
+  ['contoursdistance',['ContoursDistance',['../image_lib_common_8cpp.html#abfe9bdc70e929765c223b85ffd427fb2',1,'imageLibCommon.cpp']]],
+  ['contoursubchildrencount',['ContourSubChildrenCount',['../image_lib_common_8cpp.html#a2fddf31cd3a453bb53d53e70c3e7b855',1,'ContourSubChildrenCount(int contourNo, std::vector&lt; cv::Vec4i &gt; &amp;hierarchy):&#160;imageLibCommon.cpp'],['../image_lib_common_8h.html#a8e39f6031000ab48ceaf48a8b0f1c07a',1,'ContourSubChildrenCount(int contourNumber, std::vector&lt; cv::Vec4i &gt; &amp;hierarchy):&#160;imageLibCommon.cpp']]],
+  ['correctnuil',['correctNUIL',['../namespaceprl.html#ad8a5ad21daeb885c71f212a04be23f23',1,'prl']]],
+  ['correctnuil_2ecpp',['correctNUIL.cpp',['../correct_n_u_i_l_8cpp.html',1,'']]],
+  ['correctnuil_2eh',['correctNUIL.h',['../correct_n_u_i_l_8h.html',1,'']]],
+  ['cropverticesordering',['cropVerticesOrdering',['../auto_crop_utils_8cpp.html#a3fc35d40584d4a767d400de2ac9e958b',1,'cropVerticesOrdering(std::vector&lt; cv::Point2f &gt; &amp;contour):&#160;autoCropUtils.cpp'],['../auto_crop_utils_8h.html#a3fc35d40584d4a767d400de2ac9e958b',1,'cropVerticesOrdering(std::vector&lt; cv::Point2f &gt; &amp;contour):&#160;autoCropUtils.cpp'],['../image_lib_common_8cpp.html#ae67484da84f33246bf58e85e6c529d4f',1,'cropVerticesOrdering(std::vector&lt; cv::Point &gt; &amp;pt):&#160;imageLibCommon.cpp'],['../image_lib_common_8h.html#ae67484da84f33246bf58e85e6c529d4f',1,'cropVerticesOrdering(std::vector&lt; cv::Point &gt; &amp;pt):&#160;imageLibCommon.cpp']]]
+];

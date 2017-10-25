@@ -1,0 +1,9 @@
+<map id="src/utils.h" name="src/utils.h">
+<area shape="rect" id="node2" href="$balance_color_8cpp.html" title="src/balance/balanceColor.cpp" alt="" coords="5,87,200,114"/>
+<area shape="rect" id="node3" href="$gamma_correction_8cpp.html" title="src/balance/gammaCorrection.cpp" alt="" coords="224,87,445,114"/>
+<area shape="rect" id="node4" href="$auto_crop_utils_8cpp.html" title="src/border_detection\l/autoCropUtils.cpp" alt="" coords="470,80,610,121"/>
+<area shape="rect" id="node5" href="$hough_line_8cpp.html" title="src/border_detection\l/houghLine.cpp" alt="" coords="634,80,774,121"/>
+<area shape="rect" id="node6" href="$deskew_8cpp.html" title="src/deskew/deskew.cpp" alt="" coords="799,87,961,114"/>
+<area shape="rect" id="node7" href="$rotate_8cpp.html" title="src/rotate.cpp" alt="" coords="986,87,1089,114"/>
+<area shape="rect" id="node8" href="$utils_8cpp.html" title="src/utils.cpp" alt="" coords="1113,87,1207,114"/>
+</map>

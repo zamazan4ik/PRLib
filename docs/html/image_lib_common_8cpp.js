@@ -1,0 +1,27 @@
+var image_lib_common_8cpp =
+[
+    [ "CannyEdgeDetection", "image_lib_common_8cpp.html#ab4585847ba328fc856c9a2b738717e06", null ],
+    [ "CheckHierarhyLevelRecursively", "image_lib_common_8cpp.html#aa33f6d9783b96ada02aaf78099d2ae1e", null ],
+    [ "ContourChildrenCount", "image_lib_common_8cpp.html#add417102317787628483fe4af4d0930a", null ],
+    [ "ContoursDistance", "image_lib_common_8cpp.html#abfe9bdc70e929765c223b85ffd427fb2", null ],
+    [ "ContourSubChildrenCount", "image_lib_common_8cpp.html#a2fddf31cd3a453bb53d53e70c3e7b855", null ],
+    [ "cropVerticesOrdering", "image_lib_common_8cpp.html#ae67484da84f33246bf58e85e6c529d4f", null ],
+    [ "EnhanceLocalContrastByCLAHE", "image_lib_common_8cpp.html#a54d21cffedb6d986e05e14f6f5289e63", null ],
+    [ "EnhanceLocalContrastByCLAHE_1", "image_lib_common_8cpp.html#aabc49c262835e78ccd881be5c2e9b63a", null ],
+    [ "EnhanceLocalContrastByCLAHE_MCh", "image_lib_common_8cpp.html#a4bbdf4376a3eee599444d942b8ed0162", null ],
+    [ "EqualizeLayerHists", "image_lib_common_8cpp.html#a2fada0e1a4b976a39c63a5a11da1736f", null ],
+    [ "ExtractLayer", "image_lib_common_8cpp.html#a8aea4103ebac4d981a3bd9d3bbd04cf8", null ],
+    [ "ExtractLayer", "image_lib_common_8cpp.html#a779a2b02b490b2b97a8d93fd0a9948eb", null ],
+    [ "GetColorLayersHists", "image_lib_common_8cpp.html#a680d08f47fb2c362a57184520b8b359f", null ],
+    [ "getGaussianKernel2D", "image_lib_common_8cpp.html#ad604b4a589c2f45c5d2186bd1e5e5642", null ],
+    [ "GetHistExtremums", "image_lib_common_8cpp.html#a3d6e528f38a6241c106035a2cdbf4d51", null ],
+    [ "IsContourClockwised", "image_lib_common_8cpp.html#a3627b81f13ca4b4c496a24d1e91d5a12", null ],
+    [ "IsContourClosed", "image_lib_common_8cpp.html#a67d19ffed1fa1e67da0929a1cf5c7bf0", null ],
+    [ "IsContourCorrect", "image_lib_common_8cpp.html#ac4a7b08719df6e3d3b5f93077ad1633e", null ],
+    [ "IsContourUncorrect", "image_lib_common_8cpp.html#a0ed900abd3af756641e6d0f3e56f63e3", null ],
+    [ "IsQuadrangularConvex", "image_lib_common_8cpp.html#a534b60b532377734d3e7afeee6e5ba5d", null ],
+    [ "MatToLocalVarianceMap", "image_lib_common_8cpp.html#af5cdd1ae5cbe551193e856de535e09b5", null ],
+    [ "RemoveChildrenContours", "image_lib_common_8cpp.html#a2ef87a6c2dfc0a3ac436cafb48eb04cb", null ],
+    [ "RemoveCloseSizeChildren", "image_lib_common_8cpp.html#a27dca074aea2d985db74d81890ed4562", null ],
+    [ "ScaleToRange", "image_lib_common_8cpp.html#ad44a927535e26b8475e8824e1fc89950", null ]
+];

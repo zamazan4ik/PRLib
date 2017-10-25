@@ -1,0 +1,9 @@
+<map id="src/imageLibCommon.h" name="src/imageLibCommon.h">
+<area shape="rect" id="node2" href="$binarize_c_o_c_o_c_l_u_s_t_8cpp.html" title="src/binarizations/binarize\lCOCOCLUST.cpp" alt="" coords="5,80,172,121"/>
+<area shape="rect" id="node3" href="$binarize_f_b_c_i_t_b_8cpp.html" title="src/binarizations/binarize\lFBCITB.cpp" alt="" coords="196,80,363,121"/>
+<area shape="rect" id="node4" href="$binarize_local_otsu_8cpp.html" title="src/binarizations/binarize\lLocalOtsu.cpp" alt="" coords="387,80,553,121"/>
+<area shape="rect" id="node5" href="$auto_crop_utils_8cpp.html" title="src/border_detection\l/autoCropUtils.cpp" alt="" coords="577,80,717,121"/>
+<area shape="rect" id="node6" href="$hough_line_8cpp.html" title="src/border_detection\l/houghLine.cpp" alt="" coords="741,80,881,121"/>
+<area shape="rect" id="node7" href="$kuwahara_filter_8cpp.html" title="src/denoise/kuwaharaFilter.cpp" alt="" coords="906,87,1109,114"/>
+<area shape="rect" id="node8" href="$image_lib_common_8cpp.html" title="src/imageLibCommon.cpp" alt="" coords="1133,87,1308,114"/>
+</map>
