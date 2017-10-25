@@ -30,7 +30,7 @@
 namespace prl
 {
 
-void binarizeGAT(const cv::Mat& inputImage, cv::Mat& outputImage, const int gaussianKernelSize,
+CV_EXPORTS void binarizeGAT(const cv::Mat& inputImage, cv::Mat& outputImage, const int gaussianKernelSize,
                       const double sigmaX, const double sigmaY,
                       const double maxValue, const int blockSize, const int shift);
 

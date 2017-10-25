@@ -29,7 +29,13 @@
 
 namespace prl
 {
-void removeDots(const cv::Mat& inputImage, cv::Mat& outputImage);
+/*!
+ * \brief Remove dots on an image.
+ * \param[in] inputImage Input image.
+ * \param[out] outputImage Output image.
+ * \details Delete dots on an image.
+ */
+CV_EXPORTS void removeDots(const cv::Mat& inputImage, cv::Mat& outputImage, const double radius = -1.0);
 }
 
 #endif //PRLIB_REMOVEDOTS_H

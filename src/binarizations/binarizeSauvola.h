@@ -40,7 +40,7 @@ namespace prl
 * \details This function implements algorithm described in article
 * "Efficient Implementation of Local Adaptive Thresholding Techniques Using Integral Images".
 */
-void binarizeSauvola(
+CV_EXPORTS void binarizeSauvola(
 		cv::Mat& imageInput, cv::Mat& outputImage,
 		int windowSize = 101,
 		double thresholdCoefficient = 0.01,

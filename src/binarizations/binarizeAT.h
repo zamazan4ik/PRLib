@@ -30,7 +30,7 @@
 namespace prl
 {
 
-void binarizeAT(const cv::Mat& inputImage, cv::Mat& outputImage, const int medianKernelSize,
+CV_EXPORTS void binarizeAT(const cv::Mat& inputImage, cv::Mat& outputImage, const int medianKernelSize,
                      const double maxValue, const int blockSize, const int shift);
 
 }

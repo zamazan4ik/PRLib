@@ -169,7 +169,7 @@ void prl::binarizeFBCITB(
 
     if (useVariancesMap)
     {
-        Mat2LocalVarianceMap(inputImage, varianceMap);
+        MatToLocalVarianceMap(inputImage, varianceMap);
 
         varianceMap = (varianceMap > varianceMapThreshold);
 

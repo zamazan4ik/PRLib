@@ -39,8 +39,8 @@
  * window with size (kernelSize x kernelSize).
  * Estimated values are stored to corresponding position of variance_map.
  */
-void Mat2LocalVarianceMap(const cv::Mat& image, cv::Mat& varianceMap,
-                          const int kernelSize = 3);
+void MatToLocalVarianceMap(const cv::Mat& image, cv::Mat& varianceMap,
+                           const int kernelSize = 3);
 
 /*!
  * \brief Scale image to defined range
@@ -63,7 +63,7 @@ void ScaleToRange(const cv::Mat& src, cv::Mat& dst,
  * \endparblock
  * \return Count of children contours.
  */
-int ContourChildrenCount(int contourNumber, std::vector<cv::Vec4i>& hierarchy,
+int ContourChildrenCount(const int contourNumber, std::vector<cv::Vec4i>& hierarchy,
                          bool includeSubchildren = false);
 
 /*!
@@ -80,14 +80,7 @@ int ContourSubChildrenCount(int contourNumber, std::vector<cv::Vec4i>& hierarchy
  * \param[in] maxDistance Maximal distance between contour start and end.
  * \return true if contour is closed.
  */
-bool IsContourClosed(std::vector<cv::Point>& contour, int maxDistance = 1);
-
-/*!
- * \brief Check on closed contour.
- * \param[in] contour Tested contour.
- * \return false if contour is closed.
- */
-bool IsContourUnclosed(std::vector<cv::Point>& contour, int maxDistance = 1);
+bool IsContourClosed(const std::vector<cv::Point>& contour, int maxDistance = 1);
 
 /*!
  * \brief Checks contour for compliance.
@@ -144,8 +137,8 @@ void RemoveChildrenContours(std::vector<std::vector<cv::Point>>& contours,
 
 /*!
  * \brief Enhance local contrast.
- * \param[in] src Source image.
- * \param[out] dst Destination image.
+ * \param[in] inputImage Source image.
+ * \param[out] outputImage Destination image.
  * \param[in] CLAHEClipLimit Parameter of local contrast enhancement procedure.
  * \param[in] equalizeHistFlag \parblock
  * Histogram equalization flag (if equal true then histogram should be equalized).
@@ -154,7 +147,7 @@ void RemoveChildrenContours(std::vector<std::vector<cv::Point>>& contours,
  * <a href="http://en.wikipedia.org/wiki/Adaptive_histogram_equalization">CLAHE</a> and
  * equalize histogram if it is required.
  */
-void EnhanceLocalContrastByCLAHE(cv::Mat& src, cv::Mat& dst,
+void EnhanceLocalContrastByCLAHE(cv::Mat& inputImage, cv::Mat& outputImage,
                                  double CLAHEClipLimit,
                                  bool equalizeHistFlag);
 
@@ -205,36 +198,40 @@ void GetHistExtremums(cv::Mat& hist,
  * \param[in] inputImage Source image.
  * \param[out] outputImage Result image.
  */
-void EqualizeLayerHists(cv::Mat& inputImage, cv::Mat& outputImage);
+void EqualizeLayerHists(const cv::Mat& inputImage, cv::Mat& outputImage);
 
 
 /*!
  * \brief Extract layer by mask.
- * \param[in] sourceImage Image for layer extraction.
+ * \param[in] inputImage Image for layer extraction.
  * \param[in] mask Mask for extracted pixels.
- * \param[out] destImage Extracted layer.
+ * \param[out] outputImage Extracted layer.
  * \param[in] defaultColor Default color for masked pixels background.
  */
-void ExtractLayer(cv::Mat& sourceImage, cv::Mat& mask, cv::Mat& destImage,
+void ExtractLayer(const cv::Mat& inputImage, cv::Mat& mask, cv::Mat& outputImage,
                   const cv::Scalar& defaultColor = CV_RGB(255, 255, 255));
 
 /*!
  * \brief Extract layer by color range.
- * \param[in] sourceImage Image for layer extraction.
+ * \param[in] inputImage Image for layer extraction.
  * \param[in] lowerBoundary,upperBoundary Boundaries of color range for extraction.
- * \param[out] destImage Extracted layer.
+ * \param[out] outputImage Extracted layer.
  * \param[in] defaultColor Default color for masked pixels background.
  */
-void ExtractLayer(cv::Mat& sourceImage,
+void ExtractLayer(const cv::Mat& inputImage,
                   const cv::Scalar& lowerBoundary,
                   const cv::Scalar& upperBoundary,
-                  cv::Mat& destImage,
+                  cv::Mat& outputImage,
                   const cv::Scalar& defaultColor = CV_RGB(255, 255, 255));
 
 
-bool IsQuadrangularConvex(std::vector<cv::Point2f>& resultContour);
+bool IsQuadrangularConvex(const std::vector<cv::Point2f>& resultContour);
 
-
+/*!
+ * \brief Contour points ordering.
+ * \param[inout] pt Contour.
+ * \return true if ordering is successful.
+ */
 bool cropVerticesOrdering(std::vector<cv::Point>& pt);
 
 cv::Mat getGaussianKernel2D(const int ksize, double sigma);

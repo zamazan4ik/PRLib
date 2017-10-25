@@ -30,9 +30,11 @@
 #include <opencv2/features2d/features2d.hpp>
 #include <opencv2/imgproc/imgproc.hpp>
 
-void prl::removeDots(const cv::Mat& inputImage, cv::Mat& outputImage)
+void prl::removeDots(const cv::Mat& inputImage, cv::Mat& outputImage, const double radius)
 {
     outputImage = inputImage.clone();
+
+    size_t maxDotDiameter = inputImage.cols * 0.01;
 
     // Converting to grayscale
     cv::Mat gray;
@@ -50,7 +52,8 @@ void prl::removeDots(const cv::Mat& inputImage, cv::Mat& outputImage)
 
     params.filterByArea = true;
     // TODO: calculate coefficient depend on image size
-    params.minArea = 50;
+    params.maxArea = CV_PI * maxDotDiameter * maxDotDiameter / 4.0;
+    params.minArea = 0;
 
     params.filterByCircularity = true;
     params.minCircularity = 0.9;
@@ -71,8 +74,8 @@ void prl::removeDots(const cv::Mat& inputImage, cv::Mat& outputImage)
     int upY = height * 0.1;
     int bottomY = height - upY;
 
-    std::vector<cv::KeyPoint> filteredKeypoints;
-    for(const auto& keypoint : keypoints)
+    std::vector<cv::KeyPoint> filteredKeypoints = keypoints;
+    /*for(const auto& keypoint : keypoints)
     {
         if(keypoint.pt.x > leftX && keypoint.pt.x < rightX &&
            keypoint.pt.y > upY && keypoint.pt.y < bottomY)
@@ -80,13 +83,14 @@ void prl::removeDots(const cv::Mat& inputImage, cv::Mat& outputImage)
             continue;
         }
         filteredKeypoints.push_back(keypoint);
-    }
+    }*/
     // End border heuristic
 
     // Fill keypoits by white color.
     // TODO: maybe we should find automatically background color and use it for filling instead of white
-    for(const auto& keypoint : filteredKeypoints)
+    /*for(const auto& keypoint : filteredKeypoints)
     {
         cv::circle(outputImage, keypoint.pt, keypoint.size / 2.0 + 3, cv::Scalar(255,255,255), CV_FILLED);
-    }
+    }*/
+    cv::drawKeypoints(outputImage, keypoints, outputImage, cv::Scalar(0,0,255), cv::DrawMatchesFlags::DRAW_RICH_KEYPOINTS);
 }

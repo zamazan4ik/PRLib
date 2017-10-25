@@ -29,7 +29,7 @@
 
 namespace prl
 {
-void denoise(const cv::Mat& inputImage, cv::Mat& outputImage, double strength = 5.5);
+CV_EXPORTS void denoise(const cv::Mat& inputImage, cv::Mat& outputImage, double strength = 5.5);
 }
 
 

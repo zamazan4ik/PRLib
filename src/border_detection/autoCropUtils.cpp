@@ -270,7 +270,7 @@ void binarizeByLocalVariances(cv::Mat& image, cv::Mat& result)
 
     //! Get map of local variance
     cv::Mat varianceMap;
-    Mat2LocalVarianceMap(image, varianceMap);
+    MatToLocalVarianceMap(image, varianceMap);
 
     // for intermediate results
     cv::Mat result1;

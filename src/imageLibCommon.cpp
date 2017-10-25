@@ -30,13 +30,14 @@
 #include <stdexcept>
 #include <vector>
 
+#include <opencv2/core/core.hpp>
 #include <opencv2/imgproc/imgproc.hpp>
 
-void ExtractLayer(cv::Mat& sourceImage,
+void ExtractLayer(const cv::Mat& inputImage,
                   const cv::Scalar& lowerBoundary, const cv::Scalar& upperBoundary,
-                  cv::Mat& destImage, const cv::Scalar& defaultColor)
+                  cv::Mat& outputImage, const cv::Scalar& defaultColor)
 {
-    if (sourceImage.empty())
+    if (inputImage.empty())
     {
         throw std::invalid_argument("Image for layer extraction is empty");
     }
@@ -44,15 +45,15 @@ void ExtractLayer(cv::Mat& sourceImage,
     cv::Mat mask;
 
     //! create mask corresponding of color boundaries
-    cv::inRange(sourceImage, lowerBoundary, upperBoundary, mask);
+    cv::inRange(inputImage, lowerBoundary, upperBoundary, mask);
 
     //! extract layer by mask
-    ExtractLayer(sourceImage, mask, destImage, defaultColor);
+    ExtractLayer(inputImage, mask, outputImage, defaultColor);
 }
 
-void ExtractLayer(cv::Mat& sourceImage, cv::Mat& mask, cv::Mat& destImage, const cv::Scalar& defaultColor)
+void ExtractLayer(const cv::Mat& inputImage, cv::Mat& mask, cv::Mat& outputImage, const cv::Scalar& defaultColor)
 {
-    if (sourceImage.empty())
+    if (inputImage.empty())
     {
         throw std::invalid_argument("Image for layer extraction is empty");
     }
@@ -62,12 +63,12 @@ void ExtractLayer(cv::Mat& sourceImage, cv::Mat& mask, cv::Mat& destImage, const
         throw std::invalid_argument("Mask for layer extraction is empty");
     }
 
-    if (sourceImage.size() != mask.size())
+    if (inputImage.size() != mask.size())
     {
         throw std::invalid_argument("Sizes of image for layer extraction and mask are different");
     }
 
-    if (!((mask.channels() == 1) || (sourceImage.channels() == mask.channels())))
+    if (!((mask.channels() == 1) || (inputImage.channels() == mask.channels())))
     {
         throw std::invalid_argument("A number of channels in mask is greater than one but isn\'t equal to \
 			a number of channels of processed image");
@@ -93,11 +94,11 @@ void ExtractLayer(cv::Mat& sourceImage, cv::Mat& mask, cv::Mat& destImage, const
 
     cv::split(mask, maskChannels);
 
-    std::vector<cv::Mat> sourceImageChannels(sourceImage.channels());
+    std::vector<cv::Mat> sourceImageChannels(inputImage.channels());
     std::vector<cv::Mat> destImageChannels(sourceImageChannels.size());
-    cv::split(sourceImage, sourceImageChannels);
+    cv::split(inputImage, sourceImageChannels);
 
-    for (int channelNo = 0; channelNo < sourceImage.channels(); ++channelNo)
+    for (int channelNo = 0; channelNo < inputImage.channels(); ++channelNo)
     {
         //! if we have single channel mask then use it for each channel
         int maskChannelNo = mask.channels() > 1 ? channelNo : 0;
@@ -106,17 +107,17 @@ void ExtractLayer(cv::Mat& sourceImage, cv::Mat& mask, cv::Mat& destImage, const
         cv::Mat backgroundMask = 1 - maskChannels[maskChannelNo];
 
         //! copy masked data to new image
-        destImageChannels[channelNo] = cv::Mat(sourceImage.size(), CV_8UC1);
+        destImageChannels[channelNo] = cv::Mat(inputImage.size(), CV_8UC1);
         destImageChannels[channelNo].setTo(0);
         destImageChannels[channelNo].setTo(defaultColor[channelNo], backgroundMask);
         destImageChannels[channelNo] += sourceImageChannels[channelNo].mul(
                 maskChannels[maskChannelNo]);
     }
 
-    merge(destImageChannels, destImage);
+    cv::merge(destImageChannels, outputImage);
 }
 
-void EqualizeLayerHists(cv::Mat& inputImage, cv::Mat& outputImage)
+void EqualizeLayerHists(const cv::Mat& inputImage, cv::Mat& outputImage)
 {
     if (inputImage.empty())
     {
@@ -129,7 +130,7 @@ void EqualizeLayerHists(cv::Mat& inputImage, cv::Mat& outputImage)
     //! histogram equalization for each channel
     for (size_t i = 0; i < layers.size(); ++i)
     {
-        equalizeHist(layers[i], layers[i]);
+        cv::equalizeHist(layers[i], layers[i]);
     }
 
     cv::merge(layers, outputImage);
@@ -374,26 +375,26 @@ void EnhanceLocalContrastByCLAHE_MCh(cv::Mat& src, cv::Mat& dst, const double CL
     cv::merge(claheChannels, dst);
 }
 
-void EnhanceLocalContrastByCLAHE(cv::Mat& src, cv::Mat& dst, double CLAHEClipLimit, bool equalizeHistFlag)
+void EnhanceLocalContrastByCLAHE(cv::Mat& inputImage, cv::Mat& outputImage, double CLAHEClipLimit, bool equalizeHistFlag)
 {
-    if (src.empty())
+    if (inputImage.empty())
     {
         throw std::invalid_argument("Image for histograms enhancing is empty");
     }
 
-    if (src.channels() == 1)
+    if (inputImage.channels() == 1)
     {
         // single channel image
-        EnhanceLocalContrastByCLAHE_1(src, dst, CLAHEClipLimit, equalizeHistFlag);
+        EnhanceLocalContrastByCLAHE_1(inputImage, outputImage, CLAHEClipLimit, equalizeHistFlag);
     }
     else
     {
         // multi channel image
-        EnhanceLocalContrastByCLAHE_MCh(src, dst, CLAHEClipLimit, equalizeHistFlag);
+        EnhanceLocalContrastByCLAHE_MCh(inputImage, outputImage, CLAHEClipLimit, equalizeHistFlag);
     }
 }
 
-void Mat2LocalVarianceMap(const cv::Mat& image, cv::Mat& varianceMap, const int kernelSize)
+void MatToLocalVarianceMap(const cv::Mat& image, cv::Mat& varianceMap, const int kernelSize)
 {
     if (image.empty())
     {
@@ -464,7 +465,7 @@ void Mat2LocalVarianceMap(const cv::Mat& image, cv::Mat& varianceMap, const int 
     varianceMap += imageToProc;
 }
 
-bool IsContourClosed(std::vector<cv::Point>& contour, int maxDistance)
+bool IsContourClosed(const std::vector<cv::Point>& contour, int maxDistance)
 {
     if (contour.empty())
     {
@@ -479,12 +480,7 @@ bool IsContourClosed(std::vector<cv::Point>& contour, int maxDistance)
     );
 }
 
-bool IsContourUnclosed(std::vector<cv::Point>& contour, int maxDistance)
-{
-    return !IsContourClosed(contour, maxDistance);
-}
-
-int ContourChildrenCount(int contourNo, std::vector<cv::Vec4i>& hierarchy, bool includeSubchildren)
+int ContourChildrenCount(const int contourNo, std::vector<cv::Vec4i>& hierarchy, bool includeSubchildren)
 {
     if (hierarchy.empty())
     {
@@ -822,7 +818,7 @@ void ScaleToRange(
     src.convertTo(dst, dstType, alpha, beta);
 }
 
-bool IsQuadrangularConvex(std::vector<cv::Point2f>& resultContour)
+bool IsQuadrangularConvex(const std::vector<cv::Point2f>& resultContour)
 {
     if (resultContour.empty())
     {
@@ -836,11 +832,6 @@ bool IsQuadrangularConvex(std::vector<cv::Point2f>& resultContour)
     return (convexHullPoints.size() == 4);
 }
 
-/*!
- * \brief Contour points ordering.
- * \param[inout] pt Contour.
- * \return true if ordering is successful.
- */
 bool cropVerticesOrdering(std::vector<cv::Point>& pt)
 {
     if (pt.empty())

@@ -47,7 +47,7 @@ namespace prl
  * -# Contours detection.
  * -# Binarization by Otsu of bounding rectangle of each contour.
  */
-void binarizeLocalOtsu(
+CV_EXPORTS void binarizeLocalOtsu(
 		cv::Mat& inputImage, cv::Mat& outputImage,
 		double maxValue = 255.0,
 		double CLAHEClipLimit = 0.0,

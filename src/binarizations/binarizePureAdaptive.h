@@ -30,7 +30,7 @@
 namespace prl
 {
 
-void binarizePureAdaptive(const cv::Mat& inputImage, cv::Mat& outputImage,
+CV_EXPORTS void binarizePureAdaptive(const cv::Mat& inputImage, cv::Mat& outputImage,
                           const double maxValue, const int blockSize, const int shift);
 
 }

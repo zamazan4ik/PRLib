@@ -27,7 +27,9 @@
 #if defined(WIN32) || defined(_MSC_VER)
 #include <windows.h>
 #else
+
 #include "compatibility.h"
+
 #endif
 
 #include "leptonica/allheaders.h"
@@ -43,14 +45,20 @@ Pix* prl::opencvToLeptonica(const cv::Mat* inputImage)
 
     //The following code is based on tesseract's ImageThresholder.SetImage function
     int bpp = bytes_per_pixel * 8;
-    if (bpp == 0) bpp = 1;
+    if (bpp == 0)
+    {
+        bpp = 1;
+    }
     Pix* pix = pixCreate(width, height, bpp == 24 ? 32 : bpp);
     l_uint32* data = pixGetData(pix);
     int wpl = pixGetWpl(pix);
-    switch (bpp) {
+    switch (bpp)
+    {
         case 1:
-            for (int y = 0; y < height; ++y, data += wpl, imagedata += bytes_per_line) {
-                for (int x = 0; x < width; ++x) {
+            for (int y = 0; y < height; ++y, data += wpl, imagedata += bytes_per_line)
+            {
+                for (int x = 0; x < width; ++x)
+                {
                     if (imagedata[x / 8] & (0x80 >> (x % 8)))
                         CLEAR_DATA_BIT(data, x);
                     else
@@ -61,7 +69,8 @@ Pix* prl::opencvToLeptonica(const cv::Mat* inputImage)
 
         case 8:
             // Greyscale just copies the bytes in the right order.
-            for (int y = 0; y < height; ++y, data += wpl, imagedata += bytes_per_line) {
+            for (int y = 0; y < height; ++y, data += wpl, imagedata += bytes_per_line)
+            {
                 for (int x = 0; x < width; ++x)
                     SET_DATA_BYTE(data, x, imagedata[x]);
             }
@@ -69,8 +78,10 @@ Pix* prl::opencvToLeptonica(const cv::Mat* inputImage)
 
         case 24:
             // Put the colors in the correct places in the line buffer.
-            for (int y = 0; y < height; ++y, imagedata += bytes_per_line) {
-                for (int x = 0; x < width; ++x, ++data) {
+            for (int y = 0; y < height; ++y, imagedata += bytes_per_line)
+            {
+                for (int x = 0; x < width; ++x, ++data)
+                {
                     SET_DATA_BYTE(data, COLOR_RED, imagedata[3 * x]);
                     SET_DATA_BYTE(data, COLOR_GREEN, imagedata[3 * x + 1]);
                     SET_DATA_BYTE(data, COLOR_BLUE, imagedata[3 * x + 2]);
@@ -80,8 +91,10 @@ Pix* prl::opencvToLeptonica(const cv::Mat* inputImage)
 
         case 32:
             // Maintain byte order consistency across different endianness.
-            for (int y = 0; y < height; ++y, imagedata += bytes_per_line, data += wpl) {
-                for (int x = 0; x < width; ++x) {
+            for (int y = 0; y < height; ++y, imagedata += bytes_per_line, data += wpl)
+            {
+                for (int x = 0; x < width; ++x)
+                {
                     data[x] = (imagedata[x * 4] << 24) | (imagedata[x * 4 + 1] << 16) |
                               (imagedata[x * 4 + 2] << 8) | imagedata[x * 4 + 3];
                 }
@@ -103,7 +116,8 @@ cv::Mat prl::leptonicaToOpenCV(Pix* inputImage)
 
     int type = 0;
 
-    switch (bytes_per_pixel) {
+    switch (bytes_per_pixel)
+    {
         case 1:
         case 8:
             type = CV_8UC1;
@@ -133,11 +147,14 @@ cv::Mat prl::leptonicaToOpenCV(Pix* inputImage)
 
     const char values[] = {char(255), 0};
 
-    switch (bpp) {
+    switch (bpp)
+    {
         case 1:
 
-            for (int y = 0; y < height; ++y, data += wpl, imagedata += bytes_per_line) {
-                for (int x = 0; x < width; ++x) {
+            for (int y = 0; y < height; ++y, data += wpl, imagedata += bytes_per_line)
+            {
+                for (int x = 0; x < width; ++x)
+                {
                     imagedata[x] = values[GET_DATA_BIT(data, x)];
                     /*if (imagedata[x / 8] & (0x80 >> (x % 8))) {
                         CLEAR_DATA_BIT(data, x);
@@ -150,8 +167,10 @@ cv::Mat prl::leptonicaToOpenCV(Pix* inputImage)
 
         case 8:
             // Greyscale just copies the bytes in the right order.
-            for (int y = 0; y < height; ++y, data += wpl, imagedata += bytes_per_line) {
-                for (int x = 0; x < width; ++x) {
+            for (int y = 0; y < height; ++y, data += wpl, imagedata += bytes_per_line)
+            {
+                for (int x = 0; x < width; ++x)
+                {
                     //SET_DATA_BYTE(data, x, imagedata[x]);
                     imagedata[x] = GET_DATA_BYTE(data, x);
                 }
@@ -160,8 +179,10 @@ cv::Mat prl::leptonicaToOpenCV(Pix* inputImage)
 
         case 24:
             // Put the colors in the correct places in the line buffer.
-            for (int y = 0; y < height; ++y, imagedata += bytes_per_line) {
-                for (int x = 0; x < width; ++x, ++data) {
+            for (int y = 0; y < height; ++y, imagedata += bytes_per_line)
+            {
+                for (int x = 0; x < width; ++x, ++data)
+                {
                     imagedata[3 * x + 0] = GET_DATA_BYTE(data, COLOR_RED);
                     imagedata[3 * x + 1] = GET_DATA_BYTE(data, COLOR_GREEN);
                     imagedata[3 * x + 2] = GET_DATA_BYTE(data, COLOR_BLUE);
@@ -175,8 +196,10 @@ cv::Mat prl::leptonicaToOpenCV(Pix* inputImage)
 
         case 32:
             // Maintain byte order consistency across different endianness.
-            for (int y = 0; y < height; ++y, imagedata += bytes_per_line, data += wpl) {
-                for (int x = 0; x < width; ++x) {
+            for (int y = 0; y < height; ++y, imagedata += bytes_per_line, data += wpl)
+            {
+                for (int x = 0; x < width; ++x)
+                {
                     imagedata[x * 3 + 0] = (data[x] >> 24) & 0xff;
                     imagedata[x * 3 + 1] = (data[x] >> 16) & 0xff;
                     imagedata[x * 3 + 2] = (data[x] >> 8) & 0xff;

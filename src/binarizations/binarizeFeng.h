@@ -43,7 +43,7 @@ namespace prl
 * \details This function implements algorithm described in article
 * "Comparison of Niblack inspired Binarization methods for ancient documents".
 */
-void binarizeFeng(
+CV_EXPORTS void binarizeFeng(
 		cv::Mat& inputImage, cv::Mat& outputImage,
 		int windowSize = 21,
 		double thresholdCoefficient_alpha1 = 0.75,

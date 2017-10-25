@@ -30,7 +30,7 @@
 namespace prl
 {
 
-bool isBlurred(const cv::Mat& inputImage);
+CV_EXPORTS bool isBlurred(const cv::Mat& inputImage);
 
 }
 #endif //PRLIB_BLURDETECTION_HPP

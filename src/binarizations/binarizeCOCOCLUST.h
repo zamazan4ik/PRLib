@@ -47,7 +47,7 @@ namespace prl
  * Parameter of erode and dilatation (if equal than 0 then procedures are not used).
  * \endparblock
  */
-void binarizeCOCOCLUST(cv::Mat& inputImage, cv::Mat& outputImage,
+CV_EXPORTS void binarizeCOCOCLUST(cv::Mat& inputImage, cv::Mat& outputImage,
                        const float T_S = 45,
                        double CLAHEClipLimit = 3.0,
                        int GaussianBlurKernelSize = 19,

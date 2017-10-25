@@ -59,7 +59,7 @@ namespace prl
  * -# Adaptive threshold.
  * -# Bilateral filter.
  */
-void binarizeNativeAdaptive(
+CV_EXPORTS void binarizeNativeAdaptive(
 		cv::Mat& inputImage, cv::Mat& outputImage,
 		bool isGaussianBlurReqiured = 0,
 		int medianBlurKernelSize = 5,

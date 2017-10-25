@@ -29,7 +29,7 @@
 
 namespace prl
 {
-bool isGlared(const cv::Mat& inputImage);
+CV_EXPORTS bool isGlared(const cv::Mat& inputImage);
 }
 
 #endif //PRLIB_GLAREDETECTION_HPP

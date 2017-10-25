@@ -69,7 +69,15 @@
 
 double prl::findOrientation(const cv::Mat& inputImage)
 {
-    PIX* pix = prl::opencvToLeptonica(&inputImage);
+    cv::Mat grayImage;
+    if(inputImage.channels() == 3)
+    {
+        cv::cvtColor(inputImage, grayImage, CV_BGR2GRAY);
+    }
+
+    cv::adaptiveThreshold(grayImage, grayImage, 255, CV_ADAPTIVE_THRESH_MEAN_C, CV_THRESH_BINARY, 19, 9);
+
+    PIX* pix = prl::opencvToLeptonica(&grayImage);
     if (!pix)
     {
         return 0;
@@ -220,15 +228,16 @@ CV_EXPORTS bool prl::deskew(const cv::Mat& inputImage, cv::Mat& outputImage)
     if ((angle != 0) && (angle <= DBL_MAX && angle >= -DBL_MAX))
     {
         prl::rotate(inputImage, outputImage, angle);
+        prl::rotate(processingImage, processingImage, angle);
     }
     else
     {
         outputImage = inputImage.clone();
     }
 
-    angle = findOrientation(outputImage);
+    angle = findOrientation(processingImage);
 
-    if (angle != 0)
+    if (angle != 0.0)
     {
         prl::rotate(outputImage, outputImage, angle);
     }

@@ -29,7 +29,13 @@
 
 namespace prl
 {
-void removeLines(const cv::Mat& inputImage, cv::Mat& outputImage);
+/*!
+ * \brief Remove lines on an image.
+ * \param[in] inputImage Input image.
+ * \param[out] outputImage Output image.
+ * \details Delete horizontal and vertical lines on an image.
+ */
+CV_EXPORTS void removeLines(const cv::Mat& inputImage, cv::Mat& outputImage);
 }
 
 #endif //PRLIB_REMOVELINES_H

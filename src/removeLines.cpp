@@ -41,24 +41,25 @@ void prl::removeLines(const cv::Mat& inputImage, cv::Mat& outputImage)
 
     cv::Mat bw;
     // TODO: Try to use another binarization here
-    cv::adaptiveThreshold(~gray, bw, 255, CV_ADAPTIVE_THRESH_MEAN_C, CV_THRESH_BINARY, 15, -2);
+    //cv::adaptiveThreshold(gray, bw, 255, CV_ADAPTIVE_THRESH_MEAN_C, CV_THRESH_BINARY, 15, 0);
+    cv::threshold(~gray, bw, 255, 255, CV_THRESH_BINARY | CV_THRESH_OTSU);
 
-    // Create the images that will use to extract the horizonta and vertical lines
+    // Create the images that will use to extract the horizontal and vertical lines
     cv::Mat horizontal = bw.clone();
     cv::Mat vertical = bw.clone();
 
     // Specify size on horizontal axis
-    int horizontalsize = horizontal.cols / 30;
+    int horizontalsize = horizontal.cols / 50;
 
     // Create structure element for extracting horizontal lines through morphology operations
-    cv::Mat horizontalStructure = cv::getStructuringElement(cv::MORPH_RECT, cv::Size(horizontalsize,1));
+    cv::Mat horizontalStructure = cv::getStructuringElement(cv::MORPH_RECT, cv::Size(horizontalsize, 1));
 
     // Apply morphology operations
     cv::erode(horizontal, horizontal, horizontalStructure, cv::Point(-1, -1));
     cv::dilate(horizontal, horizontal, horizontalStructure, cv::Point(-1, -1));
 
     // Specify size on vertical axis
-    int verticalsize = vertical.rows / 30;
+    int verticalsize = vertical.rows / 50;
 
     // Create structure element for extracting vertical lines through morphology operations
     cv::Mat verticalStructure = cv::getStructuringElement(cv::MORPH_RECT, cv::Size(1, verticalsize));

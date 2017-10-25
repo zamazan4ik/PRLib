@@ -84,7 +84,7 @@ typedef std::map<int, double> FBCITB_ParamsMap;
  * \param[in] paramsMap Parameters map for operations.
  * \details This is an implementation of "Font and Background Color Independent Text Binarization".
  */
-void binarizeFBCITB(
+CV_EXPORTS void binarizeFBCITB(
         cv::Mat& inputImage, cv::Mat& outputImage,
         bool useCanny = true, bool useVariancesMap = true,
         bool useCLAHE = true, bool useBilateral = true,

@@ -29,7 +29,14 @@
 
 namespace prl
 {
-void rotate(const cv::Mat& inputImage, cv::Mat& outputImage, double angle);
+/*!
+ * \brief Rotate image.
+ * \param[in] inputImage Input image.
+ * \param[out] outputImage Output image.
+ * \param[in] angle Rotation angle
+ * \details Rotate image by provided angle.
+ */
+CV_EXPORTS void rotate(const cv::Mat& inputImage, cv::Mat& outputImage, double angle);
 }
 
 #endif //PRLIB_ROTATE

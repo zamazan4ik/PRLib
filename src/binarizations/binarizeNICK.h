@@ -40,7 +40,7 @@ namespace prl
 * \details This function implements algorithm described in article
 * "Comparison of Niblack inspired Binarization methods for ancient documents".
 */
-void binarizeNICK(
+CV_EXPORTS void binarizeNICK(
 		cv::Mat& inputImage, cv::Mat& outputImage,
 		int windowSize = 21,
 		double thresholdCoefficient = -0.01,

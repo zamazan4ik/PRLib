@@ -29,7 +29,7 @@
 
 namespace prl
 {
-void correctNUIL(const cv::Mat& inputImage, cv::Mat& outputImage, int structuringElementSize = 31);
+CV_EXPORTS void correctNUIL(const cv::Mat& inputImage, cv::Mat& outputImage, int structuringElementSize = 31);
 }
 
 #endif //PRLIB_CORRECTNUIL_H
