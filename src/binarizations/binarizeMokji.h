@@ -38,13 +38,13 @@ namespace prl
 * Modelling and Simulation 2007: 444-450
 * http://www.academypublisher.com/jcp/vol02/no08/jcp02084452.pdf
 *
-* \param image The source image.  May be in any format.
-* \param max_edge_width The maximum gradient length to consider.
-* \param min_edge_magnitude The minimum color difference in a gradient.
-* \return A black and white image.
+* \param inputImage The source image.
+* \param outputImage Binarized image.
+* \param maxEdgeWidth The maximum gradient length to consider.
+* \param minEdgeMagnitude The minimum color difference in a gradient.
 */
 CV_EXPORTS void binarizeMokji(const cv::Mat& inputImage, cv::Mat& outputImage,
-                              size_t max_edge_width = 3, size_t min_edge_magnitude = 20);
+                              size_t maxEdgeWidth = 3, size_t minEdgeMagnitude = 20);
 
 }
 

@@ -22,69 +22,63 @@
     SOFTWARE.
 */
 
+#include <array>
 #include <stdexcept>
 
 #include <opencv2/core/core.hpp>
 #include <opencv2/imgproc/imgproc.hpp>
+#include <opencv2/highgui/highgui.hpp>
 
 namespace prl
 {
 
 void binarizeMokji(const cv::Mat& inputImage, cv::Mat& outputImage,
-                   size_t max_edge_width = 3, size_t min_edge_magnitude = 20)
+                   size_t maxEdgeWidth, size_t minEdgeMagnitude)
 {
-    if (max_edge_width < 1)
+    if (maxEdgeWidth < 1)
     {
-        throw std::invalid_argument("mokjiThreshold: invalud max_edge_width");
+        throw std::invalid_argument("mokjiThreshold: invalud maxEdgeWidth");
     }
-    if (min_edge_magnitude < 1)
+    if (minEdgeMagnitude < 1)
     {
-        throw std::invalid_argument("mokjiThreshold: invalid min_edge_magnitude");
+        throw std::invalid_argument("mokjiThreshold: invalid minEdgeMagnitude");
     }
 
     cv::Mat gray;
     cv::cvtColor(inputImage, gray, CV_BGR2GRAY);
 
-    const int dilateSize = (max_edge_width + 1) * 2 - 1;
+    const size_t dilateSize = (maxEdgeWidth + 1) * 2 - 1;
 
     cv::Mat dilatedImage;
     cv::dilate(gray, dilatedImage, cv::getStructuringElement(cv::MORPH_RECT, cv::Size(dilateSize, dilateSize)));
 
-    unsigned matrix[256][256];
-    memset(matrix, 0, sizeof(matrix));
+    std::array<std::array<size_t, 256>, 256> matrix;
 
-    int const w = inputImage.cols;
-    int const h = inputImage.rows;
-    unsigned char const* src_line = gray.data;
-    int const src_stride = gray.cols;
-    unsigned char const* dilated_line = dilatedImage.data;
-    int const dilated_stride = dilatedImage.cols;
+    const int w = inputImage.cols;
+    const int h = inputImage.rows;
 
-    src_line += max_edge_width * src_stride;
-    dilated_line += max_edge_width * dilated_stride;
-    for (int y = max_edge_width; y < h - (int) max_edge_width; ++y)
+    for (int y = maxEdgeWidth; y < h - static_cast<int>(maxEdgeWidth); ++y)
     {
-        for (int x = max_edge_width; x < w - (int) max_edge_width; ++x)
+        for (int x = maxEdgeWidth; x < w - static_cast<int>(maxEdgeWidth); ++x)
         {
-            unsigned const pixel = src_line[x];
-            unsigned const darkest_neighbor = dilated_line[x];
-            assert(darkest_neighbor <= pixel);
+            const size_t pixel = gray.at<uchar>(cv::Point(x, y));
+            const size_t darkestNeighbour = dilatedImage.at<uchar>(cv::Point(x, y));
 
-            ++matrix[darkest_neighbor][pixel];
+            assert(darkestNeighbour >= pixel);
+
+            ++matrix[darkestNeighbour][pixel];
         }
-        src_line += src_stride;
-        dilated_line += dilated_stride;
     }
 
-    unsigned nominator = 0;
-    unsigned denominator = 0;
-    for (unsigned m = 0; m < 256 - min_edge_magnitude; ++m)
+    size_t nominator = 0;
+    size_t denominator = 0;
+    for (size_t m = 0; m < 256 - minEdgeMagnitude; ++m)
     {
-        for (unsigned n = m + min_edge_magnitude; n < 256; ++n)
+        for (size_t n = m + minEdgeMagnitude; n < 256; ++n)
         {
             assert(n >= m);
 
-            unsigned const val = matrix[m][n];
+            const size_t val = matrix[n][m];
             nominator += (m + n) * val;
             denominator += val;
         }
@@ -92,11 +86,11 @@ void binarizeMokji(const cv::Mat& inputImage, cv::Mat& outputImage,
 
     if (denominator == 0)
     {
-        cv::threshold(inputImage, outputImage, 128, 255, CV_THRESH_BINARY);
+        cv::threshold(gray, outputImage, 128, 255, CV_THRESH_BINARY);
     }
 
-    const double threshold = 0.5 * nominator / denominator;
-    cv::threshold(inputImage, outputImage, (int) (threshold + 0.5), 255, CV_THRESH_BINARY);
+    const int threshold = 0.5 * nominator / denominator + 0.5;
+    cv::threshold(gray, outputImage, threshold, 255, CV_THRESH_BINARY);
 }
 
 }
