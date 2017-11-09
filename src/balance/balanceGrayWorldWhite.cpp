@@ -96,26 +96,13 @@ void grayWorldWhiteBalance(const cv::Mat& inputImage, cv::Mat& outputImage,
     {
         cv::Vec3b v1 = *it;
 
-        double l = v1.val[0];
-        double a = v1.val[1];
-        double b = v1.val[2];
+        double l = v1.val[0] * r_div_ml;
+        double a = v1.val[1] * r_div_ma;
+        double b = v1.val[2] * r_div_mb;
 
-        //l = l * (r / ml);
-        //a = a * (r / ma);
-        //b = b * (r / mb);
-        l *= r_div_ml;
-        a *= r_div_ma;
-        b *= r_div_mb;
-
-        //l = std::min(255.0, l);
-        //a = std::min(255.0, a);
-        //b = std::min(255.0, b);
-        if (l > 255.0)
-        { l = 255.0; }
-        if (a > 255.0)
-        { a = 255.0; }
-        if (b > 255.0)
-        { b = 255.0; }
+        l = std::min(255.0, l);
+        a = std::min(255.0, a);
+        b = std::min(255.0, b);
 
         v1.val[0] = static_cast<uchar>(l);
         v1.val[1] = static_cast<uchar>(a);

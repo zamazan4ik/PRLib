@@ -97,7 +97,7 @@ void gammaCorrection(const cv::Mat& inputImage, cv::Mat& outputImage,
 	}
 
 	//Step two: we multiply on some coefficient, if it doesn't equal to 1.0
-	if (!eq_d(k, 1.0, 1e-9))
+	if (!eq_d(k, 1.0))
 	{
 		outputImageMat *= k;
 	}
