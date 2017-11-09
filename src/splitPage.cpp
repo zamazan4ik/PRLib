@@ -27,5 +27,15 @@
 #include <algorithm>
 
 #include <opencv2/core/core.hpp>
+#include <opencv2/imgproc/imgproc.hpp>
 
-std::pair<cv::Point, cv::Point> findVertLine(const cv::Mat& inputImage);
+std::pair<cv::Point, cv::Point> findVertLine(const cv::Mat& inputImage)
+{
+    cv::Mat imageToProc = inputImage.clone();
+    if(inputImage.channels() == 3)
+    {
+        cv::cvtColor(inputImage, imageToProc, CV_BGR2GRAY);
+    }
+
+    // TODO: Should be possibly resized to smth like 256px
+};
