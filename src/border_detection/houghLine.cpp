@@ -260,7 +260,12 @@ bool prl::findHoughLineContour(cv::Mat& inputImage,
         return false;
     }
 
-    resultContour = std::vector<cv::Point>(resultVec.begin(), resultVec.end());
+    for(const auto& vertice : resultVec)
+    {
+        resultContour.push_back({static_cast<int>(vertice.x), static_cast<int>(vertice.y)});
+    }
+
+    //resultContour = std::vector<cv::Point>(resultVec.begin(), resultVec.end());
 
     return true;
 }
