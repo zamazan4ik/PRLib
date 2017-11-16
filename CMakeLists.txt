@@ -27,7 +27,7 @@ foreach(_header ${HEADERS})
     file(COPY ${_header} DESTINATION ${CMAKE_BINARY_DIR}/include)
 endforeach()
 
-find_package(Leptonica)
+#find_package(Leptonica)
 find_package(OpenCV)
 
 include_directories(${LEPTONICA_INCLUDE_DIR})
@@ -42,7 +42,8 @@ endif()
 
 target_link_libraries(prlib
         ${OpenCV_LIBS}
-        ${LEPTONICA_LIBRARY})
+        #${LEPTONICA_LIBRARY}
+        -llept)
 
 # Building samples
 message(STATUS "Build samples: ${BUILD_SAMPLES}")
