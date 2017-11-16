@@ -45,12 +45,12 @@ void cleanBackgroundToWhite(const cv::Mat& inputImage, cv::Mat& outputImage)
         throw std::invalid_argument("Input image for flipping is empty");
     }
 
-    /*cv::Mat outputImageMat;
+    cv::Mat outputImageMat;
 
     {
         PIX* pixs = prl::opencvToLeptonica(&inputImageMat);
 
-        *//* Normalize for varying background *//*
+        /* Normalize for varying background */
         PIX* pixn = pixCleanBackgroundToWhite(pixs, nullptr, nullptr, 1.0, 70, 170);
 
         pixDestroy(&pixs);
@@ -60,7 +60,7 @@ void cleanBackgroundToWhite(const cv::Mat& inputImage, cv::Mat& outputImage)
         pixDestroy(&pixn);
     }
 
-    outputImage = outputImageMat;*/
+    outputImage = outputImageMat;
 }
 
 }
