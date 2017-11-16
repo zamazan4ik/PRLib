@@ -49,7 +49,7 @@ int main(int argc, char**argv)
     cv::Mat inputImage = cv::imread(inputImageFilename);
     cv::Mat outputImage;
 
-    prl::gammaCorrection(inputImage, outputImage);
+    prl::gammaCorrection(inputImage, outputImage, 1.0, 1.0);
 
     cv::imwrite(outputImageFilename, outputImage);
 }

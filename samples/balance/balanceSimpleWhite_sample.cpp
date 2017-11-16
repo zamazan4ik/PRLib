@@ -49,7 +49,7 @@ int main(int argc, char**argv)
     cv::Mat inputImage = cv::imread(inputImageFilename);
     cv::Mat outputImage;
 
-    prl::simpleWhiteBalance(inputImage, outputImage);
+    prl::simpleWhiteBalance(inputImage, outputImage, 25);
 
     cv::imwrite(outputImageFilename, outputImage);
 }
