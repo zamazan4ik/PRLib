@@ -16,6 +16,10 @@ set(CMAKE_BUILD_TYPE Debug)
 
 set(PRLIB_SRC_PATH {Projec})
 
+# Options
+option(BUILD_SAMPLES false)
+option(BUILD_TESTS false)
+
 file(GLOB_RECURSE HEADERS "src/*/*.h" "src/*.h")
 file(GLOB_RECURSE SOURCES "src/*/*.cpp" "src/*.cpp" "src/*/*.h" "src/*.h")
 
@@ -29,15 +33,22 @@ find_package(OpenCV)
 include_directories(${LEPTONICA_INCLUDE_DIR})
 include_directories(${OpenCV_INCLUDE_DIRS})
 
-add_library(prlib STATIC ${SOURCES} src/cleanBackgroundToWhite.cpp src/cleanBackgroundToWhite.h)
+message(STATUS "Build shared library: ${BUILD_SHARED_LIBS}")
+if(${BUILD_SHARED_LIBS})
+    add_library(prlib SHARED ${SOURCES})
+else()
+    add_library(prlib STATIC ${SOURCES})
+endif()
 
 target_link_libraries(prlib
         ${OpenCV_LIBS}
         ${LEPTONICA_LIBRARY})
 
-add_subdirectory(samples)
-
-message(STATUS ${CMAKE_SOURCE_DIR})
+# Building samples
+message(STATUS "Build samples: ${BUILD_SAMPLES}")
+if(${BUILD_SAMPLES})
+    add_subdirectory(samples)
+endif()
 
 set(CMAKE_INSTALL_PREFIX ${CMAKE_SOURCE_DIR}/out_include)
 
