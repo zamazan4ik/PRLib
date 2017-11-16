@@ -12,7 +12,7 @@ IF (NOT WIN32)
   include(FindPkgConfig)
   if ( PKG_CONFIG_FOUND )
 
-     pkg_check_modules (LEPTONICA lept>=1.40)
+     pkg_check_modules (LEPTONICA REQUIRED lept>=1.40)
 
   endif(PKG_CONFIG_FOUND)
 endif (NOT WIN32)
@@ -26,7 +26,7 @@ message(STATUS "Looking for leptonica in ${LEPTONICA_INCLUDE_DIRS}")
 FIND_PATH(LEPTONICA_INCLUDE_DIR allheaders.h
    HINTS
      ${LEPTONICA_INCLUDE_DIRS}
-    ${CMAKE_INCLUDE_PATH}
+     ${CMAKE_INCLUDE_PATH}
 )
 
 # locate the library
