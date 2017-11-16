@@ -3,3 +3,113 @@
 #include_directories(/media/zamazan4ik/For_Linux/OpenSource/PRLib/src/binarizations/)
 
 #add_executable(binCOCO binarizations/binarizeCOCOCLUST_sample.cpp)
+
+# Samples
+
+# Binarization samples
+add_executable(binarizeCOCOCLUST_sample binarizations/binarizeCOCOCLUST_sample.cpp)
+target_link_libraries(binarizeCOCOCLUST_sample prlib)
+
+add_executable(binarizeFBCITB_sample binarizations/binarizeFBCITB_sample.cpp)
+target_link_libraries(binarizeFBCITB_sample prlib)
+
+add_executable(binarizeFeng_sample binarizations/binarizeFeng_sample.cpp)
+target_link_libraries(binarizeFeng_sample prlib)
+
+add_executable(binarizeLocalOtsu_sample binarizations/binarizeLocalOtsu_sample.cpp)
+target_link_libraries(binarizeLocalOtsu_sample prlib)
+
+add_executable(binarizeNativeAdaptive_sample binarizations/binarizeNativeAdaptive_sample.cpp)
+target_link_libraries(binarizeNativeAdaptive_sample prlib)
+
+add_executable(binarizeNiblack_sample binarizations/binarizeNiblack_sample.cpp)
+target_link_libraries(binarizeNiblack_sample prlib)
+
+add_executable(binarizeNICK_sample binarizations/binarizeNICK_sample.cpp)
+target_link_libraries(binarizeNICK_sample prlib)
+
+add_executable(binarizeSauvola_sample binarizations/binarizeSauvola_sample.cpp)
+target_link_libraries(binarizeSauvola_sample prlib)
+
+add_executable(binarizeWolfJolion_sample binarizations/binarizeWolfJolion_sample.cpp)
+target_link_libraries(binarizeWolfJolion_sample prlib)
+
+add_executable(binarizeMokji_sample binarizations/binarizeMokji_sample.cpp)
+target_link_libraries(binarizeMokji_sample prlib)
+
+add_executable(binarizeByLocalVariances_sample binarizations/binarizeByLocalVariances_sample.cpp)
+target_link_libraries(binarizeByLocalVariances_sample prlib)
+
+# Thinning samples
+add_executable(thinGuoHall_sample thinning/thinGuoHall_sample.cpp)
+target_link_libraries(thinGuoHall_sample prlib)
+
+add_executable(thinZhangSuen_sample thinning/thinZhangSuen_sample.cpp)
+target_link_libraries(thinZhangSuen_sample prlib)
+
+
+# Deblur samples
+add_executable(basicDeblur_sample deblur/basicDeblur_sample.cpp)
+target_link_libraries(basicDeblur_sample prlib)
+
+add_executable(wienerFilter_sample deblur/wienerFilter_sample.cpp)
+target_link_libraries(wienerFilter_sample prlib)
+
+
+# Normalization samples
+add_executable(backgroundNormalization_sample backgroundNormalization_sample.cpp)
+target_link_libraries(backgroundNormalization_sample prlib)
+
+
+# Denoise samples
+add_executable(denoiseSaltPepper_sample denoise/denoiseSaltPepper_sample.cpp)
+target_link_libraries(denoiseSaltPepper_sample prlib)
+
+add_executable(kuwaharaFilter_sample denoise/kuwaharaFilter_sample.cpp)
+target_link_libraries(kuwaharaFilter_sample prlib)
+
+# Border detection samples
+
+# Correct non-uniform illumination samples
+add_executable(cleanBackgroundToWhite_sample cleanBackgroundToWhite_sample.cpp)
+target_link_libraries(cleanBackgroundToWhite_sample prlib)
+
+add_executable(correctNUIL_sample correctNUIL_sample.cpp)
+target_link_libraries(correctNUIL_sample prlib)
+
+# Remove hole punches samples
+add_executable(removeHolePunch_sample removeHolePunch_sample.cpp)
+target_link_libraries(removeHolePunch_sample prlib)
+
+# Remove lines samples
+add_executable(removeLines_sample removeLines_sample.cpp)
+target_link_libraries(removeLines_sample prlib)
+
+# Remove dots sample
+add_executable(removeDots_sample removeDots_sample.cpp)
+target_link_libraries(removeDots_sample prlib)
+
+# Warp sample
+add_executable(warp_sample warp_sample.cpp)
+target_link_libraries(warp_sample prlib)
+
+# Auto crop sample
+add_executable(autoCrop_sample border_detection/autoCrop_sample.cpp)
+target_link_libraries(autoCrop_sample prlib)
+
+# Deskew sample
+add_executable(deskew_sample deskew_sample.cpp)
+target_link_libraries(deskew_sample prlib)
+
+# Balance samples
+add_executable(balanceColor_sample balance/balanceColor_sample.cpp)
+target_link_libraries(balanceColor_sample prlib)
+
+add_executable(balanceGrayWorldWhite_sample balance/balanceGrayWorldWhite_sample.cpp)
+target_link_libraries(balanceGrayWorldWhite_sample prlib)
+
+add_executable(balanceSimpleWhite_sample balance/balanceSimpleWhite_sample.cpp)
+target_link_libraries(balanceSimpleWhite_sample prlib)
+
+add_executable(gammaCorrection_sample balance/gammaCorrection_sample.cpp)
+target_link_libraries(gammaCorrection_sample prlib)
