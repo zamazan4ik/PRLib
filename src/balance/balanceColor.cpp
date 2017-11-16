@@ -33,7 +33,7 @@
 #include "utils.h"
 
 void prl::colorBalance(const cv::Mat& inputImage, cv::Mat& outputImage,
-                  double colorBalanceGamma, double saturationGamma)
+                       double colorBalanceGamma, double saturationGamma)
 {
     if (inputImage.empty())
     {
