@@ -925,3 +925,17 @@ cv::Mat getGaussianKernel2D(const int ksize, double sigma)
 
     return kernel;
 }
+
+std::pair<cv::Point2f, cv::Point2f> fromVec2f(cv::Vec2f vec)
+{
+    float rho = vec[0], theta = vec[1];
+    cv::Point2f pt1, pt2;
+    double a = std::cos(theta), b = std::sin(theta);
+    double x0 = a * rho, y0 = b * rho;
+    pt1.x = static_cast<float>(cvRound(x0 + 1000 * (-b)));
+    pt1.y = static_cast<float>(cvRound(y0 + 1000 * (a)));
+    pt2.x = static_cast<float>(cvRound(x0 - 1000 * (-b)));
+    pt2.y = static_cast<float>(cvRound(y0 - 1000 * (a)));
+
+    return std::make_pair(pt1, pt2);
+}

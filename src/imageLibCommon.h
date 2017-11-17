@@ -235,4 +235,6 @@ bool IsQuadrangularConvex(const std::vector<cv::Point2f>& resultContour);
 bool cropVerticesOrdering(std::vector<cv::Point>& pt);
 
 cv::Mat getGaussianKernel2D(const int ksize, double sigma);
+
+std::pair<cv::Point2f, cv::Point2f> fromVec2f(cv::Vec2f vec);
 #endif // PRLIB_ImageLibCommon_h
