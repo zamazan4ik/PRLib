@@ -109,3 +109,6 @@ target_link_libraries(balanceSimpleWhite_sample prlib)
 
 add_executable(gammaCorrection_sample balance/gammaCorrection_sample.cpp)
 target_link_libraries(gammaCorrection_sample prlib)
+
+add_executable(segmentation_sample segmentation/segmentation_sample.cpp)
+target_link_libraries(segmentation_sample prlib)
