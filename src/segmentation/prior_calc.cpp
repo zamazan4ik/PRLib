@@ -19,7 +19,6 @@
 
 #include <vector>
 
-#include "TIFF_RW.h"
 #include "Main_def.h"
 
 #include "marklist.h"
@@ -185,7 +184,7 @@ void find_neighbors(
                         /* Add the neighbor to que */
                         data.nei_info.comp_num = loc_map[i][j] - 1;
 
-                        dist = sqrt((i - x) * (i - x) + (j - y) * (j - y));
+                        dist = std::sqrt((i - x) * (i - x) + (j - y) * (j - y));
                         data.nei_info.dis = dist;
                         Addtail(data, neighbors, cur_comp_num);
                         nei_num++;
@@ -215,7 +214,7 @@ void find_neighbors(
                         /* Add the neighbor to que */
                         data.nei_info.comp_num = loc_map[i][j] - 1;
 
-                        dist = sqrt((i - x) * (i - x) + (j - y) * (j - y));
+                        dist = std::sqrt((i - x) * (i - x) + (j - y) * (j - y));
                         data.nei_info.dis = dist;
                         Addtail(data, neighbors, cur_comp_num);
                         nei_num++;
@@ -385,7 +384,7 @@ double calc_prior(
         unsigned int comp_cnt,  /* i : component # */
         int val,                /* i : class value for specified cc # */
         Nei_header* neighbors,  /* i : neighborhood que */
-        int* class_old,             /* i : class */
+        const std::vector<int>& class_old,             /* i : class */
         Dist_para* para         /* i : parameters for distance func */
 )
 {

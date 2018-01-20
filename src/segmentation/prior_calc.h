@@ -17,6 +17,8 @@
 #define  FEAT_DIM      4
 #define  FEATAUG_DIM   6
 
+
+//TODO: Review constants
 #define  EXP_P         12.402208
 #define  A_VAL         7.137982
 #define  B_VAL         8.495436
@@ -62,10 +64,9 @@ typedef struct
 /* external function declaration */
 void find_neighbors(marklistptr list, Pixel_pos *hw, 
 Nei_header *neighbors);
-void print_neighbors(Nei_header *neighbors, unsigned int comp_cnt);
 void init_neighbors(Nei_header **header,unsigned int comp_num);
 void free_neighbors (Nei_header *header, unsigned int comp_num);
-double calc_prior(unsigned int comp_cnt, int val, Nei_header *neighbors, int *class_old, Dist_para *para);
+double calc_prior(unsigned int comp_cnt, int val, Nei_header *neighbors, const std::vector<int>& class_old, Dist_para *para);
 void calc_featdis(unsigned int comp_num, marklistptr list, double **feat, Nei_header *neighbors);
 void make_feataug(unsigned int comp_num, double **feat, Nei_header *neighbors, double **feataug);
 void calc_sizecc(unsigned int comp_num, marklistptr list, Nei_header *neighbors);

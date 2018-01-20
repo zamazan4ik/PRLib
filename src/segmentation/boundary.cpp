@@ -92,20 +92,6 @@ lrboundary_add(lrboundarytype* b, const int y, const int l, const int r)
     b->len++;
 }
 
-void
-lrboundary_dump(lrboundarytype* b, FILE* fp)
-{
-    int i;
-
-    assert(b);
-    assert(fp);
-
-    for (i = 0; i < b->len; i++)
-    {
-        fprintf(fp, "%d: %d-%d\n", b->y[i], b->l[i], b->r[i]);
-    }
-}
-
 
 /*
  *
@@ -138,20 +124,6 @@ boundary_free(boundarytype* b)
         if (b->y)
         { free(b->y); }
         boundary_init(b);
-    }
-}
-
-void
-boundary_dump(boundarytype* b, FILE* fp)
-{
-    int i;
-
-    assert(b);
-    assert(fp);
-
-    for (i = 0; i < b->len; i++)
-    {
-        fprintf(fp, "%d: %d %d\n", i, b->x[i], b->y[i]);
     }
 }
 

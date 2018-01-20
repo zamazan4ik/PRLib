@@ -35,15 +35,13 @@
 #ifndef CLUST_IO_H
 #define CLUST_IO_H
 
-#include<stdio.h>
-#include<stdlib.h>
-#include <string.h>
+#include <cstdio>
+#include <cstdlib>
+#include <cstring>
 
 #include "clust_defs.h"
 
 /* clust_io.c routines */
 void I_ReadSigSet(FILE *fd, struct SigSet *S);
-void I_WriteSigSet(FILE *fd, struct SigSet *S);
-
 
 #endif /* CLUST_IO_H */

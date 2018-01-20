@@ -20,66 +20,85 @@
 /* structure */
 typedef struct
 {
-    int     m;       /* Rows of image in pixels */
-    int     n;       /* Columns of image in pixels */
+    int m;       /* Rows of image in pixels */
+    int n;       /* Columns of image in pixels */
 } CC_pixel;
 
-typedef struct c_list{
-    CC_pixel  pixels;       /* Neighbors unsearched yet */
-    struct c_list *pnext;   /* Pointer to next data */
+typedef struct c_list
+{
+    CC_pixel pixels;       /* Neighbors unsearched yet */
+    struct c_list* pnext;   /* Pointer to next data */
 } CC_clist;
 
 typedef struct
 {
-    int     row;
-    int     col;
+    int row;
+    int col;
 } ROWCOL;
 
-typedef struct {
-    ROWCOL  upperleft;
-    ROWCOL  lowerright;
-    int     first_flag;
+typedef struct
+{
+    ROWCOL upperleft;
+    ROWCOL lowerright;
+    int first_flag;
 } Corner_info;
 
-static void cnt_boundary_length( marklistptr list, unsigned int height, unsigned int width, int *bound_list);
-static void alloc_edge_memory(int *bound_list, unsigned int comp_num, unsigned char ****edge_ptr);
-static void free_edge_memory(int *bound_list, unsigned int comp_num, unsigned char ***edge);
-static void  calc_boundary( marklistptr list, int *bound_list, unsigned char ***inner_edge,unsigned char ***outer_edge, int height, int width, unsigned char ***input_img_c, unsigned char **bin_msk);
-static void calc_edge(int *bound_list, unsigned int comp_num, unsigned char ***inner_edge, unsigned char  ***outer_edge, double *edge_depth, double *edge_std, double *edge_std2, double* edge_max, double* edge_min);
-static void calc_boundary_length_cc(marklistptr n, unsigned int height, unsigned int width, int *length);
+void cnt_boundary_length(marklistptr list, unsigned int height, unsigned int width, std::vector<int>& bound_list);
 
-static void Addtail(CC_clist newlist, CC_clist **pstart, CC_clist **pen);
-static CC_clist Removehead(CC_clist **pstart, CC_clist **pend);
+void alloc_edge_memory(std::vector<int>& bound_list, unsigned int comp_num, unsigned char**** edge_ptr);
 
-static void calc_white_edge(marklistptr list, double *white_cc_edge, double *black_cc_edge, double *area_list, unsigned int height, unsigned int width, 
-unsigned char ***input_img, unsigned char **bin_msk,
-char flg_bound);
-static void calc_white_cc(marklistptr list, double *white_cc_pxl_list, 
-unsigned int *cnt_white, 
-unsigned int height, unsigned int width, unsigned char ***input_img, 
-unsigned char **bin_msk);
+void free_edge_memory(int* bound_list, unsigned int comp_num, unsigned char*** edge);
 
-static void reverse_cc(unsigned char **input_bin, unsigned char **bin_img,
-unsigned int height, unsigned int width, unsigned char  **flip_bin, 
-unsigned char **rem_bin);
-static void Region_growing(CC_pixel s, unsigned char** bin_msk, unsigned char **out_bin, int width, int height);
-static void Region_growing_cnt(CC_pixel s, unsigned char** bin_msk, unsigned char **out_bin, int width, int height, unsigned int* cnt);
-static void ConnectedNeighbors_UCHAR(CC_pixel s, unsigned char** bin_msk,
-int width, int height, int* M, CC_pixel c[4]);
+void
+calc_boundary(marklistptr list, std::vector<int>& bound_list, unsigned char*** inner_edge, unsigned char*** outer_edge, int height,
+              int width, unsigned char*** input_img_c, unsigned char** bin_msk);
 
-static void record_corner( marklistptr n, Corner_info *corner_info);
-static void flip_reversed_cc( unsigned char ***input_img, unsigned char **bin_msk, unsigned int height, unsigned int width);   
+void calc_edge(std::vector<int>& bound_list, unsigned int comp_num, unsigned char*** inner_edge, unsigned char*** outer_edge,
+               std::vector<double>& edge_depth, std::vector<double>& edge_std, std::vector<double>& edge_std2,
+               std::vector<double>& edge_max, std::vector<double>& edge_min);
 
-static void  make_feat( marklistptr list, unsigned int comp_num,
-unsigned int height, unsigned int width, unsigned char ***input_img,
-unsigned char **bin_msk, double **vector);
+void calc_boundary_length_cc(marklistptr n, unsigned int height, unsigned int width, int* length);
 
-static void QuickSort(unsigned int *array, unsigned int *index,\
-unsigned int p,unsigned int r);
-static unsigned int Partition(unsigned int *array, unsigned int *index,\
-unsigned int p, unsigned int r);
-static unsigned int find_percentile(unsigned int *data_array, int num,
-unsigned int  percent);
+void Addtail(CC_clist newlist, CC_clist** pstart, CC_clist** pen);
+
+CC_clist Removehead(CC_clist** pstart, CC_clist** pend);
+
+void calc_white_edge(marklistptr list, std::vector<double>& white_cc_edge,
+                     std::vector<double>& black_cc_edge, std::vector<double>& area_list,
+                     unsigned int height, unsigned int width, unsigned char*** input_img,
+                     unsigned char** bin_msk, char flg_bound);
+
+void calc_white_cc(marklistptr list, std::vector<double>& white_cc_pxl_list,
+                   std::vector<unsigned int>& cnt_white,
+                   unsigned int height, unsigned int width, unsigned char*** input_img,
+                   unsigned char** bin_msk);
+
+void reverse_cc(unsigned char** input_bin, unsigned char** bin_img,
+                unsigned int height, unsigned int width, cv::Mat& flip_bin,
+                cv::Mat& rem_bin);
+
+void Region_growing(CC_pixel s, unsigned char** bin_msk, cv::Mat& out_bin, int width, int height);
+
+void Region_growing_cnt(CC_pixel s, unsigned char** bin_msk, cv::Mat& out_bin, int width, int height,
+                        unsigned int* cnt);
+
+void ConnectedNeighbors_UCHAR(CC_pixel s, unsigned char** bin_msk,
+                              int width, int height, int* M, CC_pixel c[4]);
+
+void record_corner(marklistptr n, Corner_info* corner_info);
+
+void
+flip_reversed_cc(unsigned char*** input_img, unsigned char** bin_msk, unsigned int height, unsigned int width);
+
+void make_feat(marklistptr list, unsigned int comp_num,
+                      unsigned int height, unsigned int width, unsigned char*** input_img,
+                      unsigned char** bin_msk, double** vector);
+
+void QuickSort(std::vector<unsigned int>& array, std::vector<unsigned int>& index, unsigned int p, unsigned int r);
+
+unsigned int Partition(std::vector<unsigned int>& array, std::vector<unsigned int>& index, unsigned int p, unsigned int r);
+
+unsigned int find_percentile(const std::vector<unsigned int>& data_array, int num, unsigned int percent);
 
 #endif
 

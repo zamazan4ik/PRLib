@@ -47,7 +47,6 @@
 #include "clust_io.h"
 #include "clust_util.h"
 #include "alloc_util.h"
-#include "clustermessage.h"
 
 #include "Main_def.h"
 
@@ -81,7 +80,7 @@ int classify(
         double** vector,        /* i : feature vector */
         int num,            /* i : # of the vector */
         double** loglikelihood, /* o : loglikelihood */
-        int* clus,           /* o : ML estimation */
+        std::vector<int>& clus,           /* o : ML estimation */
         int dim,            /* i : vector dimension */
         const char* filename,       /* i : parameter file name */
         double text_cost,      /* i : cost toward text */
@@ -154,7 +153,7 @@ int classify(
 
     G_free_vector(ll);
     G_free_matrix(data);
-    return (0);
+    return 0;
 }
 
 
@@ -241,10 +240,10 @@ void LogLikelihood(
             subsum = 0;
             for (k = 0; k < C->nsubclasses; k++)
             {
-                subsum += exp(subll[k] - maxlike) * C->subSig[k].pi;
+                subsum += std::exp(subll[k] - maxlike) * C->subSig[k].pi;
             }
 
-            ll[m] = log(subsum) + maxlike;
+            ll[m] = cv::log(subsum) + maxlike;
             /* Cost added by Eri */
             /* log p(y|0) - log p(y|1) < or >  log ( pi_1/pi_0 ) */
             /* log p(y|0) + log pi_0 - log p(y|1) - log pi_1 < or > 0 */

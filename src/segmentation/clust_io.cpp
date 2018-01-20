@@ -61,7 +61,7 @@ void get_subclass_means(FILE* fd, struct SubSig* Sp, int nbands);
 
 void get_subclass_covar(FILE* fd, struct SubSig* Sp, int nbands);
 
-void G_strip(register char* buf);
+void G_strip(char* buf);
 
 
 void I_ReadSigSet(FILE* fd, struct SigSet* S)
@@ -213,9 +213,9 @@ void get_subclass_covar(FILE* fd, struct SubSig* Sp, int nbands)
 }
 
 
-void G_strip(register char* buf)
+void G_strip(char* buf)
 {
-    register char* a, * b;
+    char* a, * b;
 
     /* remove leading white space */
     for (a = b = buf; *a == ' ' || *a == '\t'; a++)

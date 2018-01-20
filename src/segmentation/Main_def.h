@@ -24,5 +24,3 @@
 
 #include <opencv2/core/core.hpp>
 
-void output_tiff_UINT8( char *filename, unsigned char *img, char color_flg, unsigned int height, unsigned int width, cv::Mat& image);
-

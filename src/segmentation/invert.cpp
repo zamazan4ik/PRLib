@@ -58,8 +58,7 @@ int invert(
 
 /* From Numerical Recipies in C */
 
-int
-G_ludcmp(double** a, int n, int* indx, double* d)
+int G_ludcmp(double** a, int n, int* indx, double* d)
 {
     int imax;
     double big, dum, sum, temp;
@@ -138,8 +137,7 @@ G_ludcmp(double** a, int n, int* indx, double* d)
     return 1;
 }
 
-void
-G_lubksb(double** a, int n, int* indx, double b[])
+void G_lubksb(double** a, int n, int* indx, double b[])
 {
     int ii, ip, j;
     double sum;

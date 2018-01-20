@@ -64,8 +64,8 @@ int G_tqli(double* d, double* e, int n, double** z)
         {
             for (m = l; m < n - 1; m++)
             {
-                dd = fabs(d[m]) + fabs(d[m + 1]);
-                if (fabs(e[m]) + dd == dd)
+                dd = std::fabs(d[m]) + std::fabs(d[m + 1]);
+                if (std::fabs(e[m]) + dd == dd)
                 { break; }
             }
             if (m != l)
@@ -73,7 +73,7 @@ int G_tqli(double* d, double* e, int n, double** z)
                 if (iter++ == MAX_ITERS)
                 { return 0; } /* Too many iterations in TQLI */
                 g = (d[l + 1] - d[l]) / (2.0 * e[l]);
-                r = sqrt((g * g) + 1.0);
+                r = std::sqrt((g * g) + 1.0);
                 g = d[m] - d[l] + e[l] / (g + SIGN(r, g));
                 s = c = 1.0;
                 p = 0.0;
@@ -81,17 +81,17 @@ int G_tqli(double* d, double* e, int n, double** z)
                 {
                     f = s * e[i];
                     b = c * e[i];
-                    if (fabs(f) >= fabs(g))
+                    if (std::fabs(f) >= std::fabs(g))
                     {
                         c = g / f;
-                        r = sqrt((c * c) + 1.0);
+                        r = std::sqrt((c * c) + 1.0);
                         e[i + 1] = f * r;
                         c *= (s = 1.0 / r);
                     }
                     else
                     {
                         s = f / g;
-                        r = sqrt((s * s) + 1.0);
+                        r = std::sqrt((s * s) + 1.0);
                         e[i + 1] = g * r;
                         s *= (c = 1.0 / r);
                     }
@@ -146,7 +146,7 @@ void G_tred2(double** a, int n, double* d, double* e)
                     h += a[i][k] * a[i][k];
                 }
                 f = a[i][l];
-                g = f > 0 ? -sqrt(h) : sqrt(h);
+                g = f > 0 ? -std::sqrt(h) : std::sqrt(h);
                 e[i] = scale * g;
                 h -= f * g;
                 a[i][l] = f - g;

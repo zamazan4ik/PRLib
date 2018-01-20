@@ -42,21 +42,14 @@
 #include "clust_defs.h"
 
 
-int I_SigSetNClasses(struct SigSet *S);
-struct ClassData *I_AllocClassData(struct SigSet *S, struct ClassSig *C, int npixels);
 void I_InitSigSet(struct SigSet *S);
-void I_SigSetNBands (struct SigSet *S, int nbands);
 struct ClassSig *I_NewClassSig(struct SigSet *S);
 struct SubSig *I_NewSubSig (struct SigSet *S, struct ClassSig *C);
 void I_SetSigTitle (struct SigSet *S, char *title);
-char *I_GetSigTitle (struct SigSet *S);
 void I_SetClassTitle (struct ClassSig *C, char *title);
-char *I_GetClassTitle (struct ClassSig *C);
 void I_DeallocClassData( struct SigSet *S, struct ClassSig *C);
 void I_RemoveSubSig (struct SigSet *S, struct ClassSig *C);
 void I_RemoveClassSig(struct SigSet *S);
-void I_TermSigSet(struct SigSet *S);
-
 
 #endif /* CLUST_UTIL_H */
 

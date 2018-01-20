@@ -14,19 +14,6 @@
 #include <ctype.h>
 #include <math.h>
 
-
-int isEOF(FILE* fp)
-{
-    int ch;
-
-    ch = getc(fp);
-    ungetc(ch, fp);
-    if (ch == EOF)
-    { return 1; }
-    return 0;
-}
-
-
 unsigned short magic_getshort(FILE* fp)
 {
     int ch1, ch2;
@@ -47,160 +34,12 @@ unsigned short magic_getshort(FILE* fp)
     return ((unsigned short) ch1 << 8) | (unsigned short) ch2;
 }
 
-unsigned short magic_popshort(FILE* fp)
-{
-    int ch1, ch2;
-    ch1 = getc(fp);
-    if (ch1 == EOF)
-    { return 0; }
-    ch2 = getc(fp);
-    if (ch2 == EOF)
-    { return 0; }
-    return (ch1 << 8) | ch2;
-}
-
-unsigned char magic_getbyte(FILE* fp)
-{
-    int ch1;
-    ch1 = getc(fp);
-    if (ch1 == EOF)
-    {
-        ungetc(ch1, fp);
-        return 0;
-    }
-    ungetc(ch1, fp);
-    return ((unsigned char) ch1);
-}
-
-unsigned char magic_popbyte(FILE* fp)
-{
-    int ch1;
-    ch1 = getc(fp);
-    if (ch1 == EOF)
-    { return 0; }
-    return ((unsigned char) ch1);
-}
-
-
-/* 4 bytes of of pushback must be guaranteed */
-unsigned long magic_getlong(FILE* fp)
-{
-    int ch1, ch2, ch3, ch4;
-    ch1 = getc(fp);
-    if (ch1 == EOF)
-    {
-        ungetc(ch1, fp);
-        return 0;
-    }
-    ch2 = getc(fp);
-    if (ch2 == EOF)
-    {
-        ungetc(ch2, fp);
-        return 0;
-    }
-    ch3 = getc(fp);
-    if (ch3 == EOF)
-    {
-        ungetc(ch3, fp);
-        return 0;
-    }
-    ch4 = getc(fp);
-    if (ch4 == EOF)
-    {
-        ungetc(ch4, fp);
-        return 0;
-    }
-    ungetc(ch4, fp);
-    ungetc(ch3, fp);
-    ungetc(ch2, fp);
-    ungetc(ch1, fp);
-
-    return ((unsigned long) ch1 << 24) | ((unsigned long) ch2 << 16) | ((unsigned long) ch3 << 8) |
-           ((unsigned long) ch4);
-}
-
-unsigned long magic_poplong(FILE* fp)
-{
-    int ch1, ch2, ch3, ch4;
-    ch1 = getc(fp);
-    if (ch1 == EOF)
-    { return 0; }
-    ch2 = getc(fp);
-    if (ch2 == EOF)
-    { return 0; }
-    ch3 = getc(fp);
-    if (ch3 == EOF)
-    { return 0; }
-    ch4 = getc(fp);
-    if (ch4 == EOF)
-    { return 0; }
-    return ((unsigned long) ch1 << 24) | ((unsigned long) ch2 << 16) | ((unsigned long) ch3 << 8) |
-           ((unsigned long) ch4);
-}
-
-
-void magic_write(FILE* fp, unsigned long magic_num)
-{
-    if (fwrite(&magic_num, sizeof(magic_num), 1, fp) != 1)
-    {
-        error("magic num", "Couldn't write magic number.", "");
-    }
-}
-
-
-void magic_check(FILE* fp, unsigned long magic_num)
-{
-    unsigned long magic;
-    if (fread(&magic, sizeof(magic), 1, fp) != 1 || magic != magic_num)
-    {
-        error("magic num", "Incorrect magic number.", "");
-    }
-}
-
-
-unsigned long magic_popnamed(char fn[], int* err)
-{
-    FILE* fp;
-    unsigned long magic;
-
-    if ((fp = fopen(fn, "rb")) != NULL)
-    {
-        magic = magic_poplong(fp);
-        fclose(fp);
-        *err = 0;
-        return magic;
-    }
-    else
-    {
-        *err = 1;
-/*	error("magic_popnamed","can't open file",fn);*/
-        return 0;
-    }
-}
-
 
 void error(char* prog, char* message, char* extra)
 {
     fprintf(stderr, "%s: %s %s\n", prog, message, extra);
     exit(1);
 }
-
-void warn(char* prog, char* message, char* extra)
-{
-    fprintf(stderr, "%s: %s %s\n", prog, message, extra);
-}
-
-
-
-/*void readline(char str[], FILE *fp)
-{
-  int i=0,ch;
-
-  while(((ch=fgetc(fp))!='\n') && (!feof(fp)))
-    str[i++]=ch;
-  str[i]='\0';
-}*/
-
 
 #define GOOD_GAP 1024
 
@@ -266,7 +105,7 @@ char* fgoodgets(FILE* fp)
             fgoodgets_space[i++] = (char) ch;
         }
     }
-    while (1);
+    while (true);
 
     while ((i >= 1) && (fgoodgets_space[i - 1] == 13))
     {
@@ -281,67 +120,7 @@ char* fgoodgets(FILE* fp)
     }
 
     free(fgoodgets_space);
-    fgoodgets_space = NULL;
+    fgoodgets_space = nullptr;
 
     return p;
 }
-
-
-int getint(FILE* fp)
-{
-    register char ch;
-    register unsigned int i = 0;
-
-    do
-    {
-        ch = getc(fp);
-        if (feof(fp))
-        { return EOF; }
-    }
-    while (ch < '0' || ch > '9');
-
-    do
-    {
-        i = i * 10 + ch - '0';
-        ch = getc(fp);
-        if (feof(fp))
-        { return EOF; }
-    }
-    while (ch >= '0' && ch <= '9');
-
-    return i;
-}
-
-/* get_header_int i.e. get an integer from a PNM header ; basically  
-   the same as
-   above except for comment checking ; above kept because of lower  
-   overhead */
-
-
-int isinteger(char s[])
-{
-    int i = 0;
-
-    for (i = 0; s[i] != '\0'; i++)
-    {
-        if (!isdigit(s[i]))
-        { return 0; }
-    }
-    return 1;
-}
-
-
-int isfloat(char s[])
-{
-    int i = 0;
-
-    for (i = 0; s[i] != '\0'; i++)
-    {
-        if ((s[i] != '.') && (!isdigit(s[i])))
-        { return 0; }
-    }
-    return 1;
-}
-
-
-

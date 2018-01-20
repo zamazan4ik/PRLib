@@ -14,6 +14,8 @@
 
 #define MULTI_LAYER_RATE 2
 
+#include <array>
+
 #include <opencv2/core/core.hpp>
 
 /***************************************************/
@@ -21,7 +23,7 @@
 /***************************************************/
 typedef struct
 {
-    double** lambda;
+    std::array<double,4> lambda;
     unsigned int height; /* image height */
     unsigned int width;  /* image width */
     unsigned int min_block;  /* minimum block size */
@@ -47,6 +49,6 @@ typedef struct
 /***************************************************/
 /*  External function declarations                 */
 /***************************************************/
-int segmentation(const cv::Mat& inputImage, unsigned char** bin_msk, Seg_parameter* seg_para);
+int segmentation(const cv::Mat& inputImage, cv::Mat& bin_msk, Seg_parameter* seg_para);
 
 #endif
