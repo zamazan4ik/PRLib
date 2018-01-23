@@ -12,7 +12,9 @@
 #ifndef _CLASSIFY_H_
 #define _CLASSIFY_H_
 
-int classify(double **vector, int num, double **loglikelihood, int *clus,
+#include <vector>
+
+int classify(double **vector, int num, double **loglikelihood, std::vector<int>& clus,
 int dim, const char *filename, double text_cost, double non_text_cost);
 
 #endif

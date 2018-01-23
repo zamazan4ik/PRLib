@@ -10,12 +10,12 @@
  *
  */
 
+#include <array>
 #include <stdio.h>
 #include <string.h>
 #include <stdlib.h>
 #include <math.h>
 #include <time.h>
-#include <sys/timeb.h>
 
 #include "TIFF_RW.h"
 
@@ -122,31 +122,29 @@ void make_blkseq_c(
     /* Then, set the selected color data to                          */
     /* nh*nw*block*block format                                      */
 
-    unsigned int i, j, k, l, c, I, J;
     unsigned int half_blk;
     unsigned int x, y;
     int index;
     double mean_x, mean_x_2;
     unsigned int block_size;
     double total, total_2, val;
-    double array[3];
-    int tmp;
+    std::array<double, 3> array;
     unsigned int cnt1, cnt2, cnt3;
 
     cnt1 = cnt2 = cnt3 = 0;
     block_size = block * block;
     half_blk = block / 2;
-    for (i = 0, I = 0; i < nh; i++, I += half_blk)
+    for (size_t i = 0, I = 0; i < nh; i++, I += half_blk)
     {
-        for (j = 0, J = 0; j < nw; j++, J += half_blk)
+        for (size_t j = 0, J = 0; j < nw; j++, J += half_blk)
         {
-            for (c = 0; c < 3; c++)
+            for (size_t c = 0; c < 3; c++)
             {
                 total = 0;
                 total_2 = 0;
-                for (k = 0; k < block; k++)
+                for (size_t k = 0; k < block; k++)
                 {
-                    for (l = 0; l < block; l++)
+                    for (size_t l = 0; l < block; l++)
                     {
                         x = I + k;
                         y = J + l;
@@ -195,15 +193,15 @@ void make_blkseq_c(
             }
 
             /* Set the selected color data to overlapping block sequence O_b */
-            for (k = 0; k < block; k++)
+            for (size_t k = 0; k < block; k++)
             {
-                for (l = 0; l < block; l++)
+                for (size_t l = 0; l < block; l++)
                 {
                     x = I + k;
                     y = J + l;
                     if ((x < org_height) && (y < org_width))
                     {
-                        O_b[i][j][k][l] = (unsigned char) img[index][x][y];
+                        O_b[i][j][k][l] = img[index][x][y];
                     }
                     else
                     {
@@ -230,8 +228,7 @@ void thres_mmse(
     /* The clustering procedure uses partition to minimize            */
     /* the total variance of sub-groups.                              */
 
-    int i, j, k, l, m, thres;
-    double min_gamma, gamma;
+    int i, j, k, l, thres;
 
     for (i = 0; i < nh; i++)
     {
@@ -280,9 +277,9 @@ double calc_min_gamma(
     /*      var_0 : Variance of pixels of '0'              (G1)             */
     /*      var_1 : Variance of pixels of '1'              (G2)             */
 
-    unsigned int bak[256];
-    unsigned char z[256];
-    unsigned int c[256];
+    std::array<unsigned int , 256> bak;
+    std::array<unsigned char, 256> z;
+    std::array<unsigned int , 256> c;
     double G1_s1, G1_s2, G2_s1, G2_s2, total_s1, total_s2;
     int m;
     double total_num, G1_num, G2_num;
@@ -453,19 +450,17 @@ void horizontal_dynamic_seg
 
     unsigned int overlap, block;
     unsigned int i, j, x, y, m, coarse_i, coarse_j;
-    unsigned int class_cnt[4];
+    std::array<unsigned int, 4> class_cnt;
     double block_num;
-    double lambda1, lambda2, lambda3,
-            lambda4;
+    double lambda1, lambda2, lambda3, lambda4;
     double cost_Vb2, cost_MSE, cost_Vb3, total_cost, cost_Vb5;
     unsigned char** prev_stat;
     double** sum_cost;
-    double cost[4], cost_Vb1[4];
+    std::array<double, 4> cost, cost_Vb1;
     unsigned char sb, prev_sb;
     unsigned int** H_b, ** V_b, ** R_b, ** L_b, ** T_b, ** B_b;
     double** gamma_b, ** var_b, ** cnt_1_b;
     int class_old, index;
-    unsigned char**** C_b;
     unsigned char old_class;
 
     /* Read parameter info */
@@ -482,7 +477,6 @@ void horizontal_dynamic_seg
     gamma_b = pre_dynm_comp->gamma_b;
     var_b = pre_dynm_comp->var_b;
     cnt_1_b = pre_dynm_comp->cnt_1_b;
-    C_b = pre_dynm_comp->C_b;
 
     /* Horizontal overlapping */
     H_b = pre_dynm_comp->H_b;
@@ -595,7 +589,7 @@ void horizontal_dynamic_seg
                     {
                         /* Cost1 : # of mismatches in horizontal overlap region */
                         cost_Vb1[prev_sb] = calc_Vb1(prev_sb, sb, H_b[i][j], R_b[i][j - 1],
-                                                     L_b[i][j], var_b[i][j - 1], var_b[i][j], overlap);
+                                                     L_b[i][j], overlap);
                         /* Total Cost */
                         cost[prev_sb] = sum_cost[j - 1][prev_sb]
                                         + lambda1 * cost_Vb1[prev_sb] + lambda2 * cost_Vb2
@@ -1208,8 +1202,6 @@ double calc_Vb1(
         unsigned int H_b,        /* i : # of mismatches in horizontal direction */
         unsigned int R_b,        /* i : # of 1's in right half */
         unsigned int L_b,        /* i : # of 1's in left  half */
-        double var_prev,     /* i : variance of previous block */
-        double var_cur,      /* i : variance of current block */
         unsigned int num         /* i : # of overlap */
 )
 {

@@ -81,7 +81,7 @@ int classify(
         double** vector,        /* i : feature vector */
         int num,            /* i : # of the vector */
         double** loglikelihood, /* o : loglikelihood */
-        int* clus,           /* o : ML estimation */
+        std::vector<int>& clus,           /* o : ML estimation */
         int dim,            /* i : vector dimension */
         const char* filename,       /* i : parameter file name */
         double text_cost,      /* i : cost toward text */

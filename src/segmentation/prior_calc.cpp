@@ -385,7 +385,7 @@ double calc_prior(
         unsigned int comp_cnt,  /* i : component # */
         int val,                /* i : class value for specified cc # */
         Nei_header* neighbors,  /* i : neighborhood que */
-        int* class_old,             /* i : class */
+        std::vector<int>& class_old,             /* i : class */
         Dist_para* para         /* i : parameters for distance func */
 )
 {
@@ -438,8 +438,7 @@ void calc_featdis(
         cnt = 0;
         while (nptr != nullptr)
         {
-            dist_avg += mahal_dis(feat_list[i],
-                                           feat_list[nptr->nei_info.comp_num]);
+            dist_avg += mahal_dis(feat_list[i], feat_list[nptr->nei_info.comp_num]);
             nptr = nptr->pnext;
             cnt++;
         }

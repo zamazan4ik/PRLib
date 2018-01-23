@@ -5,50 +5,6 @@
 
 #include "allocate.h"
 
-void* get_spc(int num, size_t size)
-{
-    void* pt;
-
-    if ((pt = calloc((size_t) num, size)) == NULL)
-    {
-        fprintf(stderr, "==> calloc() error\n");
-        exit(-1);
-    }
-    return (pt);
-}
-
-void* mget_spc(int num, size_t size)
-{
-    void* pt;
-
-    if ((pt = malloc((size_t) (num * size))) == NULL)
-    {
-        fprintf(stderr, "==> malloc() error\n");
-        exit(-1);
-    }
-    return (pt);
-}
-
-void** get_img(int wd, int ht, size_t size)
-{
-    int i;
-    void** ppt;
-    char* pt;
-
-    ppt = (void**) mget_spc(ht, sizeof(void*));
-    pt = (char*) mget_spc(wd * ht, size);
-
-    for (i = 0; i < ht; i++)
-    { ppt[i] = pt + i * wd * size; }
-
-    return (ppt);
-}
-
-void free_img(void** pt)
-{
-    free((void*) pt[0]);
-    free((void*) pt);
-}
 
 /**************************************************************************
 
@@ -83,7 +39,7 @@ void* alloc_array(int size_array, size_t size_element)
 
     void* pt;
 
-    if ((pt = calloc((size_t) size_array, size_element)) == NULL)
+    if ((pt = calloc((size_t) size_array, size_element)) == nullptr)
     {
         fprintf(stderr, "==> calloc() error\n");
         exit(-1);

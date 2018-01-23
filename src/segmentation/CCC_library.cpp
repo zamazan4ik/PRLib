@@ -9,12 +9,14 @@
  *
  */
 
+#include <array>
 #include <cstdlib>
 #include <cstdio>
 #include <cstring>
 #include <cmath>
 #include <exception>
 #include <stdexcept>
+#include <vector>
 
 #include "TIFF_RW.h"
 #include "Main_def.h"
@@ -31,7 +33,6 @@
 #define boundary8_i(x) ((((x)==1)||((x)==2)||((x)==3))?1:((((x)==5)||((x)==6)||((x)==7))?-1 : 0))
 
 
-#define  diff(a, b) ((a)>(b)?((a)-(b)):((b)-(a)))
 #define  color_diff(a1, a2, a3, b1, b2, b3) ((((a1)-(b1))*((a1)-(b1)))+(((a2)-(b2))*((a2)-(b2)))+(((a3)-(b3))*((a3)-(b3))))
 
 #define  ITERATION   100
@@ -58,14 +59,13 @@ void CCC_segment(
     unsigned int cnt, comp_num, comp_cnt;
     short startx, starty;
     double **vector, **feataug;
-    int *clus;
     int ret;
     double text_cost, non_text_cost;
     double **ll;
     Nei_header *neighbors;
     Pixel_pos hw;
     Dist_para dis_para;
-    double map[2];
+    std::array<double, 2> map;
     char stop_flg;
     int org_clus;
     unsigned int height, width;
@@ -180,7 +180,7 @@ void CCC_segment(
     /******************************************************************/
     /****** Calculate data term ******/
     ll = (double **) alloc_img(comp_num, 2, sizeof(double));
-    clus = (int *) alloc_array(comp_num, sizeof(int));
+    std::vector<int> clus(comp_num);
 
     if (seg_para->cur_lyr_itr == seg_para->multi_lyr_itr - 1)
     {
@@ -296,15 +296,14 @@ void CCC_segment(
 
     marktype_free(&im);
     multifree(ll, 2);
-    multifree(clus, 1);
     free_neighbors(neighbors, comp_num);
 }
 
-static void cnt_boundary_length(
+void cnt_boundary_length(
         marklistptr list,       /* i : conncected component list */
         unsigned int height,    /* i : image height */
         unsigned int width,     /* i : image width */
-        int *bound_list /* o : boundary length for each component */
+        std::vector<int>& bound_list /* o : boundary length for each component */
 )
 {
 /************************************************************
@@ -313,7 +312,6 @@ static void cnt_boundary_length(
 
     marklistptr n;
     int comp_cnt, bound_cnt;
-    int i, j;
 
     n = list;
     comp_cnt = 0;
@@ -327,8 +325,8 @@ static void cnt_boundary_length(
     }
 }
 
-static void alloc_edge_memory(
-        int *bound_list,                 /* i : boundary list */
+void alloc_edge_memory(
+        std::vector<int>& bound_list,                 /* i : boundary list */
         unsigned int comp_num,             /* i : # of components */
         unsigned char ****edge_ptr        /* o : pointer to edge list */
 )
@@ -349,18 +347,17 @@ static void alloc_edge_memory(
     *edge_ptr = edge;
 }
 
-static void free_edge_memory(
-        int *bound_list,                 /* i : boundary list */
+void free_edge_memory(
+        std::vector<int>& bound_list,                 /* i : boundary list */
         unsigned int comp_num,             /* i : # of components */
         unsigned char ***edge             /* i : pointer to edge list */
 )
 {
-    unsigned int i, k;
     unsigned char *edge_comp;
 
-    for (k = 0; k < 3; k++)
+    for (int k = 0; k < 3; k++)
     {
-        for (i = 0; i < comp_num; i++)
+        for (int i = 0; i < comp_num; i++)
         {
             edge_comp = &edge[k][i][0];
             multifree(edge_comp, 1);
@@ -370,10 +367,10 @@ static void free_edge_memory(
     multifree(edge, 1);
 }
 
-static void calc_boundary
+void calc_boundary
         (
                 marklistptr list,             /* i : conncected component list */
-                int *bound_list,      /* i : boundary list */
+                std::vector<int>& bound_list,      /* i : boundary list */
                 unsigned char ***inner_edge, /* o : inner edge */
                 unsigned char ***outer_edge, /* o : outer edge */
                 int height,                  /* i : image height */
@@ -597,44 +594,40 @@ printf("======= comp # is %d ======\n",comp_cnt);
     }
 }
 
-static void calc_edge
+void calc_edge
         (
-                int *bound_list,      /* i : boundary list */
+                std::vector<int>& bound_list,      /* i : boundary list */
                 unsigned int comp_num,        /* i : # of cc */
                 unsigned char ***inner_edge, /* i : inner edge */
                 unsigned char ***outer_edge, /* i : outer edge */
-                double *edge_depth,   /* o : edge depth */
-                double *edge_std,     /* o : std of edge depth */
-                double *edge_std2,    /* o : std of edge depth */
-                double *edge_max,     /* o : edge depth */
-                double *edge_min      /* o : edge depth */
+                std::vector<double>& edge_depth,   /* o : edge depth */
+                std::vector<double>& edge_std,     /* o : std of edge depth */
+                std::vector<double>& edge_std2,    /* o : std of edge depth */
+                std::vector<double>& edge_max,     /* o : edge depth */
+                std::vector<double>& edge_min      /* o : edge depth */
         )
 {
-    unsigned int i, j, k;
     double edge_total, edge_total2, back_total, back_total2, data, tmp, data2;
     double tmp2;
-    unsigned int *data_array, *sort_index;
 
-    for (i = 0; i < comp_num; i++)
+    for (int i = 0; i < comp_num; i++)
     {
         edge_total = 0.0;
         edge_total2 = 0.0;
         back_total = 0.0;
         back_total2 = 0.0;
-        data_array = (unsigned int *) alloc_array(bound_list[i],
-                                                  sizeof(unsigned int));
-        sort_index = (unsigned int *) alloc_array(bound_list[i],
-                                                  sizeof(unsigned int));
-        for (j = 0; j < bound_list[i]; j++)
+        std::vector<unsigned int> data_array(bound_list[i]), sort_index(bound_list[i]);
+
+        for (int j = 0; j < bound_list[i]; j++)
         {
             data = (double) color_diff(inner_edge[0][i][j], inner_edge[1][i][j], inner_edge[2][i][j],
                                        outer_edge[0][i][j], outer_edge[1][i][j], outer_edge[2][i][j]);
-            data = sqrt(data);
+            data = std::sqrt(data);
             edge_total += data;
             edge_total2 += (data * data);
 
             data2 = (double) color_diff(0, 0, 0, outer_edge[0][i][j], outer_edge[1][i][j], outer_edge[2][i][j]);
-            data2 = sqrt(data2);
+            data2 = std::sqrt(data2);
             back_total += data2;
             back_total2 += (data2 * data2);
             data_array[j] = (unsigned int) data2;
@@ -644,8 +637,6 @@ static void calc_edge
         QuickSort(data_array, sort_index, 0, bound_list[i] - 1);
         edge_max[i] = (double) find_percentile(data_array, bound_list[i], 98);
         edge_min[i] = (double) find_percentile(data_array, bound_list[i], 2);
-        multifree(sort_index, 1);
-        multifree(data_array, 1);
 
         tmp = edge_total / (double) bound_list[i];
         tmp2 = edge_total2 / (double) bound_list[i] - tmp * tmp;
@@ -653,20 +644,20 @@ static void calc_edge
         {
             tmp2 = 0.0;
         }
-        edge_std[i] = sqrt(tmp2);
+        edge_std[i] = std::sqrt(tmp2);
         tmp = back_total / (double) bound_list[i];
         tmp2 = back_total2 / (double) bound_list[i] - tmp * tmp;
         if (tmp2 <= 0.0)
         {
             tmp2 = 0.0;
         }
-        edge_std2[i] = sqrt(tmp2);
+        edge_std2[i] = std::sqrt(tmp2);
 
     }
 }
 
 
-static void calc_boundary_length_cc(
+void calc_boundary_length_cc(
         marklistptr n,         /* i : a conncected component list */
         unsigned int height,
         unsigned int width,
@@ -775,7 +766,7 @@ static void calc_boundary_length_cc(
  * Version : 1.0
  */
 
-static CC_clist Removehead
+CC_clist Removehead
         (
                 CC_clist **pstart,
                 CC_clist **pend
@@ -811,7 +802,7 @@ static CC_clist Removehead
  * Version : 1.0
  */
 
-static void Addtail(
+void Addtail(
         CC_clist newlist,
         CC_clist **pstart,
         CC_clist **pend
@@ -838,11 +829,11 @@ static void Addtail(
 
 }
 
-static void calc_white_edge(
+void calc_white_edge(
         marklistptr list,   /* i : conncected component list */
-        double *white_cc_edge,  /* o : boundary length of cc embedded in black cc */
-        double *black_cc_edge,  /* o : boundary length of black cc */
-        double *area,           /* o : area of black cc */
+        std::vector<double>& white_cc_edge,  /* o : boundary length of cc embedded in black cc */
+        std::vector<double>& black_cc_edge,  /* o : boundary length of black cc */
+        std::vector<double>& area,           /* o : area of black cc */
         unsigned int height,   /* i : original image height */
         unsigned int width,    /* i : original image width */
         unsigned char ***input_img,   /* i : input image (color) */
@@ -856,7 +847,7 @@ static void calc_white_edge(
  *********************************************************************/
     marklistptr n, n2;
     marktype im;
-    int startx, starty, Startx, Starty, axis_i, axis_j, Axis_i, Axis_j;
+    int Startx, Starty, axis_i, axis_j;
     int i, j, x, y;
     marklistptr wlist;
     unsigned char **bin_flip;
@@ -868,12 +859,8 @@ static void calc_white_edge(
 
     n = list;
     comp_cnt = 0;
-    while (n != NULL)
+    while (n != nullptr)
     {
-
-        startx = n->data.xpos; /* column */
-        starty = n->data.ypos; /* row */
-
         /* Calculate surrounding area */
         area[comp_cnt] = (double) (n->data.w) * (n->data.h) / (double) (height * width);
 
@@ -906,14 +893,14 @@ static void calc_white_edge(
         /* Extract connected-component (nested) */
         im.imagew = n->data.w;
         im.imageh = n->data.h;
-        wlist = NULL;
+        wlist = nullptr;
         wlist = extract_all_marks(wlist, im, 1, 8);
 
         /* Count # of components */
         total_edge_cnt = 0;
         corner_info.first_flag = FLG_ON;
         n2 = wlist;
-        while (n2 != NULL)
+        while (n2 != nullptr)
         {
 
             break_flg = FLG_OFF;
@@ -974,11 +961,11 @@ static void calc_white_edge(
 
 }
 
-static void calc_white_cc(
+void calc_white_cc(
         marklistptr list,       /* i : conncected component list */
-        double *white_cc_pxl_rate,
+        std::vector<double>& white_cc_pxl_rate,
         /* o : # of white pixels embedded in black cc */
-        unsigned int *cnt_white, /* o : # of white cc */
+        std::vector<unsigned int>& cnt_white, /* o : # of white cc */
         unsigned int height,    /* i : original image height */
         unsigned int width,     /* i : original image width */
         unsigned char ***input_img,   /* i : input image (color) */
@@ -991,7 +978,7 @@ static void calc_white_cc(
  *********************************************************************/
     marklistptr n, n2;
     marktype im;
-    int startx, starty, Startx, Starty, axis_i, axis_j;
+    int Startx, Starty, axis_i, axis_j;
     int i, j, x, y;
     marklistptr wlist;
     unsigned char **bin_flip;
@@ -1000,11 +987,9 @@ static void calc_white_cc(
 
     n = list;
     comp_cnt = 0;
-    while (n != NULL)
+    while (n != nullptr)
     {
         b_pixel_cnt = 0;
-        startx = n->data.xpos; /* column */
-        starty = n->data.ypos; /* row */
 
         /* Flip binary image */
         bin_flip = (unsigned char **) alloc_img(n->data.h,
@@ -1040,14 +1025,14 @@ static void calc_white_cc(
         /* Extract connected-component (nested) */
         im.imagew = n->data.w;
         im.imageh = n->data.h;
-        wlist = NULL;
+        wlist = nullptr;
         wlist = extract_all_marks(wlist, im, 1, 8);
 
         /* Count # of components */
         n2 = wlist;
         w_pixel_cnt = 0;
         w_cc_cnt = 0;
-        while (n2 != NULL)
+        while (n2 != nullptr)
         {
             Startx = n2->data.xpos; /* column */
             Starty = n2->data.ypos; /* row */
@@ -1093,7 +1078,7 @@ static void calc_white_cc(
     }
 }
 
-static void reverse_cc(
+void reverse_cc(
         unsigned char **input_bin,        /* i : cc binary mask */
         unsigned char **bin_img,          /* i : org binary mask */
         unsigned int height,                /* i : height */
@@ -1197,7 +1182,7 @@ static void reverse_cc(
 }
 
 
-static void Region_growing
+void Region_growing
         (
                 CC_pixel s,              /* i : seed pixels */
                 unsigned char **bin_msk,        /* i : input binary mask */
@@ -1254,7 +1239,7 @@ static void Region_growing
     }/* while */
 }
 
-static void ConnectedNeighbors_UCHAR
+void ConnectedNeighbors_UCHAR
         (
                 CC_pixel s,
                 unsigned char **bin_msk,
@@ -1305,7 +1290,7 @@ static void ConnectedNeighbors_UCHAR
     *M = count;
 }
 
-static void record_corner(
+void record_corner(
         marklistptr n,           /* i : connected component list */
         Corner_info *corner_info /* io: updated corner information */
 )
@@ -1347,7 +1332,7 @@ static void record_corner(
 }
 
 
-static void flip_reversed_cc(
+void flip_reversed_cc(
         unsigned char ***input_img,
         unsigned char **bin_msk,
         unsigned int height,
@@ -1355,17 +1340,13 @@ static void flip_reversed_cc(
 )
 {
     unsigned char **bin_msk_r, **bin_flip, **bin_input, **bin_img, **rem_bin;
-    double *white_cc_pxl_list, *white_cc_edge_list,
-            *black_cc_edge_list, *area_list;
     marktype im;
     marklistptr list = NULL;
     marklistptr n;
     unsigned int i, j;
-    int *clus;
     double **vector;
     unsigned int comp_num, comp_cnt;
     short startx, starty;
-    unsigned int *cnt_white;
 
     /******************************************************************/
     /*             Connected component extraction                     */
@@ -1390,7 +1371,7 @@ static void flip_reversed_cc(
     /* Count # of components */
     n = list;
     comp_num = 0;
-    while (n != NULL)
+    while (n != nullptr)
     {
         comp_num++;
         n = n->next;
@@ -1405,9 +1386,7 @@ static void flip_reversed_cc(
     /* Allocate memories for feature vector */
     vector = (double **) alloc_img(comp_num, 4, sizeof(double));
 
-    white_cc_edge_list = (double *) alloc_array(comp_num, sizeof(double));
-    black_cc_edge_list = (double *) alloc_array(comp_num, sizeof(double));
-    area_list = (double *) alloc_array(comp_num, sizeof(double));
+    std::vector<double> white_cc_edge_list(comp_num), black_cc_edge_list(comp_num), area_list(comp_num);
     calc_white_edge(list, white_cc_edge_list, black_cc_edge_list, area_list,
                     height, width, input_img, bin_msk, FLG_BOUND);
 
@@ -1416,13 +1395,10 @@ static void flip_reversed_cc(
         vector[i][0] = white_cc_edge_list[i] / black_cc_edge_list[i];
         vector[i][1] = area_list[i];
     }
-    multifree(white_cc_edge_list, 1);
-    multifree(black_cc_edge_list, 1);
-    multifree(area_list, 1);
 
     /* Extract white connected component embedded in black connected component */
-    white_cc_pxl_list = (double *) alloc_array(comp_num, sizeof(double));
-    cnt_white = (unsigned int *) alloc_array(comp_num, sizeof(unsigned int));
+    std::vector<double> white_cc_pxl_list(comp_num);
+    std::vector<unsigned int> cnt_white(comp_num);
     calc_white_cc(list, white_cc_pxl_list, cnt_white,
                   height, width, input_img, bin_msk);
 
@@ -1431,13 +1407,11 @@ static void flip_reversed_cc(
         vector[i][2] = white_cc_pxl_list[i];
         vector[i][3] = (double) cnt_white[i];
     }
-    multifree(white_cc_pxl_list, 1);
-    multifree(cnt_white, 1);
 
     /******************************************************************/
     /*             Feature vector classification                      */
     /******************************************************************/
-    clus = (int *) alloc_array(comp_num, sizeof(int));
+    std::vector<int> clus(comp_num);
 
     for (i = 0; i < comp_num; i++)
     {
@@ -1472,7 +1446,7 @@ static void flip_reversed_cc(
 
     comp_cnt = 0;
     n = list;
-    while (n != NULL)
+    while (n != nullptr)
     {
         startx = n->data.xpos;
         starty = n->data.ypos;
@@ -1562,11 +1536,10 @@ static void flip_reversed_cc(
 
     multifree(bin_msk_r, 2);
     marktype_free(&im);
-    multifree(clus, 1);
 }
 
 
-static void make_feat(
+void make_feat(
         marklistptr list,           /* i : cc info */
         unsigned int comp_num,      /* i : # of component */
         unsigned int height,
@@ -1577,12 +1550,10 @@ static void make_feat(
 )
 {
     unsigned char ***inner_edge, ***outer_edge;
-    int *bound_list;
-    double *edge_depth, *edge_std, *edge_std2, *edge_max, *edge_min;
     unsigned int i;
 
     /* Count length of boundary for each component */
-    bound_list = (int *) alloc_array(comp_num, sizeof(int));
+    std::vector<int> bound_list(comp_num);
     cnt_boundary_length(list, height, width, bound_list);
 
     /* Calculate edgeness along boundary */
@@ -1592,11 +1563,8 @@ static void make_feat(
     calc_boundary(list, bound_list, inner_edge, outer_edge,
                   height, width, (unsigned char ***) input_img, bin_msk);
 
-    edge_depth = (double *) alloc_array(comp_num, sizeof(double));
-    edge_std = (double *) alloc_array(comp_num, sizeof(double));
-    edge_std2 = (double *) alloc_array(comp_num, sizeof(double));
-    edge_max = (double *) alloc_array(comp_num, sizeof(double));
-    edge_min = (double *) alloc_array(comp_num, sizeof(double));
+    std::vector<double> edge_depth(comp_num), edge_std(comp_num),
+            edge_std2(comp_num), edge_max(comp_num), edge_min(comp_num);
     calc_edge(bound_list, comp_num, inner_edge, outer_edge, edge_depth,
               edge_std, edge_std2, edge_max, edge_min);
 
@@ -1607,33 +1575,15 @@ static void make_feat(
         vector[i][2] = edge_std[i];
         vector[i][3] = edge_std2[i];
     }
-    multifree(edge_depth, 1);
-    multifree(edge_std, 1);
-    multifree(edge_std2, 1);
 
     free_edge_memory(bound_list, comp_num, inner_edge);
     free_edge_memory(bound_list, comp_num, outer_edge);
-
-
-    /****************** Debug *******************/
-/*
-  outfp = fopen("comp_list", "w") ;
-  for ( comp_cnt = 0 ; comp_cnt < comp_num ; comp_cnt++ ) {
-
-    fprintf(outfp, "%f %f %f\n"
-    , vector[comp_cnt][0], vector[comp_cnt][1]
-    , vector[comp_cnt][2]
-    );
-  }
-  fclose(outfp);
-*/
-
 }
 
 
-static unsigned int find_percentile
+unsigned int find_percentile
         (
-                unsigned int *data_array,
+                std::vector<unsigned int>& data_array,
                 int num,
                 unsigned int percent
         )
@@ -1657,9 +1607,9 @@ static unsigned int find_percentile
  * Version : 1.0
  */
 
-static void QuickSort(
-        unsigned int *array,  /* io : input array */
-        unsigned int *index,  /* io : index array */
+void QuickSort(
+        std::vector<unsigned int>& array,  /* io : input array */
+        std::vector<unsigned int>& index,  /* io : index array */
         unsigned int p,   /* i  : starting # of element (e.g. 0) */
         unsigned int r    /* i  : ending   # of element (e.g. n-1) */
 )
@@ -1687,10 +1637,10 @@ static void QuickSort(
  * Version : 1.0
  */
 
-static unsigned int Partition
+unsigned int Partition
         (
-                unsigned int *array,  /* io : input array */
-                unsigned int *index,  /* io : index array */
+                std::vector<unsigned int>& array,  /* io : input array */
+                std::vector<unsigned int>& index,  /* io : index array */
                 unsigned int p,      /* i : starting # of element */
                 unsigned int r       /* i : ending # of element */
         )
@@ -1702,7 +1652,7 @@ static unsigned int Partition
     x = array[p];
     i = p - 1;
     j = r + 1;
-    while (1)
+    while (true)
     {
         do
         { j--; }
@@ -1730,7 +1680,7 @@ static unsigned int Partition
     }
 }
 
-static void Region_growing_cnt
+void Region_growing_cnt
         (
                 CC_pixel s,              /* i : seed pixels */
                 unsigned char **bin_msk,        /* i : input binary mask */
