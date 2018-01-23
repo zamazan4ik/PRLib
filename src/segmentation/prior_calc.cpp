@@ -420,7 +420,6 @@ double calc_prior(
 
 void calc_featdis(
         unsigned int comp_num,    /* i : # of connected component */
-        marklistptr list,        /* i : connected component list */
         double** feat_list,   /* i : feature vector list */
         Nei_header* neighbors    /* io : neighborhood que */
 )

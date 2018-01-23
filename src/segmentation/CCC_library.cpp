@@ -220,7 +220,7 @@ void CCC_segment(
     multifree(vector, 2);
 
     /* Calculate feature vector distance */
-    calc_featdis(comp_num, list, feataug, neighbors);
+    calc_featdis(comp_num, feataug, neighbors);
     multifree(feataug, 2);
 
 

@@ -21,7 +21,6 @@
 #include "segmentation.h"
 #include "COS_library.h"
 #include "CCC_library.h"
-#include "convert_color.h"
 
 /* internal function */
 static void multiscale_seg(unsigned char*** img_sRGB,
