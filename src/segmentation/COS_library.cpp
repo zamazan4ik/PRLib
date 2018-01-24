@@ -127,9 +127,8 @@ void make_blkseq_c(
     unsigned int block_size;
     double total, total_2, val;
     std::array<double, 3> array;
-    unsigned int cnt1, cnt2, cnt3;
+    //unsigned int cnt1, cnt2, cnt3;
 
-    cnt1 = cnt2 = cnt3 = 0;
     block_size = block * block;
     half_blk = block / 2;
     for (size_t i = 0, I = 0; i < nh; i++, I += half_blk)
@@ -176,20 +175,6 @@ void make_blkseq_c(
 
             var_b[i][j] = array[index];
 
-            /* for debug */
-            if (index == 0)
-            {
-                cnt1++;
-            }
-            else if (index == 1)
-            {
-                cnt2++;
-            }
-            else
-            {
-                cnt3++;
-            }
-
             /* Set the selected color data to overlapping block sequence O_b */
             for (size_t k = 0; k < block; k++)
             {
@@ -228,7 +213,7 @@ void thres_mmse(
 
     int i, j, k, l, thres;
 
-    for (i = 0; i < nh; i++)
+    for (int i = 0; i < nh; i++)
     {
         for (j = 0; j < nw; j++)
         {
@@ -448,10 +433,9 @@ void horizontal_dynamic_seg
 
     unsigned int overlap, block;
     unsigned int i, j, x, y, m, coarse_i, coarse_j;
-    std::array<unsigned int, 4> class_cnt;
     double block_num;
     double lambda1, lambda2, lambda3, lambda4;
-    double cost_Vb2, cost_MSE, cost_Vb3, total_cost, cost_Vb5;
+    double cost_Vb2, cost_MSE, cost_Vb3, cost_Vb5;
     unsigned char** prev_stat;
     double** sum_cost;
     std::array<double, 4> cost, cost_Vb1;
@@ -489,12 +473,6 @@ void horizontal_dynamic_seg
     /* Total cost for dynamic programming */
     sum_cost = (double**) alloc_img(nw, 4, sizeof(double));
 
-    /* For DEBUG */
-    total_cost = 0;
-    for (i = 0; i < 4; i++)
-    {
-        class_cnt[i] = 0;
-    }
 
     if (first_flg == FLG_FIRST)
     {
@@ -625,8 +603,6 @@ void horizontal_dynamic_seg
                 class_old = m;
             }
         }
-        total_cost = total_cost + sum_cost[nw - 1][class_old];
-        class_cnt[class_old]++;
         old_class = seg_para->S_b[i][nw - 1];
         seg_para->S_b[i][nw - 1] = class_old;
         if (old_class != seg_para->S_b[i][nw - 1])
@@ -642,7 +618,6 @@ void horizontal_dynamic_seg
                 *change_flg = FLG_ON;
             }
             class_old = prev_stat[x][class_old];
-            class_cnt[class_old]++;
         }
     }
     multifree(sum_cost, 2);
