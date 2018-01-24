@@ -23,7 +23,9 @@
 
 /* internal function */
 static void multiscale_seg(unsigned char*** img_sRGB,
-                           unsigned char** bin_msk, Seg_parameter* seg_para);
+                           //unsigned char** bin_msk,
+                           cv::Mat& bin_msk,
+                           Seg_parameter* seg_para);
 
 /**
  * Function Name : segmentation
@@ -41,7 +43,7 @@ static void multiscale_seg(unsigned char*** img_sRGB,
 #include <opencv2/imgproc/imgproc.hpp>
 
 int segmentation(const cv::Mat& inputImage,
-        unsigned char** bin_msk,
+                 cv::Mat& bin_msk,
         Seg_parameter* seg_para
 )
 {
@@ -93,7 +95,7 @@ int segmentation(const cv::Mat& inputImage,
  * Version : 1.0
  */
 
-void multiscale_seg(unsigned char*** img_sRGB, unsigned char** bin_msk, Seg_parameter* seg_para)
+void multiscale_seg(unsigned char*** img_sRGB, cv::Mat& bin_msk, Seg_parameter* seg_para)
 {
     unsigned int height, width, nh, nw;
     unsigned int multi_lyr_itr;
@@ -104,7 +106,7 @@ void multiscale_seg(unsigned char*** img_sRGB, unsigned char** bin_msk, Seg_para
 
     seg_para->cur_block = seg_para->max_block;
     seg_para->prev_S_b = nullptr;
-    seg_para->prev_binmsk = nullptr;
+    //seg_para->prev_binmsk = nullptr;
 
     for (int L = multi_lyr_itr - 1, cur_lyr_itr = 0; L >= 0; L--, cur_lyr_itr++)
     {
@@ -116,8 +118,10 @@ void multiscale_seg(unsigned char*** img_sRGB, unsigned char** bin_msk, Seg_para
         nw = 2 * ((width - 1) / seg_para->cur_block + 1) - 1;
         seg_para->S_b = (unsigned char**) alloc_img(nh, nw,
                                                     sizeof(unsigned char));
-        seg_para->binmsk = (unsigned char**) alloc_img(height, width,
-                                                       sizeof(unsigned char));
+        //seg_para->binmsk = (unsigned char**) alloc_img(height, width, sizeof(unsigned char));
+
+        seg_para->binmsk = cv::Mat(height, width, CV_8UC3);
+
         seg_para->cur_nh = nh;
         seg_para->cur_nw = nw;
         COS_segment(img_sRGB, seg_para);
@@ -126,7 +130,7 @@ void multiscale_seg(unsigned char*** img_sRGB, unsigned char** bin_msk, Seg_para
         if (L != multi_lyr_itr - 1)
         {
             multifree(seg_para->prev_S_b, 2);
-            multifree(seg_para->prev_binmsk, 2);
+            //multifree(seg_para->prev_binmsk, 2);
         }
         if (L == 0)
         {
@@ -135,10 +139,10 @@ void multiscale_seg(unsigned char*** img_sRGB, unsigned char** bin_msk, Seg_para
             {
                 for (int j = 0; j < width; j++)
                 {
-                    bin_msk[i][j] = seg_para->binmsk[i][j];
+                    bin_msk.at<uchar>({i, j}) = seg_para->binmsk.at<uchar>({i, j});
                 }
             }
-            multifree(seg_para->binmsk, 2);
+            //multifree(seg_para->binmsk, 2);
         }
         else
         {

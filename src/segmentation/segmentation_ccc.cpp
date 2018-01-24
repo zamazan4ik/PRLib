@@ -36,7 +36,6 @@ namespace prl
         char color_flg;
         int i;
         bool error_flag = false;
-        unsigned char** bin_msk;
         int ret;
         div_t d1;
         char block_flg = FLG_OFF;
@@ -128,15 +127,13 @@ namespace prl
         seg_para.text_cost = text_cost;
 
         /* Memory allocation */
-        bin_msk = (unsigned char**) alloc_img(height, width, sizeof(unsigned char));
-
+        cv::Mat bin_mask(height, width, CV_8UC3);
         /* Segmentation */
 
-        ret = segmentation(convImage, bin_msk, &seg_para);
+        ret = segmentation(convImage, bin_mask, &seg_para);
 
         if (ret == FLG_NG)
         {
-            multifree(bin_msk, 2);
         }
 
         cv::Mat outputImageBin(height, width, CV_8U, cv::Scalar(255));
@@ -145,7 +142,7 @@ namespace prl
         {
             for (int j = 0; j < width; j++)
             {
-                if(bin_msk[i][j] > 0)
+                if(bin_mask.at<uchar>({i, j}) > 0)
                 {
                     outputImageBin.at<uchar>({j, i}) = 0;
                 }
@@ -156,7 +153,6 @@ namespace prl
 
         /* Free memories */
         multifree(seg_para.lambda, 2);
-        multifree(bin_msk, 2);
     }
 }
 

@@ -67,11 +67,11 @@ void CCC_segment(
     char stop_flg;
     int org_clus;
     unsigned int height, width;
-    unsigned char **bin_msk;
+    //unsigned char **bin_msk;
 
     height = seg_para->height;
     width = seg_para->width;
-    bin_msk = seg_para->binmsk;
+    cv::Mat bin_msk = seg_para->binmsk;
 
 
     /******************************************************************/
@@ -90,7 +90,7 @@ void CCC_segment(
     {
         for (int j = 0; j < width; j++)
         {
-            pbm_putpixel(im.bitmap, j, i, bin_msk[i][j]);
+            pbm_putpixel(im.bitmap, j, i, bin_msk.at<uchar>({i, j}));
         }
     }
 
@@ -126,7 +126,8 @@ void CCC_segment(
                 {
                     if (pbm_getpixel(n->data.bitmap, j, i) == 1)
                     {
-                        bin_msk[starty + i][startx + j] = 0;
+                        //bin_msk[starty + i][startx + j] = 0;
+                        bin_msk.at<uchar>({starty + i, startx + j}) = 0;
                     }
                 }
             }
@@ -147,7 +148,7 @@ void CCC_segment(
     {
         for (int j = 0; j < width; j++)
         {
-            pbm_putpixel(im.bitmap, j, i, bin_msk[i][j]);
+            pbm_putpixel(im.bitmap, j, i, bin_msk.at<uchar>({i, j}));
         }
     }
 
@@ -280,11 +281,11 @@ void CCC_segment(
                 {
                     if (clus[comp_cnt] == 1)
                     {
-                        bin_msk[starty + i][startx + j] = 1;
+                        bin_msk.at<uchar>({starty + i, startx + j}) = 1;
                     }
                     else
                     {
-                        bin_msk[starty + i][startx + j] = 0;
+                        bin_msk.at<uchar>({starty + i, startx + j}) = 0;
                     }
                 }
             }
@@ -374,7 +375,7 @@ void calc_boundary
                 int height,                  /* i : image height */
                 int width,                   /* i : image width */
                 unsigned char ***input_img_c, /* i : input color image */
-                unsigned char **bin_msk       /* i : binary mask */
+                cv::Mat& bin_msk       /* i : binary mask */
         )
 {
     marklistptr n;
@@ -444,10 +445,7 @@ printf("======= comp # is %d ======\n",comp_cnt);
                     {
                         continue;
                     }
-/*
-          printf("inner and outer location: (%d %d) (%d %d)\n",
-                 axis_i1,axis_j1,axis_i2, axis_j2);
-*/
+
                     for (k = 0; k < 3; k++)
                     {
                         /* collect inner info */
@@ -487,7 +485,7 @@ printf("======= comp # is %d ======\n",comp_cnt);
                                 {
                                     continue;
                                 }
-                                if (bin_msk[axis_x][axis_y] == 0)
+                                if (bin_msk.at<uchar>({axis_x, axis_y}) == 0)
                                 {
                                     cnt++;
                                     outer += (double) input_img_c[k][axis_x][axis_y];
@@ -572,7 +570,7 @@ printf("======= comp # is %d ======\n",comp_cnt);
                                 {
                                     continue;
                                 }
-                                if (bin_msk[axis_x][axis_y] == 0)
+                                if (bin_msk.at<uchar>({axis_x, axis_y}) == 0)
                                 {
                                     cnt++;
                                     outer += (double) input_img_c[k][axis_x][axis_y];
@@ -835,7 +833,7 @@ void calc_white_edge(
         unsigned int height,   /* i : original image height */
         unsigned int width,    /* i : original image width */
         unsigned char ***input_img,   /* i : input image (color) */
-        unsigned char **bin_msk,      /* i : binary mask */
+        cv::Mat& bin_msk,      /* i : binary mask */
         char flg_bound          /* i : FLG_BOUND of FLG_ORIGINAL */
 )
 {
@@ -952,7 +950,7 @@ void calc_white_edge(
             black_cc_edge[comp_cnt] = (double) (n->data.blength);
         }
         marktype_free(&im);
-        multifree(bin_flip, 2);
+        //multifree(bin_flip, 2);
         comp_cnt++;
         n = n->next;
     }
@@ -967,7 +965,7 @@ void calc_white_cc(
         unsigned int height,    /* i : original image height */
         unsigned int width,     /* i : original image width */
         unsigned char ***input_img,   /* i : input image (color) */
-        unsigned char **bin_msk       /* i : binary mask */
+        cv::Mat& bin_msk       /* i : binary mask */
 )
 {
 /*********************************************************************
@@ -1070,7 +1068,7 @@ void calc_white_cc(
         white_cc_pxl_rate[comp_cnt] = (double) w_pixel_cnt / b_pixel_cnt;
         cnt_white[comp_cnt] = w_cc_cnt;
         marktype_free(&im);
-        multifree(bin_flip, 2);
+        //multifree(bin_flip, 2);
         comp_cnt++;
         n = n->next;
     }
@@ -1332,7 +1330,7 @@ void record_corner(
 
 void flip_reversed_cc(
         unsigned char ***input_img,
-        unsigned char **bin_msk,
+        cv::Mat& bin_msk,
         unsigned int height,
         unsigned int width
 )
@@ -1357,7 +1355,7 @@ void flip_reversed_cc(
     {
         for (j = 0; j < width; j++)
         {
-            pbm_putpixel(im.bitmap, j, i, bin_msk[i][j]);
+            pbm_putpixel(im.bitmap, j, i, bin_msk.at<uchar>({i, j}));
         }
     }
 
@@ -1488,7 +1486,7 @@ void flip_reversed_cc(
             {
                 for (j = 0; j < n->data.w; j++)
                 {
-                    bin_img[i][j] = bin_msk[starty + i][startx + j];
+                    bin_img[i][j] = bin_msk.at<uchar>({starty + i, startx + j});
                 }
             }
 
@@ -1528,7 +1526,7 @@ void flip_reversed_cc(
     {
         for (j = 0; j < width; j++)
         {
-            bin_msk[i][j] = bin_msk_r[i][j];
+            bin_msk.at<uchar>({i, j}) = bin_msk_r[i][j];
         }
     }
 
@@ -1543,7 +1541,7 @@ void make_feat(
         unsigned int height,
         unsigned int width,
         unsigned char ***input_img, /* i : input image */
-        unsigned char **bin_msk,    /* i : binary mask */
+        cv::Mat& bin_msk,    /* i : binary mask */
         double **vector             /* o : feature vector */
 )
 {

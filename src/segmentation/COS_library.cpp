@@ -91,7 +91,7 @@ void COS_segment(
     {
         for (size_t j = 0; j < width; j++)
         {
-            seg_para->binmsk[i][j] = bin_msk_pad[i][j];
+            seg_para->binmsk.at<uchar>({i, j}) = bin_msk_pad[i][j];
         }
     }
     multifree(bin_msk_pad, 2);
@@ -1416,7 +1416,7 @@ double calc_gamma(
         gamma = ((G1_s2 - G1_s1 * G1_s1 / G1_num) + (G2_s2 - G2_s1 * G2_s1 / G2_num)) / total_num;
     }
 
-    *cnt_1 = (double) G2_num;
+    *cnt_1 = G2_num;
     return gamma;
 }
 
@@ -1434,7 +1434,7 @@ double calc_Vb5(
 
     unsigned int cost;
 
-    if (seg_para->prev_binmsk == nullptr)
+    if (seg_para->prev_binmsk.total() == 0)
     {
         return 0.0;
     }
@@ -1564,7 +1564,7 @@ void cnt_mismatch_bet_layer(
     /* Calculate mismatches between current layer and
        previous layer segmentation   */
 
-    if (seg_para->prev_binmsk == nullptr)
+    if (seg_para->prev_binmsk.total() == 0)
     {
         return;
     }
@@ -1590,7 +1590,7 @@ void cnt_mismatch_bet_layer(
                     }
                     else
                     {
-                        prev_value = seg_para->prev_binmsk[pos_i][pos_j];
+                        prev_value = seg_para->prev_binmsk.at<uchar>({pos_i, pos_j});
                     }
                     if (prev_value == 1)
                     {

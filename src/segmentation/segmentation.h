@@ -33,9 +33,11 @@ typedef struct
 
     /* Temporary storage for multi-layer segmentation */
     unsigned char** S_b;      /* class of current layer */
-    unsigned char** binmsk;   /* binary mask of current layer */
+    //unsigned char** binmsk;   /* binary mask of current layer */
+    cv::Mat binmsk;
     unsigned char** prev_S_b; /* class of previous coarser layer */
-    unsigned char** prev_binmsk; /* binary mask of previous layer */
+    //unsigned char** prev_binmsk; /* binary mask of previous layer */
+    cv::Mat prev_binmsk;
     unsigned int cur_block;   /* current block size for multi-layer seg */
     unsigned int prev_nh;
     unsigned int prev_nw;
@@ -47,6 +49,6 @@ typedef struct
 /***************************************************/
 /*  External function declarations                 */
 /***************************************************/
-int segmentation(const cv::Mat& inputImage, unsigned char** bin_msk, Seg_parameter* seg_para);
+int segmentation(const cv::Mat& inputImage, cv::Mat& bin_msk, Seg_parameter* seg_para);
 
 #endif
