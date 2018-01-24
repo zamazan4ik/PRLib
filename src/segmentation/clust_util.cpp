@@ -36,197 +36,96 @@
 #include "alloc_util.h"
 
 
-int
-I_SigSetNClasses(struct SigSet *S)
+void I_InitSigSet(struct SigSet* S)
 {
-  int i, count;
-
-  for (i = 0, count = 0; i < S->nclasses; i++)
-    if (S->classSig[i].used) count++;
-
-  return count;
+    S->nbands = 0;
+    S->nclasses = 0;
+    S->classSig = NULL;
+    S->title = NULL;
 }
 
 
-struct ClassData *
-I_AllocClassData(struct SigSet *S, struct ClassSig *C, int npixels)
+ClassSig*
+I_NewClassSig(struct SigSet* S)
 {
-  ClassData *Data;
+    struct ClassSig* Sp;
+    if (S->nclasses == 0)
+    {
+        S->classSig = (ClassSig*) G_malloc(sizeof(ClassSig));
+    }
+    else
+    {
+        S->classSig = (ClassSig*) G_realloc((char*) S->classSig,
+                                                   sizeof(ClassSig) * (S->nclasses + 1));
+    }
 
-  Data = &(C->classData);
-  Data->npixels = npixels;
-  Data->x = G_alloc_matrix (npixels, S->nbands);
-  Data->p = G_alloc_matrix (npixels, C->nsubclasses);
-  return Data;
+    Sp = &S->classSig[S->nclasses++];
+    Sp->classnum = 0;
+    Sp->nsubclasses = 0;
+    Sp->used = 1;
+    Sp->type = SIGNATURE_TYPE_MIXED;
+    Sp->title = NULL;
+    Sp->classData.x = NULL;
+    Sp->classData.p = NULL;
+
+    return Sp;
 }
 
 
-void
-I_InitSigSet(struct SigSet *S)
+SubSig* I_NewSubSig(SigSet* S, ClassSig* C)
 {
-  S->nbands = 0;
-  S->nclasses = 0;
-  S->classSig = NULL;
-  S->title = NULL;
-}
+    struct SubSig* Sp;
+    int i;
 
+    if (C->nsubclasses == 0)
+    {
+        C->subSig = (SubSig*) G_malloc(sizeof(SubSig));
+    }
+    else
+    {
+        C->subSig = (SubSig*) G_realloc((char*) C->subSig,
+                                               sizeof(SubSig) * (C->nsubclasses + 1));
+    }
 
-void
-I_SigSetNBands(struct SigSet *S, int nbands)
-{
-  S->nbands = nbands;
-}
-
-
-struct ClassSig *
-I_NewClassSig(struct SigSet *S)
-{
-  struct ClassSig *Sp;
-  if (S->nclasses == 0)
-    S->classSig = (struct ClassSig *) G_malloc (sizeof(struct ClassSig));
-  else
-    S->classSig = (struct ClassSig *) G_realloc((char *)S->classSig,
-                  sizeof(struct ClassSig)*(S->nclasses+1));
-
-  Sp = &S->classSig[S->nclasses++];
-  Sp->classnum = 0;
-  Sp->nsubclasses = 0;
-  Sp->used = 1;
-  Sp->type = SIGNATURE_TYPE_MIXED;
-  Sp->title = NULL;
-  Sp->classData.npixels = 0;
-  Sp->classData.x = NULL;
-  Sp->classData.p = NULL;
-    
-  return Sp;
-}
-
-
-struct SubSig *
-I_NewSubSig(struct SigSet *S, struct ClassSig *C)
-{
-  struct SubSig *Sp;
-  int i;
-
-  if (C->nsubclasses == 0)
-    C->subSig = (struct SubSig *) G_malloc (sizeof(struct SubSig));
-  else
-    C->subSig = (struct SubSig *) G_realloc ((char *)C->subSig,
-		sizeof(struct SubSig) * (C->nsubclasses+1));
-
-  Sp = &C->subSig[C->nsubclasses++];
-  Sp->used = 1;
-  Sp->R = (double **) G_calloc (S->nbands, sizeof(double *));
-  Sp->R[0] = (double *) G_calloc (S->nbands * S->nbands, sizeof(double));
-  for (i = 1; i < S->nbands; i++)
-    Sp->R[i] = Sp->R[i-1] + S->nbands;
-  Sp->Rinv = (double **) G_calloc (S->nbands, sizeof(double *));
-  Sp->Rinv[0] = (double *) G_calloc (S->nbands * S->nbands, sizeof(double));
-  for (i = 1; i < S->nbands; i++)
-    Sp->Rinv[i] = Sp->Rinv[i-1] + S->nbands;
-  Sp->means = (double *) G_calloc (S->nbands, sizeof(double));
-  Sp->N = 0;
-  Sp->pi = 0;
-  Sp->cnst = 0;
-  return Sp;
+    Sp = &C->subSig[C->nsubclasses++];
+    Sp->used = 1;
+    Sp->R = (double**) G_calloc(S->nbands, sizeof(double*));
+    Sp->R[0] = (double*) G_calloc(S->nbands * S->nbands, sizeof(double));
+    for (i = 1; i < S->nbands; i++)
+    {
+        Sp->R[i] = Sp->R[i - 1] + S->nbands;
+    }
+    Sp->Rinv = (double**) G_calloc(S->nbands, sizeof(double*));
+    Sp->Rinv[0] = (double*) G_calloc(S->nbands * S->nbands, sizeof(double));
+    for (i = 1; i < S->nbands; i++)
+    {
+        Sp->Rinv[i] = Sp->Rinv[i - 1] + S->nbands;
+    }
+    Sp->means = (double*) G_calloc(S->nbands, sizeof(double));
+    Sp->pi = 0;
+    Sp->cnst = 0;
+    return Sp;
 }
 
 
 void
-I_SetSigTitle(struct SigSet *S, char *title)
+I_SetSigTitle(struct SigSet* S, char* title)
 {
-  if (title == NULL) title = "";
-  if (S->title) free (S->title);
-  S->title = G_malloc (strlen (title)+1);
-  strcpy(S->title, title);
+    if (title == NULL)
+    { title = ""; }
+    if (S->title)
+    { free(S->title); }
+    S->title = G_malloc(strlen(title) + 1);
+    strcpy(S->title, title);
 }
-
-
-char *
-I_GetSigTitle(struct SigSet *S)
-{
-  if (S->title) return S->title;
-  else return "";
-}
-
 
 void
-I_SetClassTitle(struct ClassSig *C, char *title)
+I_SetClassTitle(struct ClassSig* C, char* title)
 {
-  if (title == NULL) title = "";
-  if (C->title) free (C->title);
-  C->title = G_malloc (strlen (title)+1);
-  strcpy(C->title, title);
+    if (title == NULL)
+    { title = ""; }
+    if (C->title)
+    { free(C->title); }
+    C->title = G_malloc(strlen(title) + 1);
+    strcpy(C->title, title);
 }
-
-char *
-I_GetClassTitle(struct ClassSig *C)
-{
-  if (C->title) return C->title;
-  else return "";
-}
-
-
-/* Deallocators */
-
-void
-I_DeallocClassData(struct SigSet *S, struct ClassSig *C)
-{
-  struct ClassData * Data;
-
-  Data = &(C->classData);
-  G_free_matrix(Data->p);
-  Data->p = NULL;
-  G_free_matrix(Data->x);
-  Data->x = NULL;
-  Data->npixels = 0;
-
-}
-
-    
-void
-I_RemoveSubSig(struct SigSet *S, struct ClassSig *C)
-{
-  struct SubSig *Sp;
-
-  Sp = &C->subSig[--C->nsubclasses];
-
-  G_dealloc( (char *) Sp->R[0] );
-  G_dealloc( (char *) Sp->R );
-  G_dealloc( (char *) Sp->Rinv[0] );
-  G_dealloc( (char *) Sp->Rinv );
-  G_dealloc( (char *) Sp->means );
-
-  C->subSig = (struct SubSig *) G_realloc((char *)C->subSig,
-		    sizeof(struct SubSig) * (C->nsubclasses));
-  return;
-}
-
-
-void
-I_RemoveClassSig(struct SigSet *S)
-{
-  struct ClassSig *Sp;
-    
-  Sp = &(S->classSig[--S->nclasses]);
-    
-  I_DeallocClassData( S, Sp ); 
-    
-  while(Sp->nsubclasses>0) {
-    I_RemoveSubSig( S, Sp);
-  }
-  S->classSig = (struct ClassSig *) G_realloc ((char *)S->classSig,
-                sizeof(struct ClassSig) * (S->nclasses));
-}     
-    
-
-void
-I_TermSigSet(struct SigSet *S)
-{
-  while(S->nclasses>0) {
-    I_RemoveClassSig( S );
-  }
-}
-
-
-

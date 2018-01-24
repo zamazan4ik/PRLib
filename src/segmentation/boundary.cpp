@@ -142,20 +142,6 @@ boundary_free(boundarytype* b)
 }
 
 void
-boundary_dump(boundarytype* b, FILE* fp)
-{
-    int i;
-
-    assert(b);
-    assert(fp);
-
-    for (i = 0; i < b->len; i++)
-    {
-        fprintf(fp, "%d: %d %d\n", i, b->x[i], b->y[i]);
-    }
-}
-
-void
 boundary_bounds(boundarytype* b, int* xl, int* xr, int* yt, int* yb)
 {
     int i;

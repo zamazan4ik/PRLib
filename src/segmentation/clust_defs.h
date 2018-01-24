@@ -46,14 +46,12 @@
 
 struct ClassData
 {
-	int npixels;
 	double **x;   /* pixel list: x[npixels][nbands] */
 	double **p;   /* prob        p[npixels][subclasses] */
 };
 
 struct SubSig
 {
-	double N;
 	double pi;
 	double *means;
 	double **R;

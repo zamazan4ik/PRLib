@@ -43,7 +43,5 @@
 
 /* clust_io.c routines */
 void I_ReadSigSet(FILE *fd, struct SigSet *S);
-void I_WriteSigSet(FILE *fd, struct SigSet *S);
-
 
 #endif /* CLUST_IO_H */

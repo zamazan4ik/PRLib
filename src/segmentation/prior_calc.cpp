@@ -19,7 +19,6 @@
 
 #include <vector>
 
-#include "TIFF_RW.h"
 #include "Main_def.h"
 
 #include "marklist.h"

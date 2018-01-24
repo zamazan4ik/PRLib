@@ -1,10 +1,11 @@
 #include <cmath>
+#include <vector>
 
 #include "alloc_util.h"
 
-int G_ludcmp(double** a, int n, int* indx, double* d);
+int G_ludcmp(double** a, int n, std::vector<int>& indx, double* d);
 
-void G_lubksb(double** a, int n, int* indx, double b[]);
+void G_lubksb(double** a, int n, std::vector<int>& indx, double b[]);
 
 
 
@@ -15,10 +16,9 @@ int invert(
 )
 {
     int status;
-    int* indx;
     double** y, * col, d;
 
-    indx = G_alloc_ivector(n);
+    std::vector<int> indx(n);
     y = G_alloc_matrix(n, n);
     col = G_alloc_vector(n);
 
@@ -48,7 +48,6 @@ int invert(
         }
     }
 
-    G_free_ivector(indx);
     G_free_matrix(y);
     G_free_vector(col);
 
@@ -58,8 +57,7 @@ int invert(
 
 /* From Numerical Recipies in C */
 
-int
-G_ludcmp(double** a, int n, int* indx, double* d)
+int G_ludcmp(double** a, int n, std::vector<int>& indx, double* d)
 {
     int imax;
     double big, dum, sum, temp;
@@ -138,8 +136,7 @@ G_ludcmp(double** a, int n, int* indx, double* d)
     return 1;
 }
 
-void
-G_lubksb(double** a, int n, int* indx, double b[])
+void G_lubksb(double** a, int n, std::vector<int>& indx, double b[])
 {
     int ii, ip, j;
     double sum;

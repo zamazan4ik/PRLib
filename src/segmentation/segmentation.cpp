@@ -14,7 +14,6 @@
 #include <cstdlib>
 #include <cmath>
 
-#include "TIFF_RW.h"
 
 #include "Main_def.h"
 #include "allocate.h"

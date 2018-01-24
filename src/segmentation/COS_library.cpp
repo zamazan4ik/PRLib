@@ -17,7 +17,6 @@
 #include <math.h>
 #include <time.h>
 
-#include "TIFF_RW.h"
 
 #include "Main_def.h"
 #include "allocate.h"
@@ -46,7 +45,6 @@ void COS_segment(
     /*        (2) Thresholding each overlapping block using mmse           */
     /*        (3) Cost optimization segmentation using dynamic programming */
 
-    unsigned int i, j;
     unsigned int new_height, new_width;
     unsigned int block, height, width, nh, nw;
     unsigned char**** O_b;
@@ -89,9 +87,9 @@ void COS_segment(
     bin_msk_pad = (unsigned char**) alloc_img(new_height, new_width,
                                               sizeof(unsigned char));
     dynamic_seg(C_b, gamma_b, var_b, cnt_1_b, nh, nw, seg_para, bin_msk_pad);
-    for (i = 0; i < height; i++)
+    for (size_t i = 0; i < height; i++)
     {
-        for (j = 0; j < width; j++)
+        for (size_t j = 0; j < width; j++)
         {
             seg_para->binmsk[i][j] = bin_msk_pad[i][j];
         }

@@ -40,11 +40,8 @@ typedef Pixel Gray;
 
 
 
-int    pbm_isapbmfile(FILE *fp);
 void   pbm_free(Pixel ***bitmap,int rows);
 Pixel  **pbm_copy(Pixel **bitmap, int cols, int rows);
 Pixel  **pbm_alloc(int cols, int rows);
-Pixel **pbm_readfile(FILE *fp,int *cols, int *rows, short *resolution);
-void   pbm_writefile(FILE *fp,Pixel **bitmap,int cols, int rows, int resolution);
 
 #endif

@@ -9,7 +9,6 @@
 
 #include <opencv2/imgproc/imgproc.hpp>
 
-#include "TIFF_RW.h"
 
 #include "getopt.h"
 #include "allocate.h"
@@ -36,7 +35,7 @@ namespace prl
         int height, width;
         char color_flg;
         int i;
-        boolean error_flag = FALSE;
+        bool error_flag = false;
         unsigned char** bin_msk;
         int ret;
         div_t d1;
@@ -137,7 +136,6 @@ namespace prl
 
         if (ret == FLG_NG)
         {
-            //free_TIFF_img(input_img);
             multifree(bin_msk, 2);
         }
 
@@ -158,7 +156,6 @@ namespace prl
 
         /* Free memories */
         multifree(seg_para.lambda, 2);
-        //free_TIFF_img(input_img);
         multifree(bin_msk, 2);
     }
 }
