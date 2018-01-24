@@ -76,7 +76,7 @@ void find_neighbors(
     loc_map = (unsigned int**) alloc_img(height, width, sizeof(unsigned int));
     n = list;
     comp_cnt = 0;
-    while (n != NULL)
+    while (n != nullptr)
     {
         /* Put a marker at centroid of cc */
         startx = n->data.xpos;
@@ -262,7 +262,7 @@ void Addtail(
 
     /* Pre-check */
     nptr = pstart;
-    while (nptr != NULL)
+    while (nptr != nullptr)
     {
         /* if already exists */
         if (nptr->nei_info.comp_num == newlist.nei_info.comp_num)
@@ -287,7 +287,7 @@ void Addtail(
     pend = ptr;
 
     *pend = newlist;
-    pend->pnext = NULL;
+    pend->pnext = nullptr;
 
     neighbors[comp_cnt].pstart = pstart;
     neighbors[comp_cnt].pend = pend;
@@ -321,7 +321,7 @@ Nei_list Removehead
 
         if (!(*pstart))
         {/* If que has become empty */
-            *pend = NULL;
+            *pend = nullptr;
         }
     }
 
@@ -362,8 +362,8 @@ void init_neighbors(Nei_header** header,    /* io :  pointer to neighborhood inf
     header_ptr = (Nei_header*) alloc_array(comp_num, sizeof(Nei_header));
     for (i = 0; i < comp_num; i++)
     {
-        header_ptr[i].pstart = NULL;
-        header_ptr[i].pend = NULL;
+        header_ptr[i].pstart = nullptr;
+        header_ptr[i].pend = nullptr;
     }
     *header = header_ptr;
 }

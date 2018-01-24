@@ -40,8 +40,8 @@ void I_InitSigSet(struct SigSet* S)
 {
     S->nbands = 0;
     S->nclasses = 0;
-    S->classSig = NULL;
-    S->title = NULL;
+    S->classSig = nullptr;
+    S->title = nullptr;
 }
 
 
@@ -64,9 +64,9 @@ I_NewClassSig(struct SigSet* S)
     Sp->nsubclasses = 0;
     Sp->used = 1;
     Sp->type = SIGNATURE_TYPE_MIXED;
-    Sp->title = NULL;
-    Sp->classData.x = NULL;
-    Sp->classData.p = NULL;
+    Sp->title = nullptr;
+    Sp->classData.x = nullptr;
+    Sp->classData.p = nullptr;
 
     return Sp;
 }
@@ -111,7 +111,7 @@ SubSig* I_NewSubSig(SigSet* S, ClassSig* C)
 void
 I_SetSigTitle(struct SigSet* S, char* title)
 {
-    if (title == NULL)
+    if (title == nullptr)
     { title = ""; }
     if (S->title)
     { free(S->title); }
@@ -122,7 +122,7 @@ I_SetSigTitle(struct SigSet* S, char* title)
 void
 I_SetClassTitle(struct ClassSig* C, char* title)
 {
-    if (title == NULL)
+    if (title == nullptr)
     { title = ""; }
     if (C->title)
     { free(C->title); }

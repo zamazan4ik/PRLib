@@ -175,7 +175,7 @@ void multifree(void* r, int d)
 
     for (p = (void**) r, i = 0; i < d; p = (void**) next, i++)
     {
-        if (p != NULL)
+        if (p != nullptr)
         {
             next = *p;
             free((void*) p);

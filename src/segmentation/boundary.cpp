@@ -33,7 +33,7 @@ int g_x2 = 0;
 int g_y2 = 0;
 
 
-#define REALLOCINC 128
+const int REALLOCINC = 128;
 
 /*
  *
@@ -43,20 +43,18 @@ int g_y2 = 0;
  *
  */
 
-void
-lrboundary_init(lrboundarytype* b)
+void lrboundary_init(lrboundarytype* b)
 {
     if (b)
     {
         b->len = 0;
-        b->l = NULL;
-        b->r = NULL;
-        b->y = NULL;
+        b->l = nullptr;
+        b->r = nullptr;
+        b->y = nullptr;
     }
 }
 
-void
-lrboundary_free(lrboundarytype* b)
+void lrboundary_free(lrboundarytype* b)
 {
     if (b)
     {
@@ -70,8 +68,7 @@ lrboundary_free(lrboundarytype* b)
     }
 }
 
-void
-lrboundary_add(lrboundarytype* b, const int y, const int l, const int r)
+void lrboundary_add(lrboundarytype* b, const int y, const int l, const int r)
 {
     assert(b);
 
@@ -92,44 +89,18 @@ lrboundary_add(lrboundarytype* b, const int y, const int l, const int r)
     b->len++;
 }
 
-void
-lrboundary_dump(lrboundarytype* b, FILE* fp)
-{
-    int i;
 
-    assert(b);
-    assert(fp);
-
-    for (i = 0; i < b->len; i++)
-    {
-        fprintf(fp, "%d: %d-%d\n", b->y[i], b->l[i], b->r[i]);
-    }
-}
-
-
-/*
- *
- *
- * boundary()
- *
- *
- */
-
-
-
-void
-boundary_init(boundarytype* b)
+void boundary_init(boundarytype* b)
 {
     if (b)
     {
         b->len = 0;
-        b->x = NULL;
-        b->y = NULL;
+        b->x = nullptr;
+        b->y = nullptr;
     }
 }
 
-void
-boundary_free(boundarytype* b)
+void boundary_free(boundarytype* b)
 {
     if (b)
     {
@@ -141,8 +112,7 @@ boundary_free(boundarytype* b)
     }
 }
 
-void
-boundary_bounds(boundarytype* b, int* xl, int* xr, int* yt, int* yb)
+void boundary_bounds(boundarytype* b, int* xl, int* xr, int* yt, int* yb)
 {
     int i;
 
@@ -182,8 +152,7 @@ boundary_bounds(boundarytype* b, int* xl, int* xr, int* yt, int* yb)
     }
 }
 
-void
-boundary_start(boundarytype* b, int* startx, int* starty)
+void boundary_start(boundarytype* b, int* startx, int* starty)
 {
     assert(b);
     assert(startx);
@@ -200,8 +169,7 @@ boundary_start(boundarytype* b, int* startx, int* starty)
     }
 }
 
-void
-boundary_add(boundarytype* b, const int x, const int y)
+void boundary_add(boundarytype* b, const int x, const int y)
 {
     assert(b);
 
@@ -395,8 +363,7 @@ void boundary_trace_inside4(const marktype* image,
 }
 
 
-void
-boundary_max_lr(const boundarytype* b, lrboundarytype* lrb)
+void boundary_max_lr(const boundarytype* b, lrboundarytype* lrb)
 {
     int i, j, miny = 0, maxy = 0, l, r;
 
@@ -435,10 +402,9 @@ boundary_max_lr(const boundarytype* b, lrboundarytype* lrb)
 }
 
 
-int
-next_pixel(const marktype* image, int* x, int* y)
+int next_pixel(const marktype* image, int* x, int* y)
 {
-    if ((image == NULL) || (image->w <= 0) || (image->h <= 0))
+    if ((image == nullptr) || (image->w <= 0) || (image->h <= 0))
     {
         return 1;
     }
@@ -470,47 +436,8 @@ next_pixel(const marktype* image, int* x, int* y)
 }
 
 
-int
-next_pixel_bound(const marktype* image, int* x, int* y, int x1, int y1, int x2, int y2)
-{
-    if ((image == NULL) || (image->w <= 0) || (image->h <= 0))
-    {
-        return 1;
-    }
 
-    assert(x && y);
-    assert((*x >= x1) && (*y >= y1) && (*x <= x2) && (*y <= y2));
-
-    /*  assert((x1<image->w) && (x2<image->w));
-    assert((y1<image->h) && (y2<image->h));*/
-
-    /*
-     * find the next pixel
-     */
-    while (gpix ((*image), *x, *y) == 0)
-    {
-        (*x)++;
-        if (*x > x2)
-        {
-            *x = x1;
-            (*y)++;
-            if (*y > y2)
-            {
-                /*
-                 * reset the counters to the origin at the end of the image
-                 */
-                *x = x1;
-                *y = y1;
-                return 1;
-            }
-        }
-    }
-    return 0;
-}
-
-
-marktype
-boundary_extract_nested(marktype* image, int x, int y, int conn)
+marktype boundary_extract_nested(marktype* image, int x, int y, int conn)
 {
     marktype d;
     int xl, xr, yt, yb;
@@ -555,8 +482,7 @@ boundary_extract_nested(marktype* image, int x, int y, int conn)
 }
 
 
-marktype
-boundary_extract_non_nested(marktype* image, int x, int y, int conn)
+marktype boundary_extract_non_nested(marktype* image, int x, int y, int conn)
 {
     marktype d;
     int xl, xr, yt, yb, i, l;

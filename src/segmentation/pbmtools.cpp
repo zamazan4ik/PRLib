@@ -22,7 +22,7 @@
 /*
 Frees the memory used in the bitmap structure.
 usage: pbm_free(&bitmap);
-Sets bitmap to be NULL on return.
+Sets bitmap to be nullptr on return.
 */
 void pbm_free(Pixel*** bitmap, int rows)
 {
@@ -35,7 +35,7 @@ void pbm_free(Pixel*** bitmap, int rows)
 /*  for(r=0;r<rows;r++)
 		free((*bitmap)[r]);
   free(*bitmap);*/
-    (*bitmap) = NULL;
+    (*bitmap) = nullptr;
 }
 
 
@@ -69,7 +69,7 @@ Pixel** pbm_copy(Pixel** bitmap, int cols, int rows)
     int x, y;
 
     if ((cols == 0) || (rows == 0))
-    { return NULL; }
+    { return nullptr; }
 
     p = pbm_alloc(cols, rows);
     for (x = 0; x < newc; x++)

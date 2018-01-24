@@ -498,7 +498,7 @@ void horizontal_dynamic_seg
 
     if (first_flg == FLG_FIRST)
     {
-        if (seg_para->prev_S_b != NULL)
+        if (seg_para->prev_S_b != nullptr)
         {
             for (i = 0; i < nh; i++)
             {
@@ -1311,7 +1311,7 @@ double calc_Vb2(
 
     if (i < seg_para->cur_nh - 1)
     {
-        if (first_flg == FLG_NONFIRST || seg_para->prev_S_b != NULL)
+        if (first_flg == FLG_NONFIRST || seg_para->prev_S_b != nullptr)
         {
             sb_prev_below = S_b[i + 1][j];
 

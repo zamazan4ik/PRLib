@@ -32,8 +32,6 @@
 */
 
 
-#define PI 3.141592654
-
 #include <cstdio>
 #include <cstdlib>
 #include <cstring>
@@ -49,6 +47,8 @@
 #include "alloc_util.h"
 
 #include "Main_def.h"
+
+const double PI = 3.141592654;
 
 /* Subroutine in eigen.c */
 void eigen(

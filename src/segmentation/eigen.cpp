@@ -6,7 +6,6 @@ int G_tqli(std::vector<double>& d, std::vector<double>& e, int n, double** z);
 
 void G_tred2(double** a, int n, std::vector<double>& d, std::vector<double>& e);
 
-#define MAX_ITERS 30
 #define SIGN(a, b) ((b)<0 ? -fabs(a) : fabs(a))
 
 
@@ -43,6 +42,7 @@ void eigen(
 
 int G_tqli(std::vector<double>& d, std::vector<double>& e, int n, double** z)
 {
+    const int MAX_ITERS = 30;
     int m, l, iter, i, k;
     double s, r, p, g, f, dd, c, b;
 

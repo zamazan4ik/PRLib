@@ -9,6 +9,7 @@
  *
  */
 
+#include <algorithm>
 #include <array>
 #include <cstdlib>
 #include <cstdio>
@@ -51,7 +52,7 @@ void CCC_segment(
 )
 {
     marktype im;
-    marklistptr list = NULL;
+    marklistptr list = nullptr;
     marklistptr n;
     unsigned int cnt, comp_num, comp_cnt;
     short startx, starty;
@@ -391,7 +392,7 @@ void calc_boundary
     n = list;
     comp_cnt = 0;
 
-    while (n != NULL)
+    while (n != nullptr)
     {
 /*
 printf("======= comp # is %d ======\n",comp_cnt);
@@ -780,7 +781,7 @@ CC_clist Removehead
 
         if (!(*pstart))
         {/* If que has become empty */
-            *pend = NULL;
+            *pend = nullptr;
         }
     }
 
@@ -822,7 +823,7 @@ void Addtail(
     *pend = ptr;
 
     **pend = newlist;
-    (*pend)->pnext = NULL;
+    (*pend)->pnext = nullptr;
 
 }
 
@@ -1196,12 +1197,12 @@ void Region_growing
     int M, i;
 
     /* Initialization */
-    pstart = NULL;
-    pend = NULL;
+    pstart = nullptr;
+    pend = nullptr;
 
     data.pixels.m = s.m;
     data.pixels.n = s.n;
-    data.pnext = NULL;
+    data.pnext = nullptr;
 
     /* Add a seed pixel to cc check list */
     Addtail(data, &pstart, &pend);
@@ -1223,7 +1224,7 @@ void Region_growing
         for (i = 0; i < M; i++)
         {
             tmp[i].pixels = neigh[i];
-            tmp[i].pnext = NULL;
+            tmp[i].pnext = nullptr;
 
             /* If neighboring pixel is not inspected yet */
             if (out_msk[tmp[i].pixels.m][tmp[i].pixels.n] == 0)
@@ -1338,7 +1339,7 @@ void flip_reversed_cc(
 {
     unsigned char **bin_msk_r, **bin_flip, **bin_input, **bin_img, **rem_bin;
     marktype im;
-    marklistptr list = NULL;
+    marklistptr list = nullptr;
     marklistptr n;
     unsigned int i, j;
     double **vector;
@@ -1466,7 +1467,7 @@ void flip_reversed_cc(
 
     comp_cnt = 0;
     n = list;
-    while (n != NULL)
+    while (n != nullptr)
     {
         startx = n->data.xpos;
         starty = n->data.ypos;
@@ -1588,7 +1589,7 @@ unsigned int find_percentile
     unsigned int thres;
 
     thres = num * percent / 100;
-    return (data_array[thres]);
+    return data_array[thres];
 }
 
 /**
@@ -1663,12 +1664,15 @@ unsigned int Partition
 
         if (i < j)
         {
-            tempf = array[i];
-            tempi = index[i];
-            array[i] = array[j];
-            index[i] = index[j];
-            array[j] = tempf;
-            index[j] = tempi;
+            //tempf = array[i];
+            //tempi = index[i];
+            //array[i] = array[j];
+            //index[i] = index[j];
+            //array[j] = tempf;
+            //index[j] = tempi;
+
+            std::swap(array[i], array[j]);
+            std::swap(index[i], index[j]);
         }
         else
         {
@@ -1696,12 +1700,12 @@ void Region_growing_cnt
     unsigned int cnt = 0;
 
     /* Initialization */
-    pstart = NULL;
-    pend = NULL;
+    pstart = nullptr;
+    pend = nullptr;
 
     data.pixels.m = s.m;
     data.pixels.n = s.n;
-    data.pnext = NULL;
+    data.pnext = nullptr;
 
     /* Add a seed pixel to cc check list */
     Addtail(data, &pstart, &pend);
@@ -1724,7 +1728,7 @@ void Region_growing_cnt
         for (i = 0; i < M; i++)
         {
             tmp[i].pixels = neigh[i];
-            tmp[i].pnext = NULL;
+            tmp[i].pnext = nullptr;
 
             /* If neighboring pixel is not inspected yet */
             if (out_msk[tmp[i].pixels.m][tmp[i].pixels.n] == 0)

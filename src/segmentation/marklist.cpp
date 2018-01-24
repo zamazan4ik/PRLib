@@ -54,8 +54,8 @@ marktype_init(marktype* d)
     d->xoffset = d->yoffset = 0;
     d->baseline = 0;
     d->topline = 0;
-    d->name = NULL;
-    d->bitmap = NULL;
+    d->name = nullptr;
+    d->bitmap = nullptr;
     d->resolution = 0;
     d->imagew = d->imageh = 0;
     d->h_runs = d->v_runs = 0;
@@ -338,7 +338,7 @@ marklistptr marklist_add(marklistptr* list, marktype m)
         *list = (marklistptr) malloc(sizeof(marklisttype));
         if ((*list) == nullptr)
         {
-            error("marklist_add", "OUT of Memory in marklist_add", "");
+            //error("marklist_add", "OUT of Memory in marklist_add", "");
         }
         p = *list;
     }
@@ -352,12 +352,12 @@ marklistptr marklist_add(marklistptr* list, marktype m)
         p->next = (marklistptr) malloc(sizeof(marklisttype));
         if (p->next == nullptr)
         {
-            error("marklist_add", "OUT of Memory in marklist_add", "");
+            //error("marklist_add", "OUT of Memory in marklist_add", "");
         }
         p = p->next;
     }
     p->data = m;
-    p->next = NULL;
+    p->next = nullptr;
     return p;
 
 }
@@ -394,14 +394,14 @@ marklistptr marklist_getat(marklistptr list, int pos, marktype* d)
     }
     fprintf(stderr, "marklist_getat(): access off ends of list: pos %d\n", pos);
     /*abort ();*/
-    return NULL;
+    return nullptr;
 }
 
 
 int
 marklist_removeat(marklistptr* list, int pos)
 {
-    marklistptr c, n, p = NULL;
+    marklistptr c, n, p = nullptr;
     int count = 0;
 
     if ((pos == 0) && (*list))
@@ -420,7 +420,7 @@ marklist_removeat(marklistptr* list, int pos)
         {
             if (count == pos)
             {    /* two cases, no previous, >=1 previous */
-                if (p == NULL)
+                if (p == nullptr)
                 {    /* no previous */
                     n = c->next;
                     marktype_free(&(c->data));
@@ -466,7 +466,7 @@ marktype_writeascii(FILE* fp, marktype d)
     marktype_area(&d);
 
     fprintf(fp, "Mark: %d\n", d.symnum);
-    fprintf(fp, "Char: %s\n", (d.name == NULL) ? "?" : d.name);
+    fprintf(fp, "Char: %s\n", (d.name == nullptr) ? "?" : d.name);
     fprintf(fp, "Baseline: %d\n", d.baseline);
     fprintf(fp, "Topline: %d\n", d.topline);
     fprintf(fp, "Xpos: %d\n", d.xpos);
@@ -496,7 +496,7 @@ typedef struct
 } fillpostype;
 
 
-fillpostype* filla = NULL;
+fillpostype* filla = nullptr;
 
 #define push(i, j) \
     if(top==MAX_FS){\
@@ -519,7 +519,7 @@ marktype_fill_cleanup(void)
     {
         free(filla);
     }
-    filla = NULL;
+    filla = nullptr;
     MAX_FS = 8192;
 }
 
@@ -535,7 +535,7 @@ marktype_fillextract8(marktype image,
 
     bottom = top = 0;
 
-    if (filla == NULL)
+    if (filla == nullptr)
     CALLOC (filla, MAX_FS, fillpostype);
 
     if (pbm_getpixel (image.bitmap, i, j) == fillcol)
@@ -610,7 +610,7 @@ marktype_fillextract4(marktype image,
 
     top = bottom = 0;
 
-    if (filla == NULL)
+    if (filla == nullptr)
     CALLOC (filla, MAX_FS, fillpostype);
 
     if (pbm_getpixel (image.bitmap, i, j) == fillcol)

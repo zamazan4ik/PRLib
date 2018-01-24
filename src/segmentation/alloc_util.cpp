@@ -75,7 +75,7 @@ char *G_calloc(int n,int m)
 
 char *G_realloc(char *b,int n)
 {
-    if (b == NULL) b = (char*)malloc ((unsigned)n);
+    if (b == nullptr) b = (char*)malloc ((unsigned)n);
     else b = (char*)realloc(b, (unsigned)n);
     if (b || !n) return(b);
 
@@ -113,13 +113,13 @@ double **G_alloc_matrix(int rows,int cols)
 
 void G_free_vector(double *v)
 {
-    if(v!=NULL) free ((char *)v);
+    if(v!=nullptr) free ((char *)v);
 }
 
 
 void G_free_matrix(double **m)
 {
-    if(m!=NULL) {
+    if(m!=nullptr) {
       free ((char *)(m[0]));
       free ((char *)m);
     }
@@ -147,7 +147,7 @@ int **G_alloc_imatrix(int rows,int cols)
 
 void G_free_ivector(int *v)
 {
-    if(v!=NULL) {
+    if(v!=nullptr) {
       free ((char *)v);
     }
 }
@@ -155,7 +155,7 @@ void G_free_ivector(int *v)
 
 void G_free_imatrix(int **m)
 {
-    if(m!=NULL) {
+    if(m!=nullptr) {
       free ((char *)(m[0]));
       free ((char *)m);
     }
