@@ -1,9 +1,10 @@
 #include <cmath>
+#include <vector>
 #include "alloc_util.h"
 
-int G_tqli(double* d, double* e, int n, double** z);
+int G_tqli(std::vector<double>& d, std::vector<double>& e, int n, double** z);
 
-void G_tred2(double** a, int n, double* d, double* e);
+void G_tred2(double** a, int n, std::vector<double>& d, std::vector<double>& e);
 
 #define MAX_ITERS 30
 #define SIGN(a, b) ((b)<0 ? -fabs(a) : fabs(a))
@@ -14,19 +15,18 @@ void G_tred2(double** a, int n, double* d, double* e);
 /*  symmetric matices.                                     */
 void eigen(
         double** M,     /* Input matrix */
-        double* lambda, /* Output eigenvalues */
+        std::vector<double>& lambda, /* Output eigenvalues */
         int n           /* Input matrix dimension */
 )
 {
-    int i, j;
-    double** a, * e;
+    double** a;
 
     a = G_alloc_matrix(n, n);
-    e = G_alloc_vector(n);
+    std::vector<double> e(n);
 
-    for (i = 0; i < n; i++)
+    for (int i = 0; i < n; i++)
     {
-        for (j = 0; j < n; j++)
+        for (int j = 0; j < n; j++)
         {
             a[i][j] = M[i][j];
         }
@@ -35,27 +35,21 @@ void eigen(
     G_tred2(a, n, lambda, e);
     G_tqli(lambda, e, n, a);
 
-    /* Returns eigenvectors	*/
-/*
-  for(i=0; i<n; i++) 
-  for(j=0; j<n; j++) 
-    M[i][j] = a[i][j]; 
-*/
-
     G_free_matrix(a);
-    G_free_vector(e);
 }
 
 
 /* From Numerical Recipies in C */
 
-int G_tqli(double* d, double* e, int n, double** z)
+int G_tqli(std::vector<double>& d, std::vector<double>& e, int n, double** z)
 {
     int m, l, iter, i, k;
     double s, r, p, g, f, dd, c, b;
 
     for (i = 1; i < n; i++)
-    { e[i - 1] = e[i]; }
+    {
+        e[i - 1] = e[i];
+    }
     e[n - 1] = 0.0;
     for (l = 0; l < n; l++)
     {
@@ -64,8 +58,8 @@ int G_tqli(double* d, double* e, int n, double** z)
         {
             for (m = l; m < n - 1; m++)
             {
-                dd = fabs(d[m]) + fabs(d[m + 1]);
-                if (fabs(e[m]) + dd == dd)
+                dd = std::fabs(d[m]) + std::fabs(d[m + 1]);
+                if (std::fabs(e[m]) + dd == dd)
                 { break; }
             }
             if (m != l)
@@ -73,7 +67,7 @@ int G_tqli(double* d, double* e, int n, double** z)
                 if (iter++ == MAX_ITERS)
                 { return 0; } /* Too many iterations in TQLI */
                 g = (d[l + 1] - d[l]) / (2.0 * e[l]);
-                r = sqrt((g * g) + 1.0);
+                r = std::sqrt((g * g) + 1.0);
                 g = d[m] - d[l] + e[l] / (g + SIGN(r, g));
                 s = c = 1.0;
                 p = 0.0;
@@ -81,17 +75,17 @@ int G_tqli(double* d, double* e, int n, double** z)
                 {
                     f = s * e[i];
                     b = c * e[i];
-                    if (fabs(f) >= fabs(g))
+                    if (std::fabs(f) >= std::fabs(g))
                     {
                         c = g / f;
-                        r = sqrt((c * c) + 1.0);
+                        r = std::sqrt((c * c) + 1.0);
                         e[i + 1] = f * r;
                         c *= (s = 1.0 / r);
                     }
                     else
                     {
                         s = f / g;
-                        r = sqrt((s * s) + 1.0);
+                        r = std::sqrt((s * s) + 1.0);
                         e[i + 1] = g * r;
                         s *= (c = 1.0 / r);
                     }
@@ -119,20 +113,20 @@ int G_tqli(double* d, double* e, int n, double** z)
 }
 
 
-void G_tred2(double** a, int n, double* d, double* e)
+void G_tred2(double** a, int n, std::vector<double>& d, std::vector<double>& e)
 {
-    int l, k, j, i;
+    int l;
     double scale, hh, h, g, f;
 
-    for (i = n - 1; i >= 1; i--)
+    for (int i = n - 1; i >= 1; i--)
     {
         l = i - 1;
         h = scale = 0.0;
         if (l > 0)
         {
-            for (k = 0; k <= l; k++)
+            for (int k = 0; k <= l; k++)
             {
-                scale += fabs(a[i][k]);
+                scale += std::fabs(a[i][k]);
             }
             if (scale == 0.0)
             {
@@ -140,27 +134,27 @@ void G_tred2(double** a, int n, double* d, double* e)
             }
             else
             {
-                for (k = 0; k <= l; k++)
+                for (int k = 0; k <= l; k++)
                 {
                     a[i][k] /= scale;
                     h += a[i][k] * a[i][k];
                 }
                 f = a[i][l];
-                g = f > 0 ? -sqrt(h) : sqrt(h);
+                g = f > 0 ? -std::sqrt(h) : std::sqrt(h);
                 e[i] = scale * g;
                 h -= f * g;
                 a[i][l] = f - g;
                 f = 0.0;
-                for (j = 0; j <= l; j++)
+                for (int j = 0; j <= l; j++)
                 {
                     /* Next statement can be omitted if eigenvectors not wanted */
                     a[j][i] = a[i][j] / h;
                     g = 0.0;
-                    for (k = 0; k <= j; k++)
+                    for (int k = 0; k <= j; k++)
                     {
                         g += a[j][k] * a[i][k];
                     }
-                    for (k = j + 1; k <= l; k++)
+                    for (int k = j + 1; k <= l; k++)
                     {
                         g += a[k][j] * a[i][k];
                     }
@@ -168,11 +162,11 @@ void G_tred2(double** a, int n, double* d, double* e)
                     f += e[j] * a[i][j];
                 }
                 hh = f / (h + h);
-                for (j = 0; j <= l; j++)
+                for (int j = 0; j <= l; j++)
                 {
                     f = a[i][j];
                     e[j] = g = e[j] - hh * f;
-                    for (k = 0; k <= j; k++)
+                    for (int k = 0; k <= j; k++)
                     {
                         a[j][k] -= (f * e[k] + g * a[i][k]);
                     }
@@ -190,19 +184,19 @@ void G_tred2(double** a, int n, double* d, double* e)
     e[0] = 0.0;
     /* Contents of this loop can be omitted if eigenvectors not
             wanted except for statement d[i]=a[i][i]; */
-    for (i = 0; i < n; i++)
+    for (int i = 0; i < n; i++)
     {
         l = i - 1;
         if (d[i])
         {
-            for (j = 0; j <= l; j++)
+            for (int j = 0; j <= l; j++)
             {
                 g = 0.0;
-                for (k = 0; k <= l; k++)
+                for (int k = 0; k <= l; k++)
                 {
                     g += a[i][k] * a[k][j];
                 }
-                for (k = 0; k <= l; k++)
+                for (int k = 0; k <= l; k++)
                 {
                     a[k][j] -= g * a[k][i];
                 }
@@ -210,7 +204,9 @@ void G_tred2(double** a, int n, double* d, double* e)
         }
         d[i] = a[i][i];
         a[i][i] = 1.0;
-        for (j = 0; j <= l; j++)
-        { a[j][i] = a[i][j] = 0.0; }
+        for (int j = 0; j <= l; j++)
+        {
+            a[j][i] = a[i][j] = 0.0;
+        }
     }
 }

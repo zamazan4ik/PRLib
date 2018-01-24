@@ -15,6 +15,6 @@
 /***************************************************/
 /*  External function declarations                 */
 /***************************************************/
-void COS_segment(unsigned char ***img,Seg_parameter *seg_para);
+void COS_segment(unsigned char ***img, Seg_parameter *seg_para);
 
 #endif

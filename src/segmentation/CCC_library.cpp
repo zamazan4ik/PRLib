@@ -34,8 +34,6 @@
 
 #define  color_diff(a1, a2, a3, b1, b2, b3) ((((a1)-(b1))*((a1)-(b1)))+(((a2)-(b2))*((a2)-(b2)))+(((a3)-(b3))*((a3)-(b3))))
 
-#define  ITERATION   100
-
 /**
  * Function Name : CCC_segment
  *
@@ -228,7 +226,8 @@ void CCC_segment(
     dis_para.a_val = A_VAL;
     dis_para.b_val = B_VAL;
 
-    for (int k = 0; k < ITERATION; k++)
+    const size_t Iterations = 100;
+    for (int k = 0; k < Iterations; k++)
     {
         stop_flg = FLG_ON;
         for (int i = 0; i < comp_num; i++)
@@ -315,7 +314,7 @@ void cnt_boundary_length(
     n = list;
     comp_cnt = 0;
 
-    while (n != NULL)
+    while (n != nullptr)
     {
         calc_boundary_length_cc(n, height, width, &bound_cnt);
         bound_list[comp_cnt] = bound_cnt;
@@ -331,13 +330,12 @@ void alloc_edge_memory(
 )
 {
     unsigned char ***edge;
-    unsigned int i, k;
 
     edge = (unsigned char ***) alloc_array(3, sizeof(unsigned char **));
-    for (k = 0; k < 3; k++)
+    for (size_t k = 0; k < 3; k++)
     {
         edge[k] = (unsigned char **) alloc_array(comp_num, sizeof(unsigned char *));
-        for (i = 0; i < comp_num; i++)
+        for (size_t i = 0; i < comp_num; i++)
         {
             edge[k][i] = (unsigned char *) alloc_array(bound_list[i],
                                                        sizeof(unsigned char));

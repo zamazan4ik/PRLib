@@ -606,8 +606,7 @@ boundary_extract_non_nested(marktype* image, int x, int y, int conn)
     return d;
 }
 
-marklistptr
-extract_all_marks(marklistptr list, marktype image, int nested, int conn)
+marklistptr extract_all_marks(marklistptr list, marktype image, int nested, int conn)
 {
     int x, y, sym;
     marklistptr step = list;
@@ -634,7 +633,7 @@ extract_all_marks(marklistptr list, marktype image, int nested, int conn)
         }
         d.symnum = sym++;
 
-        if (list == NULL)
+        if (list == nullptr)
         {
             step = marklist_addcopy(&list, d);
         }
@@ -649,55 +648,3 @@ extract_all_marks(marklistptr list, marktype image, int nested, int conn)
 
     return list;
 }
-
-
-marklistptr
-extract_all_marks_bound(marklistptr list, marktype image, int nested, int conn,
-
-                        int x1, int y1, int x2, int y2)
-{
-    int x, y, sym;
-    marklistptr step = list;
-    static int qq = 0;
-
-    assert((nested == 0) || (nested == 1));
-    assert((conn == 4) || (conn == 8));
-
-    g_x1 = x1;
-    g_y1 = y1;
-    g_x2 = x2;
-    g_y2 = y2;
-
-    x = x1;
-    y = y1;
-    sym = 0;
-    while ((next_pixel_bound(&image, &x, &y, x1, y1, x2, y2) == 0))
-    {
-        marktype d;
-
-        if (nested == 1)
-        {
-            d = boundary_extract_nested(&image, x, y, conn);
-        }
-        else
-        {
-            d = boundary_extract_non_nested(&image, x, y, conn);
-        }
-        d.symnum = sym++;
-
-        if (list == NULL)
-        {
-            step = marklist_addcopy(&list, d);
-        }
-        else
-        {
-            step = marklist_addcopy(&step, d);
-        }
-
-        marktype_free(&d);
-    }
-    marktype_fill_cleanup();
-
-    return list;
-}
-

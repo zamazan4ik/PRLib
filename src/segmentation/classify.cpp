@@ -34,11 +34,11 @@
 
 #define PI 3.141592654
 
-#include<stdio.h>
-#include<stdlib.h>
-#include <string.h>
-#include <math.h>
-#include <float.h>
+#include <cstdio>
+#include <cstdlib>
+#include <cstring>
+#include <cmath>
+#include <cfloat>
 #include <exception>
 #include <stdexcept>
 
@@ -47,14 +47,13 @@
 #include "clust_io.h"
 #include "clust_util.h"
 #include "alloc_util.h"
-#include "clustermessage.h"
 
 #include "Main_def.h"
 
 /* Subroutine in eigen.c */
 void eigen(
         double** M,     /* Input matrix */
-        double* lambda, /* Output eigenvalues */
+        std::vector<double>& lambda, /* Output eigenvalues */
         int n           /* Input matrix dimension */
 );
 
@@ -70,7 +69,7 @@ int invert(
 
 void LogLikelihood(
         double* vector,
-        double* ll,          /* log likelihood, ll[class] */
+        std::vector<double>& ll,          /* log likelihood, ll[class] */
         struct SigSet* S,    /* class signatures */
         double text_cost,
         double non_text_cost
@@ -92,7 +91,7 @@ int classify(
     SigSet S;
     const char* paramfname;
     int NDataVectors;
-    double** data, *ll;
+    double** data;
     int maxindex;
     double maxval;
 
@@ -131,7 +130,8 @@ int classify(
     LogLikelihood_init(&S);
 
     /* Compute Log likelihood for each class*/
-    ll = G_alloc_vector(S.nclasses);
+    //ll = G_alloc_vector(S.nclasses);
+    std::vector<double> ll(S.nclasses);
 
     for (int i = 0; i < NDataVectors; i++)
     {
@@ -152,7 +152,6 @@ int classify(
         clus[i] = maxindex;
     }
 
-    G_free_vector(ll);
     G_free_matrix(data);
     return (0);
 }
@@ -160,7 +159,7 @@ int classify(
 
 void LogLikelihood(
         double* vector,
-        double* ll,          /* log likelihood, ll[class] */
+        std::vector<double>& ll,          /* log likelihood, ll[class] */
         struct SigSet* S,    /* class signatures */
         double text_cost,    /* cost */
         double non_text_cost
@@ -257,19 +256,15 @@ void LogLikelihood(
 }
 
 
-static void LogLikelihood_init(struct SigSet* S)
+void LogLikelihood_init(struct SigSet* S)
 {
-    int m;
-    int i;
-    int b1, b2;
     int nbands;
-    double* lambda;
     ClassSig* C;
     SubSig* SubS;
 
     nbands = S->nbands;
     /* allocate scratch memory */
-    lambda = (double*) G_malloc(nbands * sizeof(double));
+    std::vector<double> lambda(nbands);
 
     /* invert matrix and compute constant for each subclass */
 
@@ -319,6 +314,5 @@ static void LogLikelihood_init(struct SigSet* S)
             invert(SubS->Rinv, nbands);
         }
     }
-    free((char*) lambda);
 }
 

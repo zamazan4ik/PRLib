@@ -35,7 +35,7 @@
 #ifndef CLUST_IO_H
 #define CLUST_IO_H
 
-#include<stdio.h>
+#include <stdio.h>
 #include<stdlib.h>
 #include <string.h>
 

@@ -92,7 +92,6 @@ Description:
 
 void*** alloc_vol(int dim1, int dim2, int dim3, size_t size_element)
 {
-    int i, j;
     char* pt;
     void** ppt, *** pppt;
 
@@ -100,17 +99,17 @@ void*** alloc_vol(int dim1, int dim2, int dim3, size_t size_element)
     ppt = (void**) alloc_array(dim1 * dim2, sizeof(void*));
     pt = (char*) alloc_array(dim1 * dim2 * dim3, size_element);
 
-    for (i = 0; i < dim1; i++)
+    for (int i = 0; i < dim1; i++)
     {
         pppt[i] = ppt + i * dim2;
     }
 
-    for (j = 0; j < dim1 * dim2; j++)
+    for (int j = 0; j < dim1 * dim2; j++)
     {
         ppt[j] = pt + j * dim3 * size_element;
     }
 
-    return (pppt);
+    return pppt;
 }
 
 /************************************************************************

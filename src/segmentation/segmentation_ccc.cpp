@@ -71,7 +71,7 @@ namespace prl
         /* Set block size */
         if (block_flg == FLG_OFF)
         {
-            block = (unsigned int) (block * (unsigned int) (floor((double) dpi / 300)));
+            block = (unsigned int) (block * (unsigned int) (std::floor((double) dpi / 300)));
         }
         /* Check block size value */
         d1 = div(block, 4);
