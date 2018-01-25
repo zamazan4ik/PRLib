@@ -45,8 +45,7 @@ void I_InitSigSet(struct SigSet* S)
 }
 
 
-ClassSig*
-I_NewClassSig(struct SigSet* S)
+ClassSig* I_NewClassSig(SigSet* S)
 {
     struct ClassSig* Sp;
     if (S->nclasses == 0)
@@ -108,8 +107,7 @@ SubSig* I_NewSubSig(SigSet* S, ClassSig* C)
 }
 
 
-void
-I_SetSigTitle(struct SigSet* S, char* title)
+void I_SetSigTitle(SigSet* S, char* title)
 {
     if (title == nullptr)
     { title = ""; }
@@ -119,8 +117,7 @@ I_SetSigTitle(struct SigSet* S, char* title)
     strcpy(S->title, title);
 }
 
-void
-I_SetClassTitle(struct ClassSig* C, char* title)
+void I_SetClassTitle(ClassSig* C, char* title)
 {
     if (title == nullptr)
     { title = ""; }

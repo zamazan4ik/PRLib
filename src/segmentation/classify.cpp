@@ -130,7 +130,6 @@ int classify(
     LogLikelihood_init(&S);
 
     /* Compute Log likelihood for each class*/
-    //ll = G_alloc_vector(S.nclasses);
     std::vector<double> ll(S.nclasses);
 
     for (int i = 0; i < NDataVectors; i++)
@@ -153,7 +152,7 @@ int classify(
     }
 
     G_free_matrix(data);
-    return (0);
+    return 0;
 }
 
 
@@ -165,13 +164,12 @@ void LogLikelihood(
         double non_text_cost
 )
 {
-    int m;               /* class index */
+    //int m;               /* class index */
     int k;               /* subclass index */
     int b1, b2;           /* spectral index */
     int max_nsubclasses; /* maximum number of subclasses */
     int nbands;          /* number of spectral bands */
-    double* subll;        /* log likelihood of subclasses */
-    double* diff;
+    //double* subll;        /* log likelihood of subclasses */
     double maxlike;
     double subsum;
     ClassSig* C;
@@ -181,7 +179,7 @@ void LogLikelihood(
 
     /* determine the maximum number of subclasses */
     max_nsubclasses = 0;
-    for (m = 0; m < S->nclasses; m++)
+    for (int m = 0; m < S->nclasses; m++)
     {
         if (S->classSig[m].nsubclasses > max_nsubclasses)
         {
@@ -190,13 +188,12 @@ void LogLikelihood(
     }
 
     /* allocate memory */
-    diff = (double*) G_malloc(nbands * sizeof(double));
-    subll = (double*) G_malloc(max_nsubclasses * sizeof(double));
+    std::vector<double> diff(nbands), subll(max_nsubclasses);
 
     /* Compute log likelihood for each class */
 
     /* for each class */
-    for (m = 0; m < S->nclasses; m++)
+    for (int m = 0; m < S->nclasses; m++)
     {
         C = &(S->classSig[m]);
 
@@ -240,10 +237,10 @@ void LogLikelihood(
             subsum = 0;
             for (k = 0; k < C->nsubclasses; k++)
             {
-                subsum += exp(subll[k] - maxlike) * C->subSig[k].pi;
+                subsum += std::exp(subll[k] - maxlike) * C->subSig[k].pi;
             }
 
-            ll[m] = log(subsum) + maxlike;
+            ll[m] = std::log(subsum) + maxlike;
             /* Cost added by Eri */
             /* log p(y|0) - log p(y|1) < or >  log ( pi_1/pi_0 ) */
             /* log p(y|0) + log pi_0 - log p(y|1) - log pi_1 < or > 0 */
@@ -251,8 +248,6 @@ void LogLikelihood(
             ll[0] += non_text_cost;  /* More non-text */
         }
     }
-    free((char*) diff);
-    free((char*) subll);
 }
 
 

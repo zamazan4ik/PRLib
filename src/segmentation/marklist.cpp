@@ -28,8 +28,7 @@
  * marktype_copy, make a completely new copy, creates a 
  * new bitmap as well.
  */
-marktype
-marktype_copy(marktype d)
+marktype marktype_copy(marktype d)
 {
     marktype d2;
 
@@ -37,14 +36,13 @@ marktype_copy(marktype d)
     d2.bitmap = pbm_copy(d.bitmap, d2.w, d2.h);
     if (d.name)
     {
-        d2.name = (char*) strdup(d.name);
+        d2.name = strdup(d.name);
     }
     return d2;
 }
 
 
-void
-marktype_init(marktype* d)
+void marktype_init(marktype* d)
 {
     d->symnum = 0;
     d->xpos = d->ypos = 0;
@@ -75,8 +73,7 @@ marktype_init(marktype* d)
  *
  * the w and h values are set.
  */
-void
-marktype_alloc(marktype* d, int w, int h)
+void marktype_alloc(marktype* d, int w, int h)
 {
     marktype_init(d);
     d->bitmap = pbm_alloc(w, h);
@@ -87,8 +84,7 @@ marktype_alloc(marktype* d, int w, int h)
 }
 
 
-void
-marktype_free(marktype* d)
+void marktype_free(marktype* d)
 {
     if (d->bitmap)
     {
@@ -108,8 +104,7 @@ marktype_free(marktype* d)
  * 
  * If there are no set pixels the centroid values are set to -1.
  */
-void
-marktype_calc_centroid(marktype* b)
+void marktype_calc_centroid(marktype* b)
 {
     int r, c;
     int count = 0;
@@ -146,8 +141,7 @@ marktype_calc_centroid(marktype* b)
  * marktype_area, calculates the number of set pixels, as with all these
  * functions we assume the the number can fix in an integer.
  */
-void
-marktype_area(marktype* d)
+void marktype_area(marktype* d)
 {
     int x, y;
     int set = 0;
@@ -163,164 +157,6 @@ marktype_area(marktype* d)
         }
     }
     d->set = set;
-}
-
-
-void
-marklist_reconstruct(marklistptr list, marktype* im)
-{
-    marklistptr step;
-    int imagew = 0, imageh = 0;
-    int min_w = 0, min_h = 0, max_w = 0, max_h = 0;
-
-    for (step = list; step; step = step->next)
-    {
-        if (step->data.imagew > max_w)
-        { max_w = step->data.imagew; }
-        if (step->data.imagew < min_w)
-        { min_w = step->data.imagew; }
-        if (step->data.imageh > max_h)
-        { max_h = step->data.imageh; }
-        if (step->data.imageh < min_h)
-        { min_h = step->data.imageh; }
-    }
-
-    imagew = max_w;
-    imageh = max_h;
-
-    marktype_alloc(im, imagew, imageh);
-
-    for (step = list; step; step = step->next)
-    {
-        marktype_placeat(*im, step->data, step->data.xpos, step->data.ypos);
-    }
-}
-
-/* places 'mark' at position (x,y) in 'image' bitmap. Crops if the image doesn't fit */
-
-void
-marktype_placeat(marktype image, marktype mark, int x, int y)
-{
-    int i, j, g;
-
-    for (j = 0; j < mark.h; j++)
-    {
-        for (i = 0; i < mark.w; i++)
-        {
-            g = gpix (mark, i, j);
-            if (g)
-                ppix (image, x + i, y + j, g);
-        }
-    }
-}
-
-
-void
-marktype_adj_bound(marktype* m)
-{
-    int x, y, w, h;
-    int xpos, ypos, baseline, topline;
-    int top = 0, left = 0, right = 0, bot = 0;
-    marktype temp;
-
-    w = m->w;
-    h = m->h;
-    xpos = m->xpos;
-    ypos = m->ypos;
-    baseline = m->baseline;
-    topline = m->topline;
-
-    for (y = 0; y < h; y++)
-    {
-        for (x = 0; x < w; x++)
-        {
-            if (pbm_getpixel (m->bitmap, x, y))
-            {
-                top = y;
-                x = w;
-                y = h;
-            }
-        }
-    }
-    for (y = h - 1; y >= 0; y--)
-    {
-        for (x = 0; x < w; x++)
-        {
-            if (pbm_getpixel (m->bitmap, x, y))
-            {
-                bot = y;
-                x = w;
-                y = -1;
-            }
-        }
-    }
-    for (x = 0; x < w; x++)
-    {
-        for (y = 0; y < h; y++)
-        {
-            if (pbm_getpixel (m->bitmap, x, y))
-            {
-                left = x;
-                x = w;
-                y = h;
-            }
-        }
-    }
-    for (x = w - 1; x >= 0; x--)
-    {
-        for (y = 0; y < h; y++)
-        {
-            if (pbm_getpixel (m->bitmap, x, y))
-            {
-                right = x;
-                x = -1;
-                y = h;
-            }
-        }
-    }
-    {
-        Pixel** bitmap;
-
-        temp = *m;
-        temp.w = right - left + 1;
-        temp.h = bot - top + 1;
-
-        /* allocate the bitmap field */
-        marktype_alloc(&temp, temp.w, temp.h);
-
-        /* save the pointer */
-        bitmap = temp.bitmap;
-
-        /* copy all fields */
-        temp = *m;
-
-        /* reset the three fields we wanted to save */
-        temp.bitmap = bitmap;
-        temp.w = right - left + 1;
-        temp.h = bot - top + 1;
-    }
-
-    temp.xpos = xpos + left;
-    temp.ypos = ypos + top;
-    temp.baseline = baseline - (top);
-    temp.topline = topline - (top);
-
-    for (x = 0; x < temp.w; x++)
-    {
-        for (y = 0; y < temp.h; y++)
-            pbm_putpixel (temp.bitmap, x, y, pbm_getpixel(m->bitmap, x + left, y + top));
-    }
-
-    marktype_free(m);
-
-    if (m->name)
-    {
-        temp.name = (char*) realloc(temp.name, sizeof(char) * (strlen(m->name) + 1));
-        strcpy(temp.name, m->name);
-    }
-    marktype_calc_centroid(&temp);
-
-    *m = temp;
 }
 
 
@@ -375,118 +211,6 @@ marklistptr marklist_addcopy(marklistptr* list, marktype m)
     return marklist_add(list, d);
 }
 
-/*
- * marklist_getat, gets the mark from position [0, marklist_length-1]
- */
-marklistptr marklist_getat(marklistptr list, int pos, marktype* d)
-{
-    int count = 0;
-
-    while (list)
-    {
-        if (count == pos)
-        {
-            *d = list->data;
-            return list;
-        }
-        count++;
-        list = list->next;
-    }
-    fprintf(stderr, "marklist_getat(): access off ends of list: pos %d\n", pos);
-    /*abort ();*/
-    return nullptr;
-}
-
-
-int
-marklist_removeat(marklistptr* list, int pos)
-{
-    marklistptr c, n, p = nullptr;
-    int count = 0;
-
-    if ((pos == 0) && (*list))
-    {    /* if removing the 1st element */
-        /* change courtesy of Tim Theobald (Pegasus software) */
-        p = *list;
-        *list = (*list)->next;
-        marktype_free(&(p->data));
-        free(p);
-        return 1;
-    }
-    else
-    {
-        c = *list;
-        while (c)
-        {
-            if (count == pos)
-            {    /* two cases, no previous, >=1 previous */
-                if (p == nullptr)
-                {    /* no previous */
-                    n = c->next;
-                    marktype_free(&(c->data));
-                    free(c);
-                    c = n;
-                    return 1;
-                }
-                else
-                {
-                    /* >=1 previous */
-                    n = c->next;
-                    marktype_free(&(c->data));
-                    free(c);
-                    p->next = n;
-                    return 1;
-                }
-            }
-            count++;
-            p = c;
-            c = c->next;
-        }
-    }
-    fprintf(stderr, "marklist_removeat(): access off ends of list: pos %d\n", pos);
-    /*abort ();*/
-    return 0;            /* nothing was removed */
-}
-
-
-/* only writes out ascii form */
-void
-marktype_writeascii(FILE* fp, marktype d)
-{
-    int r, c, rows, cols;
-    int xtot = d.xcen, ytot = d.ycen;
-
-    rows = d.h;
-    cols = d.w;
-
-    /*
-     * calls calc_centroid, so the C is placed in the correct location
-     */
-    marktype_calc_centroid(&d);
-    marktype_area(&d);
-
-    fprintf(fp, "Mark: %d\n", d.symnum);
-    fprintf(fp, "Char: %s\n", (d.name == nullptr) ? "?" : d.name);
-    fprintf(fp, "Baseline: %d\n", d.baseline);
-    fprintf(fp, "Topline: %d\n", d.topline);
-    fprintf(fp, "Xpos: %d\n", d.xpos);
-    fprintf(fp, "Ypos: %d\n", d.ypos);
-    fprintf(fp, "ImageW: %d\n", d.imagew);
-    fprintf(fp, "ImageH: %d\n", d.imageh);
-    fprintf(fp, "Cols: %d Rows: %d\n", d.w, d.h);
-    for (r = 0; r < d.h; r++)
-    {
-        for (c = 0; c < d.w; c++)
-        {
-            if ((r == ytot) && (c == xtot))
-                putc (pbm_getpixel(d.bitmap, c, r) ? 'C' : '!', fp);
-            else
-                putc (pbm_getpixel(d.bitmap, c, r) ? 'X' : '.', fp);
-        }
-        putc ('\n', fp);
-    }
-}
-
 static int MAX_FS = 8192;
 
 static int bottom = 0, top = 0;
@@ -512,8 +236,7 @@ fillpostype* filla = nullptr;
     j=filla[top].y
 
 
-void
-marktype_fill_cleanup(void)
+void marktype_fill_cleanup(void)
 {
     if (filla)
     {
@@ -524,8 +247,7 @@ marktype_fill_cleanup(void)
 }
 
 
-void
-marktype_fillextract8(marktype image,
+void marktype_fillextract8(marktype image,
                       marktype* mark,
                       int i, int j, int xl, int yt,
                       unsigned int lookfor, unsigned int fillcol)
@@ -600,8 +322,7 @@ marktype_fillextract8(marktype image,
 }
 
 
-void
-marktype_fillextract4(marktype image,
+void marktype_fillextract4(marktype image,
                       marktype* mark,
                       int i, int j, int xl, int yt,
                       unsigned int lookfor, unsigned int fillcol)

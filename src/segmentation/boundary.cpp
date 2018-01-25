@@ -485,7 +485,7 @@ marktype boundary_extract_nested(marktype* image, int x, int y, int conn)
 marktype boundary_extract_non_nested(marktype* image, int x, int y, int conn)
 {
     marktype d;
-    int xl, xr, yt, yb, i, l;
+    int xl, xr, yt, yb;
     lrboundarytype lrb;
     boundarytype b;
     int p;
@@ -512,11 +512,10 @@ marktype boundary_extract_non_nested(marktype* image, int x, int y, int conn)
     d.xpos = xl;
     d.ypos = yt;
 
-    for (i = 0; i < lrb.len; i++)
+    for (int i = 0; i < lrb.len; i++)
     {
-        for (l = lrb.l[i]; l <= lrb.r[i]; l++)
+        for (int l = lrb.l[i]; l <= lrb.r[i]; l++)
         {
-
             p = pbm_getpixel (image->bitmap, l, lrb.y[i]);
             pbm_putpixel(d.bitmap, l - xl, lrb.y[i] - yt, p);
             if (p)

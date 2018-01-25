@@ -75,8 +75,6 @@ void COS_segment(
 
     C_b = (unsigned char****) alloc_vols(nh, nw, block, block,
                                          sizeof(unsigned char));
-    //gamma_b = (double**) alloc_img(nh, nw, sizeof(double));
-    //cnt_1_b = (double**) alloc_img(nh, nw, sizeof(double));
     cv::Mat gamma_b(nh, nw, CV_64FC3);
     cv::Mat cnt_1_b(nh, nw, CV_64FC3);
     thres_mmse(O_b, nh, nw, block, C_b, gamma_b, cnt_1_b);
@@ -97,9 +95,6 @@ void COS_segment(
 
     /* Free memories */
     multifree(C_b, 4);
-    //multifree(gamma_b, 2);
-    //multifree(cnt_1_b, 2);
-    //multifree(var_b, 2);
 }
 
 void make_blkseq_c(

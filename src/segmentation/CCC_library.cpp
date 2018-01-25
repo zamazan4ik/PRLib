@@ -858,8 +858,8 @@ void calc_white_edge(
         area[comp_cnt] = (double) (n->data.w) * (n->data.h) / (double) (height * width);
 
         /* Flip binary image */
-        bin_flip = (unsigned char **) alloc_img(n->data.h,
-                                                n->data.w, sizeof(unsigned char));
+        bin_flip = (unsigned char **) alloc_img(n->data.h, n->data.w, sizeof(unsigned char));
+        //cv::Mat bin_flip(n->data.h, n->data.w, CV_8UC3);
         for (i = 0; i < n->data.h; i++)
         {
             for (j = 0; j < n->data.w; j++)
@@ -867,6 +867,8 @@ void calc_white_edge(
                 if (pbm_getpixel(n->data.bitmap, j, i) == 0)
                 {
                     bin_flip[i][j] = 1;
+                    //printf("rows=%d cols=%d\ni=%d j=%d\n", bin_flip.rows, bin_flip.cols, i, j);
+                    //bin_flip.at<uchar>({j, i}) = 1;
                 }
             }
         }
@@ -880,6 +882,7 @@ void calc_white_edge(
             for (j = 0; j < n->data.w; j++)
             {
                 pbm_putpixel(im.bitmap, j, i, bin_flip[i][j]);
+                //pbm_putpixel(im.bitmap, j, i, bin_flip.at<uchar>({i, j}));
             }
         }
 
