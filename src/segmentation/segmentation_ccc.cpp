@@ -53,13 +53,12 @@ namespace prl
 
         /* Read lambda parameters and multiscale layers */
         seg_para.multi_lyr_itr = 1;
-        seg_para.lambda = (double**) alloc_img(1, 4, sizeof(double));
         // TODO: Predefined values
         //30.680974 21.939354 36.658849 56.000098
-        seg_para.lambda[0][0] = 30.680974;
-        seg_para.lambda[0][1] = 21.939354;
-        seg_para.lambda[0][2] = 36.658849;
-        seg_para.lambda[0][3] = 56.000098;
+        seg_para.lambda[0] = 30.680974;
+        seg_para.lambda[1] = 21.939354;
+        seg_para.lambda[2] = 36.658849;
+        seg_para.lambda[3] = 56.000098;
         multi_lyr_itr = seg_para.multi_lyr_itr;
 
         if (dpi <= 0 || block <= 0 || dynamic_itr_num <= 0 || multi_lyr_itr <= 0)
@@ -150,9 +149,6 @@ namespace prl
         }
 
         outputImage = outputImageBin.clone();
-
-        /* Free memories */
-        multifree(seg_para.lambda, 2);
     }
 }
 

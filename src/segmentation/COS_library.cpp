@@ -49,8 +49,6 @@ void COS_segment(
     unsigned int block, height, width, nh, nw;
     unsigned char**** O_b;
     unsigned char**** C_b;
-    double** var_b, ** gamma_b, ** cnt_1_b;
-    unsigned char** bin_msk_pad;
 
     /*** (1) Make an over-lapping block sequence from original image ***/
     /***     with padding                                            ***/
@@ -70,37 +68,38 @@ void COS_segment(
     /* Make an overlapping block sequence & calculate its variance */
     O_b = (unsigned char****) alloc_vols(nh, nw, block, block,
                                          sizeof(unsigned char));
-    var_b = (double**) alloc_img(nh, nw, sizeof(double));
+    cv::Mat var_b(nh, nw, CV_64FC3);
     make_blkseq_c(img, height, width, nh, nw, block, O_b, var_b);
 
     /*** (2) Threshold each block to get blockwise segmentation ***/
 
     C_b = (unsigned char****) alloc_vols(nh, nw, block, block,
                                          sizeof(unsigned char));
-    gamma_b = (double**) alloc_img(nh, nw, sizeof(double));
-    cnt_1_b = (double**) alloc_img(nh, nw, sizeof(double));
+    //gamma_b = (double**) alloc_img(nh, nw, sizeof(double));
+    //cnt_1_b = (double**) alloc_img(nh, nw, sizeof(double));
+    cv::Mat gamma_b(nh, nw, CV_64FC3);
+    cv::Mat cnt_1_b(nh, nw, CV_64FC3);
     thres_mmse(O_b, nh, nw, block, C_b, gamma_b, cnt_1_b);
     multifree(O_b, 4);
 
     /*** (3) Dynamic programming segmentation ***/
 
-    bin_msk_pad = (unsigned char**) alloc_img(new_height, new_width,
-                                              sizeof(unsigned char));
+    cv::Mat bin_msk_pad(new_height, new_width, CV_8UC3);
+
     dynamic_seg(C_b, gamma_b, var_b, cnt_1_b, nh, nw, seg_para, bin_msk_pad);
     for (size_t i = 0; i < height; i++)
     {
         for (size_t j = 0; j < width; j++)
         {
-            seg_para->binmsk.at<uchar>({i, j}) = bin_msk_pad[i][j];
+            seg_para->binmsk.at<uchar>({i, j}) = bin_msk_pad.at<uchar>({i, j});
         }
     }
-    multifree(bin_msk_pad, 2);
 
     /* Free memories */
     multifree(C_b, 4);
-    multifree(gamma_b, 2);
-    multifree(cnt_1_b, 2);
-    multifree(var_b, 2);
+    //multifree(gamma_b, 2);
+    //multifree(cnt_1_b, 2);
+    //multifree(var_b, 2);
 }
 
 void make_blkseq_c(
@@ -111,7 +110,7 @@ void make_blkseq_c(
         unsigned int nw,          /* i : block width */
         unsigned int block,       /* i : block size */
         unsigned char**** O_b,   /* o : output overlapping block sequence (4-D) */
-        double** var_b        /* o : variance for each block  */
+        cv::Mat& var_b        /* o : variance for each block  */
 )
 {
     /* Image is divided into a set of overlapping blocks.            */
@@ -127,7 +126,6 @@ void make_blkseq_c(
     unsigned int block_size;
     double total, total_2, val;
     std::array<double, 3> array;
-    //unsigned int cnt1, cnt2, cnt3;
 
     block_size = block * block;
     half_blk = block / 2;
@@ -173,7 +171,7 @@ void make_blkseq_c(
                 index = 2;
             }
 
-            var_b[i][j] = array[index];
+            var_b.at<double>({i, j}) = array[index];
 
             /* Set the selected color data to overlapping block sequence O_b */
             for (size_t k = 0; k < block; k++)
@@ -202,8 +200,8 @@ void thres_mmse(
         unsigned int nw,          /* i : block width */
         unsigned int block,       /* i : block size */
         unsigned char**** C_b,    /* o : output image */
-        double** gamma_b,      /* o : gamma */
-        double** cnt_1_b       /* o : # of 1's in each block */
+        cv::Mat& gamma_b,      /* o : gamma */
+        cv::Mat& cnt_1_b       /* o : # of 1's in each block */
 )
 {
     /* Each pixel in each overlapping block is segmented into         */
@@ -219,7 +217,7 @@ void thres_mmse(
         {
 
             /* Calculate smallest gamma */
-            gamma_b[i][j] = calc_min_gamma(O_b[i][j], block, &thres, &(cnt_1_b[i][j]));
+            gamma_b.at<double>({i, j}) = calc_min_gamma(O_b[i][j], block, &thres, &(cnt_1_b.at<double>({i, j})));
 
             /* Segmentation for each overlapping block */
             for (k = 0; k < block; k++)
@@ -238,7 +236,7 @@ void thres_mmse(
             }
 
             /* Calculate smallest gamma */
-            gamma_b[i][j] = calc_gamma(O_b[i][j], C_b[i][j], block, &(cnt_1_b[i][j]));
+            gamma_b.at<double>({i, j}) = calc_gamma(O_b[i][j], C_b[i][j], block, &(cnt_1_b.at<double>({i, j})));
 
         }
     }
@@ -260,9 +258,9 @@ double calc_min_gamma(
     /*      var_0 : Variance of pixels of '0'              (G1)             */
     /*      var_1 : Variance of pixels of '1'              (G2)             */
 
-    std::array<unsigned int , 256> bak;
+    std::array<unsigned int, 256> bak;
     std::array<unsigned char, 256> z;
-    std::array<unsigned int , 256> c;
+    std::array<unsigned int, 256> c;
     double G1_s1, G1_s2, G2_s1, G2_s2, total_s1, total_s2;
     int m;
     double total_num, G1_num, G2_num;
@@ -270,14 +268,11 @@ double calc_min_gamma(
     int min_index;
 
     /* Initialization */
-    for (int n = 0; n < 256; n++)
-    {
-        bak[n] = 0;  /* buffer for backet sort */
-        z[n] = 0;    /* Image value of histgram */
-        c[n] = 0;    /* # of pixels of histgram */
-    }
+    bak.fill(0);
+    z.fill(0);
+    c.fill(0);
 
-    /* backet sort */
+    /* bucket sort */
     for (int k = 0; k < block; k++)
     {
         for (int l = 0; l < block; l++)
@@ -314,7 +309,8 @@ double calc_min_gamma(
     G1_num = 0;  /* Total number of group1 (G1) */
 
     for (int t = 0; t < m; t++)
-    { /* For all possible thresholds */
+    {
+        /* For all possible thresholds */
         /* Update the total sum of G1 and G2 */
         G1_s1 = G1_s1 + z[t] * c[t];
         G1_s2 = G1_s2 + (z[t] * z[t]) * c[t];
@@ -342,13 +338,13 @@ double calc_min_gamma(
         {
             min_gamma = gamma;
             min_index = 0;
-            *cnt_1 = (double) G2_num;
+            *cnt_1 = G2_num;
         }
         else if (gamma < min_gamma)
         {
             min_gamma = gamma;
             min_index = t;
-            *cnt_1 = (double) G2_num;
+            *cnt_1 = G2_num;
         }
     }
     *thres = z[min_index];
@@ -357,13 +353,13 @@ double calc_min_gamma(
 
 void dynamic_seg(
         unsigned char**** C_b,         /* i : block binary image */
-        double** gamma_b,           /* i : gamma for each block */
-        double** var_b,             /* i : variance for each block */
-        double** cnt_1_b,           /* i : # of 1's in each block */
+        cv::Mat& gamma_b,           /* i : gamma for each block */
+        cv::Mat& var_b,             /* i : variance for each block */
+        cv::Mat& cnt_1_b,           /* i : # of 1's in each block */
         unsigned int nh,               /* i : block height */
         unsigned int nw,               /* i : block width */
         Seg_parameter* seg_para,       /* i : weight cofficient info */
-        unsigned char** bin_msk        /* o : output binary mask */
+        cv::Mat& bin_msk        /* o : output binary mask */
 )
 {
     /* Cost Optimized Segmentation with dynamic programming.                */
@@ -432,33 +428,30 @@ void horizontal_dynamic_seg
     /*         Dynamic programming is performed row by row.                    */
 
     unsigned int overlap, block;
-    unsigned int i, j, x, y, m, coarse_i, coarse_j;
+    unsigned int coarse_i, coarse_j;
     double block_num;
     double lambda1, lambda2, lambda3, lambda4;
     double cost_Vb2, cost_MSE, cost_Vb3, cost_Vb5;
     unsigned char** prev_stat;
-    double** sum_cost;
     std::array<double, 4> cost, cost_Vb1;
-    unsigned char sb, prev_sb;
     unsigned int** H_b, ** V_b, ** R_b, ** L_b, ** T_b, ** B_b;
-    double** gamma_b, ** var_b, ** cnt_1_b;
     int class_old, index;
     unsigned char old_class;
 
     /* Read parameter info */
     block = seg_para->cur_block;
-    lambda1 = seg_para->lambda[seg_para->cur_lyr_itr][0];
-    lambda2 = seg_para->lambda[seg_para->cur_lyr_itr][1];
-    lambda3 = seg_para->lambda[seg_para->cur_lyr_itr][2];
-    lambda4 = seg_para->lambda[seg_para->cur_lyr_itr][3];
+    lambda1 = seg_para->lambda/*[seg_para->cur_lyr_itr]*/[0];
+    lambda2 = seg_para->lambda/*[seg_para->cur_lyr_itr]*/[1];
+    lambda3 = seg_para->lambda/*[seg_para->cur_lyr_itr]*/[2];
+    lambda4 = seg_para->lambda/*[seg_para->cur_lyr_itr]*/[3];
 
     block_num = block * block;
     overlap = block * (block / 2);
 
     /* Read pre-computed values */
-    gamma_b = pre_dynm_comp->gamma_b;
-    var_b = pre_dynm_comp->var_b;
-    cnt_1_b = pre_dynm_comp->cnt_1_b;
+    cv::Mat gamma_b = pre_dynm_comp->gamma_b;
+    cv::Mat var_b = pre_dynm_comp->var_b;
+    cv::Mat cnt_1_b = pre_dynm_comp->cnt_1_b;
 
     /* Horizontal overlapping */
     H_b = pre_dynm_comp->H_b;
@@ -471,16 +464,16 @@ void horizontal_dynamic_seg
     /* Optimal path for dynamic programming */
     prev_stat = (unsigned char**) alloc_img(nw, 4, sizeof(unsigned char));
     /* Total cost for dynamic programming */
-    sum_cost = (double**) alloc_img(nw, 4, sizeof(double));
+    cv::Mat sum_cost(nw, 4, CV_64FC3);
 
 
     if (first_flg == FLG_FIRST)
     {
         if (seg_para->prev_S_b != nullptr)
         {
-            for (i = 0; i < nh; i++)
+            for (int i = 0; i < nh; i++)
             {
-                for (j = 0; j < nw; j++)
+                for (int j = 0; j < nw; j++)
                 {
                     coarse_i = i / MULTI_LAYER_RATE;
                     coarse_j = j / MULTI_LAYER_RATE;
@@ -498,35 +491,36 @@ void horizontal_dynamic_seg
         }
     }
 
-    for (i = 0; i < nh; i++)
+    for (size_t i = 0; i < nh; i++)
     {
         /* initialization for row dynamic programming resource */
-        for (x = 0; x < nw; x++)
+        for (size_t x = 0; x < nw; x++)
         {
-            for (y = 0; y < 4; y++)
+            for (size_t y = 0; y < 4; y++)
             {
                 prev_stat[x][y] = 0;
-                sum_cost[x][y] = 0;
+                sum_cost.at<double>({x, y}) = 0;
             }
         }
-        for (j = 0; j < nw; j++)
+        for (size_t j = 0; j < nw; j++)
         {
             /* initialization */
-            for (x = 0; x < 4; x++)
+            for (size_t x = 0; x < 4; x++)
             {
                 cost[x] = 0;
                 cost_Vb1[x] = 0;
             }
-            for (sb = 0; sb < 4; sb++)
-            { /* For 4 current classes */
+            for (size_t sb = 0; sb < 4; sb++)
+            {
+                /* For 4 current classes */
                 /* Cost3: Number of 1's in the current block */
                 if (sb == 0)
                 {
-                    cost_Vb3 = cnt_1_b[i][j];
+                    cost_Vb3 = cnt_1_b.at<double>({i, j});
                 }
                 else if (sb == 1)
                 {
-                    cost_Vb3 = block_num - cnt_1_b[i][j];
+                    cost_Vb3 = block_num - cnt_1_b.at<double>({i, j});
                 }
                 else if (sb == 2)
                 {
@@ -550,13 +544,13 @@ void horizontal_dynamic_seg
                 }
 
                 /* Cost_MSE: Variance */
-                cost_MSE = calc_MSE(sb, gamma_b[i][j], var_b[i][j]);
+                cost_MSE = calc_MSE(sb, gamma_b.at<double>({i, j}), var_b.at<double>({i, j}));
                 /* cost_MSE = cost_MSE/256.0; */
 
                 /* Cost_Vb5: # of mismatches with previous layer */
                 cost_Vb5 = calc_Vb5(pre_dynm_comp, sb, seg_para, i, j, block_num);
 
-                for (prev_sb = 0; prev_sb < 4; prev_sb++)
+                for (size_t prev_sb = 0; prev_sb < 4; prev_sb++)
                 {
                     /* For 4 previous classes */
                     cost[prev_sb] = 0;
@@ -567,7 +561,7 @@ void horizontal_dynamic_seg
                         cost_Vb1[prev_sb] = calc_Vb1(prev_sb, sb, H_b[i][j], R_b[i][j - 1],
                                                      L_b[i][j], overlap);
                         /* Total Cost */
-                        cost[prev_sb] = sum_cost[j - 1][prev_sb]
+                        cost[prev_sb] = sum_cost.at<double>({j - 1, prev_sb})
                                         + lambda1 * cost_Vb1[prev_sb] + lambda2 * cost_Vb2
                                         + lambda3 * cost_Vb3 + cost_MSE
                                         + lambda4 * cost_Vb5;
@@ -580,7 +574,7 @@ void horizontal_dynamic_seg
                 }
                 /* Find min cost & optimal path */
                 index = 0;
-                for (m = 1; m <= 3; m++)
+                for (size_t m = 1; m <= 3; m++)
                 {
                     if (cost[m] <= cost[index])
                     {
@@ -590,15 +584,15 @@ void horizontal_dynamic_seg
 
                 /* Record path */
                 prev_stat[j][sb] = index;
-                sum_cost[j][sb] = cost[index];
+                sum_cost.at<double>({j, sb}) = cost[index];
             }
         }
         /* Procedure at the end of row */
         /* Find an optimal set of classes with minimum cost in current row */
         class_old = 0;
-        for (m = 1; m <= 3; m++)
+        for (size_t m = 1; m <= 3; m++)
         {
-            if (sum_cost[nw - 1][m] < sum_cost[nw - 1][class_old])
+            if (sum_cost.at<double>({nw - 1, m}) < sum_cost.at<double>({nw - 1, class_old}))
             {
                 class_old = m;
             }
@@ -609,7 +603,7 @@ void horizontal_dynamic_seg
         {
             *change_flg = FLG_ON;
         }
-        for (x = nw - 1; x > 0; x--)
+        for (int x = nw - 1; x > 0; x--)
         {
             old_class = seg_para->S_b[i][x - 1];
             seg_para->S_b[i][x - 1] = prev_stat[x][class_old];
@@ -620,7 +614,6 @@ void horizontal_dynamic_seg
             class_old = prev_stat[x][class_old];
         }
     }
-    multifree(sum_cost, 2);
     multifree(prev_stat, 2);
 }
 
@@ -631,7 +624,7 @@ void decide_binmsk
                 unsigned int nh,                  /* i : block height */
                 unsigned int nw,                  /* i : block width */
                 unsigned char** S_b,              /* i : segmentation class */
-                unsigned char** bin_msk           /* o : binary mask */
+                cv::Mat& bin_msk           /* o : binary mask */
         )
 {
     unsigned int i, j, k, l;
@@ -654,7 +647,7 @@ void decide_binmsk
                 {
                     for (l = BlockStart; l < BlockStop; l++)
                     {
-                        bin_msk[i * BlockHalf + k][j * BlockHalf + l] = C_b[i][j][k][l];
+                        bin_msk.at<uchar>({i * BlockHalf + k, j * BlockHalf + l}) = C_b[i][j][k][l];
                     }
                 }
             }
@@ -664,7 +657,7 @@ void decide_binmsk
                 {
                     for (l = BlockStart; l < BlockStop; l++)
                     {
-                        bin_msk[i * BlockHalf + k][j * BlockHalf + l] = 1 - C_b[i][j][k][l];
+                        bin_msk.at<uchar>({i * BlockHalf + k, j * BlockHalf + l}) = 1 - C_b[i][j][k][l];
                     }
                 }
             }
@@ -674,7 +667,7 @@ void decide_binmsk
                 {
                     for (l = BlockStart; l < BlockStop; l++)
                     {
-                        bin_msk[i * BlockHalf + k][j * BlockHalf + l] = 0;
+                        bin_msk.at<uchar>({i * BlockHalf + k, j * BlockHalf + l}) = 0;
                     }
                 }
             }
@@ -684,7 +677,7 @@ void decide_binmsk
                 {
                     for (l = BlockStart; l < BlockStop; l++)
                     {
-                        bin_msk[i * BlockHalf + k][j * BlockHalf + l] = 1;
+                        bin_msk.at<uchar>({i * BlockHalf + k, j * BlockHalf + l}) = 1;
                     }
                 }
             }
@@ -702,7 +695,7 @@ void decide_binmsk
             {
                 for (l = BlockStart; l < BlockStop; l++)
                 {
-                    bin_msk[k][j * BlockHalf + l] = C_b[i][j][k][l];
+                    bin_msk.at<uchar>({k, j * BlockHalf + l}) = C_b[i][j][k][l];
                 }
             }
         }
@@ -712,7 +705,7 @@ void decide_binmsk
             {
                 for (l = BlockStart; l < BlockStop; l++)
                 {
-                    bin_msk[k][j * BlockHalf + l] = 1 - C_b[i][j][k][l];
+                    bin_msk.at<uchar>({k, j * BlockHalf + l}) = 1 - C_b[i][j][k][l];
                 }
             }
         }
@@ -722,7 +715,7 @@ void decide_binmsk
             {
                 for (l = BlockStart; l < BlockStop; l++)
                 {
-                    bin_msk[k][j * BlockHalf + l] = 0;
+                    bin_msk.at<uchar>({k, j * BlockHalf + l}) = 0;
                 }
             }
         }
@@ -732,7 +725,7 @@ void decide_binmsk
             {
                 for (l = BlockStart; l < BlockStop; l++)
                 {
-                    bin_msk[k][j * BlockHalf + l] = 1;
+                    bin_msk.at<uchar>({k, j * BlockHalf + l}) = 1;
                 }
             }
         }
@@ -748,7 +741,7 @@ void decide_binmsk
             {
                 for (l = BlockStart; l < BlockStop; l++)
                 {
-                    bin_msk[i * BlockHalf + k][j * BlockHalf + l] = C_b[i][j][k][l];
+                    bin_msk.at<uchar>({i * BlockHalf + k, j * BlockHalf + l}) = C_b[i][j][k][l];
                 }
             }
         }
@@ -758,7 +751,7 @@ void decide_binmsk
             {
                 for (l = BlockStart; l < BlockStop; l++)
                 {
-                    bin_msk[i * BlockHalf + k][j * BlockHalf + l] = 1 - C_b[i][j][k][l];
+                    bin_msk.at<uchar>({i * BlockHalf + k, j * BlockHalf + l}) = 1 - C_b[i][j][k][l];
                 }
             }
         }
@@ -768,7 +761,7 @@ void decide_binmsk
             {
                 for (l = BlockStart; l < BlockStop; l++)
                 {
-                    bin_msk[i * BlockHalf + k][j * BlockHalf + l] = 0;
+                    bin_msk.at<uchar>({i * BlockHalf + k, j * BlockHalf + l}) = 0;
                 }
             }
         }
@@ -778,7 +771,7 @@ void decide_binmsk
             {
                 for (l = BlockStart; l < BlockStop; l++)
                 {
-                    bin_msk[i * BlockHalf + k][j * BlockHalf + l] = 1;
+                    bin_msk.at<uchar>({i * BlockHalf + k, j * BlockHalf + l}) = 1;
                 }
             }
         }
@@ -794,7 +787,7 @@ void decide_binmsk
             {
                 for (l = 0; l < BlockStart; l++)
                 {
-                    bin_msk[i * BlockHalf + k][l] = C_b[i][j][k][l];
+                    bin_msk.at<uchar>({i * BlockHalf + k, l}) = C_b[i][j][k][l];
                 }
             }
         }
@@ -804,7 +797,7 @@ void decide_binmsk
             {
                 for (l = 0; l < BlockStart; l++)
                 {
-                    bin_msk[i * BlockHalf + k][l] = 1 - C_b[i][j][k][l];
+                    bin_msk.at<uchar>({i * BlockHalf + k, l}) = 1 - C_b[i][j][k][l];
                 }
             }
         }
@@ -814,7 +807,7 @@ void decide_binmsk
             {
                 for (l = 0; l < BlockStart; l++)
                 {
-                    bin_msk[i * BlockHalf + k][l] = 0;
+                    bin_msk.at<uchar>({i * BlockHalf + k, l}) = 0;
                 }
             }
         }
@@ -824,7 +817,7 @@ void decide_binmsk
             {
                 for (l = 0; l < BlockStart; l++)
                 {
-                    bin_msk[i * BlockHalf + k][l] = 1;
+                    bin_msk.at<uchar>({i * BlockHalf + k, l}) = 1;
                 }
             }
         }
@@ -840,7 +833,7 @@ void decide_binmsk
             {
                 for (l = BlockStop; l < block; l++)
                 {
-                    bin_msk[i * BlockHalf + k][j * BlockHalf + l] = C_b[i][j][k][l];
+                    bin_msk.at<uchar>({i * BlockHalf + k, j * BlockHalf + l}) = C_b[i][j][k][l];
                 }
             }
         }
@@ -850,7 +843,7 @@ void decide_binmsk
             {
                 for (l = BlockStop; l < block; l++)
                 {
-                    bin_msk[i * BlockHalf + k][j * BlockHalf + l] = 1 - C_b[i][j][k][l];
+                    bin_msk.at<uchar>({i * BlockHalf + k, j * BlockHalf + l}) = 1 - C_b[i][j][k][l];
                 }
             }
         }
@@ -860,7 +853,7 @@ void decide_binmsk
             {
                 for (l = BlockStop; l < block; l++)
                 {
-                    bin_msk[i * BlockHalf + k][j * BlockHalf + l] = 0;
+                    bin_msk.at<uchar>({i * BlockHalf + k, j * BlockHalf + l}) = 0;
                 }
             }
         }
@@ -870,7 +863,7 @@ void decide_binmsk
             {
                 for (l = BlockStop; l < block; l++)
                 {
-                    bin_msk[i * BlockHalf + k][j * BlockHalf + l] = 1;
+                    bin_msk.at<uchar>({i * BlockHalf + k, j * BlockHalf + l}) = 1;
                 }
             }
         }
@@ -886,7 +879,7 @@ void decide_binmsk
         {
             for (l = 0; l < BlockStart; l++)
             {
-                bin_msk[k][l] = C_b[i][j][k][l];
+                bin_msk.at<uchar>({k, l}) = C_b[i][j][k][l];
             }
         }
     }
@@ -896,7 +889,7 @@ void decide_binmsk
         {
             for (l = 0; l < BlockStart; l++)
             {
-                bin_msk[k][l] = 1 - C_b[i][j][k][l];
+                bin_msk.at<uchar>({k, l}) = 1 - C_b[i][j][k][l];
             }
         }
     }
@@ -906,7 +899,7 @@ void decide_binmsk
         {
             for (l = 0; l < BlockStart; l++)
             {
-                bin_msk[k][l] = 0;
+                bin_msk.at<uchar>({k, l}) = 0;
             }
         }
     }
@@ -916,7 +909,7 @@ void decide_binmsk
         {
             for (l = 0; l < BlockStart; l++)
             {
-                bin_msk[k][l] = 1;
+                bin_msk.at<uchar>({k, l}) = 1;
             }
         }
     }
@@ -931,7 +924,7 @@ void decide_binmsk
         {
             for (l = BlockStop; l < block; l++)
             {
-                bin_msk[k][j * BlockHalf + l] = C_b[i][j][k][l];
+                bin_msk.at<uchar>({k, j * BlockHalf + l}) = C_b[i][j][k][l];
             }
         }
     }
@@ -941,7 +934,7 @@ void decide_binmsk
         {
             for (l = BlockStop; l < block; l++)
             {
-                bin_msk[k][j * BlockHalf + l] = 1 - C_b[i][j][k][l];
+                bin_msk.at<uchar>({k, j * BlockHalf + l}) = 1 - C_b[i][j][k][l];
             }
         }
     }
@@ -951,7 +944,7 @@ void decide_binmsk
         {
             for (l = BlockStop; l < block; l++)
             {
-                bin_msk[k][j * BlockHalf + l] = 0;
+                bin_msk.at<uchar>({k, j * BlockHalf + l}) = 0;
             }
         }
     }
@@ -961,7 +954,7 @@ void decide_binmsk
         {
             for (l = BlockStop; l < block; l++)
             {
-                bin_msk[k][j * BlockHalf + l] = 1;
+                bin_msk.at<uchar>({k, j * BlockHalf + l}) = 1;
             }
         }
     }
@@ -976,7 +969,7 @@ void decide_binmsk
         {
             for (l = 0; l < BlockStart; l++)
             {
-                bin_msk[i * BlockHalf + k][l] = C_b[i][j][k][l];
+                bin_msk.at<uchar>({i * BlockHalf + k, l}) = C_b[i][j][k][l];
             }
         }
     }
@@ -986,7 +979,7 @@ void decide_binmsk
         {
             for (l = 0; l < BlockStart; l++)
             {
-                bin_msk[i * BlockHalf + k][l] = 1 - C_b[i][j][k][l];
+                bin_msk.at<uchar>({i * BlockHalf + k, l}) = 1 - C_b[i][j][k][l];
             }
         }
     }
@@ -996,7 +989,7 @@ void decide_binmsk
         {
             for (l = 0; l < BlockStart; l++)
             {
-                bin_msk[i * BlockHalf + k][l] = 0;
+                bin_msk.at<uchar>({i * BlockHalf + k, l}) = 0;
             }
         }
     }
@@ -1006,7 +999,7 @@ void decide_binmsk
         {
             for (l = 0; l < BlockStart; l++)
             {
-                bin_msk[i * BlockHalf + k][l] = 1;
+                bin_msk.at<uchar>({i * BlockHalf + k, l}) = 1;
             }
         }
     }
@@ -1021,7 +1014,7 @@ void decide_binmsk
         {
             for (l = BlockStop; l < block; l++)
             {
-                bin_msk[i * BlockHalf + k][j * BlockHalf + l] = C_b[i][j][k][l];
+                bin_msk.at<uchar>({i * BlockHalf + k, j * BlockHalf + l}) = C_b[i][j][k][l];
             }
         }
     }
@@ -1031,7 +1024,7 @@ void decide_binmsk
         {
             for (l = BlockStop; l < block; l++)
             {
-                bin_msk[i * BlockHalf + k][j * BlockHalf + l] = 1 - C_b[i][j][k][l];
+                bin_msk.at<uchar>({i * BlockHalf + k, j * BlockHalf + l}) = 1 - C_b[i][j][k][l];
             }
         }
     }
@@ -1041,7 +1034,7 @@ void decide_binmsk
         {
             for (l = BlockStop; l < block; l++)
             {
-                bin_msk[i * BlockHalf + k][j * BlockHalf + l] = 0;
+                bin_msk.at<uchar>({i * BlockHalf + k, j * BlockHalf + l}) = 0;
             }
         }
     }
@@ -1051,7 +1044,7 @@ void decide_binmsk
         {
             for (l = BlockStop; l < block; l++)
             {
-                bin_msk[i * BlockHalf + k][j * BlockHalf + l] = 1;
+                bin_msk.at<uchar>({i * BlockHalf + k, j * BlockHalf + l}) = 1;
             }
         }
     }
@@ -1070,21 +1063,19 @@ void cnt_ext_neighbor(
     /* For each block, count # of mismatches between a neighboring block and  */
     /* current block in horizontal & vertical direction                       */
 
-    int i, j, k, l;
-
     /* Count # of mismatches in horizontal overlapping region */
-    for (i = 0; i < nh; i++)
+    for (int i = 0; i < nh; i++)
     {
         H_b[i][0] = 0;
     }
-    for (i = 0; i < nh; i++)
+    for (int i = 0; i < nh; i++)
     {
-        for (j = 1; j < nw; j++)
+        for (int j = 1; j < nw; j++)
         {
             H_b[i][j] = 0;
-            for (k = 0; k < block; k++)
+            for (int k = 0; k < block; k++)
             {
-                for (l = 0; l < block / 2; l++)
+                for (int l = 0; l < block / 2; l++)
                 {
                     H_b[i][j] = H_b[i][j] + (C_b[i][j - 1][k][block / 2 + l] != C_b[i][j][k][l]);
                 }
@@ -1093,18 +1084,18 @@ void cnt_ext_neighbor(
     }
 
     /* Count # of mismatches in vertical overlapping region */
-    for (j = 0; j < nw; j++)
+    for (int j = 0; j < nw; j++)
     {
         V_b[0][j] = 0;
     }
-    for (i = 1; i < nh; i++)
+    for (int i = 1; i < nh; i++)
     {
-        for (j = 0; j < nw; j++)
+        for (int j = 0; j < nw; j++)
         {
             V_b[i][j] = 0;
-            for (k = 0; k < block / 2; k++)
+            for (int k = 0; k < block / 2; k++)
             {
-                for (l = 0; l < block; l++)
+                for (int l = 0; l < block; l++)
                 {
                     V_b[i][j] = V_b[i][j] + (C_b[i - 1][j][block / 2 + k][l] != C_b[i][j][k][l]);
                 }
@@ -1225,7 +1216,7 @@ double calc_Vb2(
         unsigned int** V_b,           /* i : # of mismatches in vertical direction */
         unsigned int** B_b,           /* i : # of 1's in bottom half */
         unsigned int** T_b,           /* i : # of 1's in top half */
-        double** var_b,           /* i : variance of previous block */
+        cv::Mat& var_b,           /* i : variance of previous block */
         unsigned int num,             /* i : # of overlap */
         unsigned int i,               /* i : ith row in block */
         unsigned int j,               /* i : jth column in block */

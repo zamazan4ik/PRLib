@@ -106,7 +106,6 @@ void multiscale_seg(unsigned char*** img_sRGB, cv::Mat& bin_msk, Seg_parameter* 
 
     seg_para->cur_block = seg_para->max_block;
     seg_para->prev_S_b = nullptr;
-    //seg_para->prev_binmsk = nullptr;
 
     for (int L = multi_lyr_itr - 1, cur_lyr_itr = 0; L >= 0; L--, cur_lyr_itr++)
     {
@@ -130,7 +129,6 @@ void multiscale_seg(unsigned char*** img_sRGB, cv::Mat& bin_msk, Seg_parameter* 
         if (L != multi_lyr_itr - 1)
         {
             multifree(seg_para->prev_S_b, 2);
-            //multifree(seg_para->prev_binmsk, 2);
         }
         if (L == 0)
         {
@@ -142,7 +140,6 @@ void multiscale_seg(unsigned char*** img_sRGB, cv::Mat& bin_msk, Seg_parameter* 
                     bin_msk.at<uchar>({i, j}) = seg_para->binmsk.at<uchar>({i, j});
                 }
             }
-            //multifree(seg_para->binmsk, 2);
         }
         else
         {

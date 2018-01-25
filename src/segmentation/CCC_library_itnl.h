@@ -56,8 +56,7 @@ void Addtail(CC_clist newlist, CC_clist **pstart, CC_clist **pen);
 CC_clist Removehead(CC_clist **pstart, CC_clist **pend);
 
 void calc_white_edge(marklistptr list, std::vector<double>& white_cc_edge, std::vector<double>& black_cc_edge, std::vector<double>& area_list, unsigned int height, unsigned int width,
-unsigned char ***input_img, cv::Mat& bin_msk,
-char flg_bound);
+cv::Mat& bin_msk, char flg_bound);
 void calc_white_cc(marklistptr list, std::vector<double>& white_cc_pxl_list,
                           std::vector<unsigned int>& cnt_white,
 unsigned int height, unsigned int width, unsigned char ***input_img, 

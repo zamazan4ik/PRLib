@@ -648,7 +648,6 @@ void calc_edge
             tmp2 = 0.0;
         }
         edge_std2[i] = std::sqrt(tmp2);
-
     }
 }
 
@@ -666,7 +665,6 @@ void calc_boundary_length_cc(
 
     int bound_cnt;
     char **bin;
-    int i, j;
     int inner_i, inner_j, outer_i, outer_j;
     int axis_i1, axis_i2, axis_j1, axis_j2;
     int startx, starty;
@@ -675,9 +673,9 @@ void calc_boundary_length_cc(
     bound_cnt = 0;
 
     /* Make padding */
-    for (i = 0; i < n->data.h; i++)
+    for (int i = 0; i < n->data.h; i++)
     {
-        for (j = 0; j < n->data.w; j++)
+        for (int j = 0; j < n->data.w; j++)
         {
             bin[i + 1][j + 1] = pbm_getpixel(n->data.bitmap, j, i);
         }
@@ -686,9 +684,9 @@ void calc_boundary_length_cc(
     /* Extract edges */
     startx = n->data.xpos; /* column */
     starty = n->data.ypos; /* row */
-    for (i = -1; i < n->data.h; i++)
+    for (int i = -1; i < n->data.h; i++)
     {
-        for (j = -1; j < n->data.w; j++)
+        for (int j = -1; j < n->data.w; j++)
         {
             if (bin[i + 1][j + 1] != bin[i + 2][j + 1])
             {
@@ -832,7 +830,6 @@ void calc_white_edge(
         std::vector<double>& area,           /* o : area of black cc */
         unsigned int height,   /* i : original image height */
         unsigned int width,    /* i : original image width */
-        unsigned char ***input_img,   /* i : input image (color) */
         cv::Mat& bin_msk,      /* i : binary mask */
         char flg_bound          /* i : FLG_BOUND of FLG_ORIGINAL */
 )
@@ -1384,7 +1381,7 @@ void flip_reversed_cc(
 
     std::vector<double> white_cc_edge_list(comp_num), black_cc_edge_list(comp_num), area_list(comp_num);
     calc_white_edge(list, white_cc_edge_list, black_cc_edge_list, area_list,
-                    height, width, input_img, bin_msk, FLG_BOUND);
+                    height, width, bin_msk, FLG_BOUND);
 
     for (i = 0; i < comp_num; i++)
     {

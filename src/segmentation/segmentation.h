@@ -14,6 +14,8 @@
 
 #define MULTI_LAYER_RATE 2
 
+#include <array>
+
 #include <opencv2/core/core.hpp>
 
 /***************************************************/
@@ -21,7 +23,7 @@
 /***************************************************/
 typedef struct
 {
-    double** lambda;
+    std::array<double, 4> lambda;
     unsigned int height; /* image height */
     unsigned int width;  /* image width */
     unsigned int min_block;  /* minimum block size */
@@ -33,10 +35,8 @@ typedef struct
 
     /* Temporary storage for multi-layer segmentation */
     unsigned char** S_b;      /* class of current layer */
-    //unsigned char** binmsk;   /* binary mask of current layer */
     cv::Mat binmsk;
     unsigned char** prev_S_b; /* class of previous coarser layer */
-    //unsigned char** prev_binmsk; /* binary mask of previous layer */
     cv::Mat prev_binmsk;
     unsigned int cur_block;   /* current block size for multi-layer seg */
     unsigned int prev_nh;
