@@ -46,10 +46,12 @@ int main(int argc, char**argv)
     }*/
 
     cv::Mat inputImage = cv::imread(inputImageFilename);
-    cv::Mat outputImage;
+    std::vector<cv::Mat> outputImage;
 
-    prl::segmentation_ccc(inputImage, outputImage);
+    prl::segmentMRC(inputImage, outputImage);
 
-    cv::imwrite(outputImageFilename, outputImage);
+    cv::imwrite("text.png", outputImage[0]);
+    cv::imwrite("fg.png", outputImage[1]);
+    cv::imwrite("bg.png", outputImage[2]);
 }
 

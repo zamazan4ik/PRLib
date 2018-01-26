@@ -6,24 +6,19 @@
 #include <cmath>
 #include <ctime>
 #include <exception>
+#include <vector>
 
 #include <opencv2/imgproc/imgproc.hpp>
 
 
-#include "getopt.h"
 #include "allocate.h"
 #include "Main_def.h"
 #include "segmentation.h"
 
 
-
-
-/* Internal function declaration */
-//static void usage(void);
-
 namespace prl
 {
-    void segmentation_ccc(const cv::Mat& inputImage, cv::Mat& outputImage)
+    void segmentation_ccc(const cv::Mat& inputImage, std::vector<cv::Mat>& outputImages)
     {
         if (inputImage.channels() != 3)
         {
@@ -148,7 +143,135 @@ namespace prl
             }
         }
 
-        outputImage = outputImageBin.clone();
+
+        //! Fill layers
+        //! 1) Text layer
+        //! 2) Foreground layer
+        //! 3) Background layer
+
+        outputImages.resize(3);
+
+        cv::threshold(outputImageBin, outputImageBin, 0, 255, CV_THRESH_BINARY | CV_THRESH_OTSU);
+
+        outputImages[0] = outputImageBin.clone();
+
+        inputImage.copyTo(outputImages[1], 255 - outputImageBin);
+        outputImages[1].setTo(cv::Scalar(255, 255, 255), outputImageBin);
+        inputImage.copyTo(outputImages[2], outputImageBin);
+        outputImages[2].setTo(cv::Scalar(255, 255, 255), 255 - outputImageBin);
     }
+
+    cv::Vec3b findMedianColor(const cv::Mat& fgImage, const cv::Mat& textImage)
+    {
+        std::vector<int> red, green, blue;
+        std::vector<int> result;
+
+        //Collect color values
+        for (int i = 0; i < fgImage.rows; i++)
+        {
+            for (int j = 0; j < fgImage.cols; j++)
+            {
+                if (textImage.at<uchar>(j, i) == 0)
+                {
+                    red.push_back(fgImage.at<cv::Vec3b>(j, i)[2]);
+                    green.push_back(fgImage.at<cv::Vec3b>(j, i)[1]);
+                    blue.push_back(fgImage.at<cv::Vec3b>(j, i)[0]);
+                }
+            }
+        }
+
+        const int VECTOR_SIZE = red.size();
+
+        //Sort values
+        std::sort(red.begin(), red.end());
+        std::sort(green.begin(), green.end());
+        std::sort(blue.begin(), blue.end());
+
+        int redInt, blueInt, greenInt;
+
+        //Get median value for each colour channel
+        redInt = VECTOR_SIZE % 2 != 0 ? red.at(std::floor(VECTOR_SIZE / 2)) :
+                 (red.at(VECTOR_SIZE / 2) + red.at((VECTOR_SIZE / 2) - 1)) / 2;
+        greenInt = VECTOR_SIZE % 2 != 0 ? green.at(std::floor(VECTOR_SIZE / 2)) :
+                   (green.at(VECTOR_SIZE / 2) + green.at((VECTOR_SIZE / 2) - 1)) / 2;
+        blueInt = VECTOR_SIZE % 2 != 0 ? blue.at(std::floor(VECTOR_SIZE / 2)) :
+                  (blue.at(VECTOR_SIZE / 2) + blue.at((VECTOR_SIZE / 2) - 1)) / 2;
+
+        return {blueInt, greenInt, redInt};
+    }
+
+    void reduceTo64Colors(cv::Mat& inputImage, const cv::Mat& textImage)
+    {
+        for (int i = 0; i < inputImage.rows; i++)
+        {
+            for (int j = 0; j < inputImage.cols; j++)
+            {
+                // operator XXXXXXXX & 11000000 equivalent to  XXXXXXXX AND 11000000 (=192)
+                // operator 01000000 >> 2 is a 2-bit shift to the right = 00010000
+                if(textImage.at<uchar>(j, i) == 0)
+                {
+                    for (int k = 0; k < inputImage.channels(); ++k)
+                    {
+                        inputImage.at<cv::Vec3b>(j, i)[k] &= 192;
+                    }
+                }
+            }
+        }
+    }
+
+    void ForegroundOptimize(cv::Mat& fgImage, const cv::Mat& textImage)
+    {
+        // TODO: Possibly we should disable it for quality reason
+        //! Reduce colormap
+        reduceTo64Colors(fgImage, textImage);
+
+        //! Found median color
+        auto medianColor = findMedianColor(fgImage, textImage);
+
+        //! Fill with median color
+        for (int i = 0; i < fgImage.rows; i++)
+        {
+            for (int j = 0; j < fgImage.cols; j++)
+            {
+                if(textImage.at<uchar>(j, i) != 0)
+                {
+                    fgImage.at<cv::Vec3b>(j, i) = medianColor;
+                }
+            }
+        }
+    }
+
+    void BackgroundOptimization(cv::Mat& bgImage, const cv::Mat& textImage)
+    {
+
+    }
+
+    void segmentMRC(const cv::Mat& inputImage, std::vector<cv::Mat>& outputImages)
+    {
+        std::vector<cv::Mat> layers;
+
+        //! Get layers
+        segmentation_ccc(inputImage, layers);
+
+        //! Optimize foreground filling
+        //ForegroundOptimize(layers[MRC_Layers::Foreground], layers[MRC_Layers::Text]);
+
+        //BackgroundOptimization(layers[MRC_Layers::Background], layers[MRC_Layers::Text]);
+
+        const bool isDownsamplingRequired = true;
+        //TODO: Play with downsampling coefficients
+        const double foregroundRatio = 2.0, backgroundRatio = 2.0;
+
+        if(isDownsamplingRequired)
+        {
+            //! Downsample foreground layer
+            cv::resize(layers[MRC_Layers::Foreground], layers[MRC_Layers::Foreground], cv::Size(), 1.0 / foregroundRatio, 1.0 / foregroundRatio, cv::InterpolationFlags::INTER_CUBIC);
+            //! Downsample background layer
+            cv::resize(layers[MRC_Layers::Background], layers[MRC_Layers::Background], cv::Size(), 1.0 / backgroundRatio, 1.0 / backgroundRatio, cv::InterpolationFlags::INTER_CUBIC);
+        }
+
+        outputImages = layers;
+    }
+
 }
 

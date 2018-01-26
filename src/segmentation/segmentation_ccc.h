@@ -25,10 +25,14 @@
 #ifndef PRLIB_Segmentation_Lepton_h
 #define PRLIB_Segmentation_Lepton_h
 
+#include <vector>
+
 #include <opencv2/core/core.hpp>
 
 namespace prl
 {
+
+    enum MRC_Layers {Text = 0, Foreground, Background};
 /*!
  * \brief Normalize background.
  * \param[in] inputImage Input image.
@@ -37,7 +41,8 @@ namespace prl
  * \note Implementation of this procedure is based on
  * <a href="http://www.leptonica.com/">Leptonica library</a>..
  */
-    CV_EXPORTS void segmentation_ccc(const cv::Mat& inputImage, cv::Mat& outputImage);
+    CV_EXPORTS void segmentation_ccc(const cv::Mat& inputImage, std::vector<cv::Mat>& outputImage);
+    CV_EXPORTS void segmentMRC(const cv::Mat& inputImage, std::vector<cv::Mat>& outputImages);
 }
 
 #endif // PRLIB_Segmentation_Lepton_h
