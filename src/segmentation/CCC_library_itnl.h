@@ -66,9 +66,9 @@ void reverse_cc(unsigned char **input_bin, unsigned char **bin_img,
 unsigned int height, unsigned int width, unsigned char  **flip_bin, 
 unsigned char **rem_bin);
 void Region_growing(CC_pixel s, unsigned char** bin_msk, unsigned char **out_bin, int width, int height);
-void Region_growing_cnt(CC_pixel s, unsigned char** bin_msk, unsigned char **out_bin, int width, int height, unsigned int* cnt);
+void Region_growing_cnt(CC_pixel s, unsigned char** bin_msk, cv::Mat& out_bin, int width, int height, unsigned int* cnt);
 void ConnectedNeighbors_UCHAR(CC_pixel s, unsigned char** bin_msk,
-int width, int height, int* M, CC_pixel c[4]);
+int width, int height, int* M, std::array<CC_pixel,4>& c);
 
 void record_corner( marklistptr n, Corner_info *corner_info);
 void flip_reversed_cc( unsigned char ***input_img, cv::Mat& bin_msk, unsigned int height, unsigned int width);

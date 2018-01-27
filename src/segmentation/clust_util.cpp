@@ -36,7 +36,7 @@
 #include "alloc_util.h"
 
 
-void I_InitSigSet(struct SigSet* S)
+void I_InitSigSet(SigSet* S)
 {
     S->nbands = 0;
     S->nclasses = 0;

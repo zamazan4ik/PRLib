@@ -47,8 +47,8 @@
  */
 
 void CCC_segment(
-        unsigned char ***input_img, /* i : input image */
-        Seg_parameter *seg_para     /* io : segmentation parameters */
+        unsigned char*** input_img, /* i : input image */
+        Seg_parameter* seg_para     /* io : segmentation parameters */
 )
 {
     marktype im;
@@ -56,11 +56,11 @@ void CCC_segment(
     marklistptr n;
     unsigned int cnt, comp_num, comp_cnt;
     short startx, starty;
-    double **vector, **feataug;
+    double** vector, ** feataug;
     int ret;
     double text_cost, non_text_cost;
-    double **ll;
-    Nei_header *neighbors;
+    double** ll;
+    Nei_header* neighbors;
     Pixel_pos hw;
     Dist_para dis_para;
     std::array<double, 2> map;
@@ -170,7 +170,7 @@ void CCC_segment(
     /*             Feature vector calculation                         */
     /******************************************************************/
     /* Allocate memories for feature vector */
-    vector = (double **) alloc_img(comp_num, FEAT_DIM, sizeof(double));
+    vector = (double**) alloc_img(comp_num, FEAT_DIM, sizeof(double));
     make_feat(list, comp_num, height, width, input_img, bin_msk, vector);
 
 
@@ -178,7 +178,7 @@ void CCC_segment(
     /*             MAP optimization for segmentation                  */
     /******************************************************************/
     /****** Calculate data term ******/
-    ll = (double **) alloc_img(comp_num, 2, sizeof(double));
+    ll = (double**) alloc_img(comp_num, 2, sizeof(double));
     std::vector<int> clus(comp_num);
 
     if (seg_para->cur_lyr_itr == seg_para->multi_lyr_itr - 1)
@@ -214,7 +214,7 @@ void CCC_segment(
     find_neighbors(list, &hw, neighbors);
 
     /* Calculate feature vector with augments */
-    feataug = (double **) alloc_img(comp_num, FEATAUG_DIM, sizeof(double));
+    feataug = (double**) alloc_img(comp_num, FEATAUG_DIM, sizeof(double));
     make_feataug(comp_num, vector, neighbors, feataug);
     multifree(vector, 2);
 
@@ -328,19 +328,19 @@ void cnt_boundary_length(
 void alloc_edge_memory(
         std::vector<int>& bound_list,                 /* i : boundary list */
         unsigned int comp_num,             /* i : # of components */
-        unsigned char ****edge_ptr        /* o : pointer to edge list */
+        unsigned char**** edge_ptr        /* o : pointer to edge list */
 )
 {
-    unsigned char ***edge;
+    unsigned char*** edge;
 
-    edge = (unsigned char ***) alloc_array(3, sizeof(unsigned char **));
+    edge = (unsigned char***) alloc_array(3, sizeof(unsigned char**));
     for (size_t k = 0; k < 3; k++)
     {
-        edge[k] = (unsigned char **) alloc_array(comp_num, sizeof(unsigned char *));
+        edge[k] = (unsigned char**) alloc_array(comp_num, sizeof(unsigned char*));
         for (size_t i = 0; i < comp_num; i++)
         {
-            edge[k][i] = (unsigned char *) alloc_array(bound_list[i],
-                                                       sizeof(unsigned char));
+            edge[k][i] = (unsigned char*) alloc_array(bound_list[i],
+                                                      sizeof(unsigned char));
         }
     }
     *edge_ptr = edge;
@@ -349,10 +349,10 @@ void alloc_edge_memory(
 void free_edge_memory(
         std::vector<int>& bound_list,                 /* i : boundary list */
         unsigned int comp_num,             /* i : # of components */
-        unsigned char ***edge             /* i : pointer to edge list */
+        unsigned char*** edge             /* i : pointer to edge list */
 )
 {
-    unsigned char *edge_comp;
+    unsigned char* edge_comp;
 
     for (int k = 0; k < 3; k++)
     {
@@ -370,18 +370,18 @@ void calc_boundary
         (
                 marklistptr list,             /* i : conncected component list */
                 std::vector<int>& bound_list,      /* i : boundary list */
-                unsigned char ***inner_edge, /* o : inner edge */
-                unsigned char ***outer_edge, /* o : outer edge */
+                unsigned char*** inner_edge, /* o : inner edge */
+                unsigned char*** outer_edge, /* o : outer edge */
                 int height,                  /* i : image height */
                 int width,                   /* i : image width */
-                unsigned char ***input_img_c, /* i : input color image */
+                unsigned char*** input_img_c, /* i : input color image */
                 cv::Mat& bin_msk       /* i : binary mask */
         )
 {
     marklistptr n;
     int comp_cnt, bound_cnt;
     int i, j, k, x, y;
-    char **bin;
+    char** bin;
     int starty, startx, inner_i, inner_j, outer_i, outer_j;
     int axis_x, axis_y, axis_i1, axis_i2, axis_j1, axis_j2;
     char max_flg;
@@ -395,10 +395,7 @@ void calc_boundary
 
     while (n != nullptr)
     {
-/*
-printf("======= comp # is %d ======\n",comp_cnt);
-*/
-        bin = (char **) alloc_img(n->data.h + 2, n->data.w + 2, sizeof(char));
+        bin = (char**) alloc_img(n->data.h + 2, n->data.w + 2, sizeof(char));
         bound_cnt = 0;
 
         /* Make padding */
@@ -496,9 +493,6 @@ printf("======= comp # is %d ======\n",comp_cnt);
 
                         inner_edge[k][comp_cnt][bound_cnt] = inner;
                         outer_edge[k][comp_cnt][bound_cnt] = outer;
-/*
-          printf("inner = %f outer = %f\n",inner, outer);
-*/
                     }
                     bound_cnt++;
                 }
@@ -594,8 +588,8 @@ void calc_edge
         (
                 std::vector<int>& bound_list,      /* i : boundary list */
                 unsigned int comp_num,        /* i : # of cc */
-                unsigned char ***inner_edge, /* i : inner edge */
-                unsigned char ***outer_edge, /* i : outer edge */
+                unsigned char*** inner_edge, /* i : inner edge */
+                unsigned char*** outer_edge, /* i : outer edge */
                 std::vector<double>& edge_depth,   /* o : edge depth */
                 std::vector<double>& edge_std,     /* o : std of edge depth */
                 std::vector<double>& edge_std2,    /* o : std of edge depth */
@@ -656,7 +650,7 @@ void calc_boundary_length_cc(
         marklistptr n,         /* i : a conncected component list */
         unsigned int height,
         unsigned int width,
-        int *length     /* o : boundary length for the component */
+        int* length     /* o : boundary length for the component */
 )
 {
 /************************************************************
@@ -664,12 +658,12 @@ void calc_boundary_length_cc(
  ************************************************************/
 
     int bound_cnt;
-    char **bin;
+    char** bin;
     int inner_i, inner_j, outer_i, outer_j;
     int axis_i1, axis_i2, axis_j1, axis_j2;
     int startx, starty;
 
-    bin = (char **) alloc_img(n->data.h + 2, n->data.w + 2, sizeof(char));
+    bin = (char**) alloc_img(n->data.h + 2, n->data.w + 2, sizeof(char));
     bound_cnt = 0;
 
     /* Make padding */
@@ -762,8 +756,8 @@ void calc_boundary_length_cc(
 
 CC_clist Removehead
         (
-                CC_clist **pstart,
-                CC_clist **pend
+                CC_clist** pstart,
+                CC_clist** pend
         )
 {
     CC_clist ret;
@@ -798,14 +792,14 @@ CC_clist Removehead
 
 void Addtail(
         CC_clist newlist,
-        CC_clist **pstart,
-        CC_clist **pend
+        CC_clist** pstart,
+        CC_clist** pend
 )
 {
-    CC_clist *ptr;
+    CC_clist* ptr;
 
     /* Memory allocation */
-    ptr = (CC_clist *) malloc(sizeof(CC_clist));
+    ptr = (CC_clist*) malloc(sizeof(CC_clist));
 
     if (*pend)
     {/* If que is not empty */
@@ -843,7 +837,7 @@ void calc_white_edge(
     int Startx, Starty, axis_i, axis_j;
     int i, j, x, y;
     marklistptr wlist;
-    unsigned char **bin_flip;
+    unsigned char** bin_flip;
     unsigned int comp_cnt;
     char break_flg;
     int length, total_edge_cnt;
@@ -858,7 +852,7 @@ void calc_white_edge(
         area[comp_cnt] = (double) (n->data.w) * (n->data.h) / (double) (height * width);
 
         /* Flip binary image */
-        bin_flip = (unsigned char **) alloc_img(n->data.h, n->data.w, sizeof(unsigned char));
+        bin_flip = (unsigned char**) alloc_img(n->data.h, n->data.w, sizeof(unsigned char));
         //cv::Mat bin_flip(n->data.h, n->data.w, CV_8UC3);
         for (i = 0; i < n->data.h; i++)
         {
@@ -942,7 +936,7 @@ void calc_white_edge(
         if (flg_bound == FLG_BOUND)
         {
             tmp = 2 * ((double) corner_info.lowerright.row - corner_info.upperleft.row + 1) +
-                  +2 * ((double) corner_info.lowerright.col - corner_info.upperleft.col + 1);
+                  + 2 * ((double) corner_info.lowerright.col - corner_info.upperleft.col + 1);
             black_cc_edge[comp_cnt] = tmp;
         }
         else
@@ -964,7 +958,7 @@ void calc_white_cc(
         std::vector<unsigned int>& cnt_white, /* o : # of white cc */
         unsigned int height,    /* i : original image height */
         unsigned int width,     /* i : original image width */
-        unsigned char ***input_img,   /* i : input image (color) */
+        unsigned char*** input_img,   /* i : input image (color) */
         cv::Mat& bin_msk       /* i : binary mask */
 )
 {
@@ -977,7 +971,7 @@ void calc_white_cc(
     int Startx, Starty, axis_i, axis_j;
     int i, j, x, y;
     marklistptr wlist;
-    unsigned char **bin_flip;
+    unsigned char** bin_flip;
     unsigned int comp_cnt, b_pixel_cnt, w_pixel_cnt, tmp_pxl_cnt, w_cc_cnt;
     char break_flg;
 
@@ -988,8 +982,8 @@ void calc_white_cc(
         b_pixel_cnt = 0;
 
         /* Flip binary image */
-        bin_flip = (unsigned char **) alloc_img(n->data.h,
-                                                n->data.w, sizeof(unsigned char));
+        bin_flip = (unsigned char**) alloc_img(n->data.h,
+                                               n->data.w, sizeof(unsigned char));
         for (i = 0; i < n->data.h; i++)
         {
             for (j = 0; j < n->data.w; j++)
@@ -1075,27 +1069,25 @@ void calc_white_cc(
 }
 
 void reverse_cc(
-        unsigned char **input_bin,        /* i : cc binary mask */
-        unsigned char **bin_img,          /* i : org binary mask */
+        unsigned char** input_bin,        /* i : cc binary mask */
+        unsigned char** bin_img,          /* i : org binary mask */
         unsigned int height,                /* i : height */
         unsigned int width,                 /* i : width */
-        unsigned char **flip_bin,         /* o : reversed binary mask */
-        unsigned char **rem_bin           /* o : reversed binary mask */
+        unsigned char** flip_bin,         /* o : reversed binary mask */
+        unsigned char** rem_bin           /* o : reversed binary mask */
 )
 {
 /*********************************************************************
  *     Reverse the input binary mask.
  *********************************************************************/
-    int i, j;
     CC_pixel seed;
     unsigned int b_pxl_cnt = 0;
     unsigned int cnt;
-    unsigned char **tmp_bin;
 
     /* Count black pixel number */
-    for (i = 0; i < height; i++)
+    for (int i = 0; i < height; i++)
     {
-        for (j = 0; j < width; j++)
+        for (int j = 0; j < width; j++)
         {
             if (input_bin[i][j] == 1)
             {
@@ -1105,9 +1097,9 @@ void reverse_cc(
     }
 
     /* Flip the original binary image */
-    for (i = 0; i < height; i++)
+    for (int i = 0; i < height; i++)
     {
-        for (j = 0; j < width; j++)
+        for (int j = 0; j < width; j++)
         {
             if (bin_img[i][j] == 0)
             {
@@ -1121,9 +1113,9 @@ void reverse_cc(
     }
 
     /* Detect boundary pixels by region-growing */
-    for (i = 0; i < height; i++)
+    for (int i = 0; i < height; i++)
     {
-        for (j = 0; j < width; j++)
+        for (int j = 0; j < width; j++)
         {
             if (i != 0 && i != height - 1 && j != 0 && j != width - 1)
             {
@@ -1143,19 +1135,18 @@ void reverse_cc(
     }
 
     /* Detect large redundancy by region-growing */
-    tmp_bin = (unsigned char **) alloc_img(height, width,
-                                           sizeof(unsigned char));
-    for (i = 0; i < height; i++)
+    cv::Mat tmp_bin(height, width, CV_8UC3);
+    for (int i = 0; i < height; i++)
     {
-        for (j = 0; j < width; j++)
+        for (int j = 0; j < width; j++)
         {
-            tmp_bin[i][j] = rem_bin[i][j];
+            tmp_bin.at<uchar>({i, j}) = rem_bin[i][j];
         }
     }
 
-    for (i = 0; i < height; i++)
+    for (int i = 0; i < height; i++)
     {
-        for (j = 0; j < width; j++)
+        for (int j = 0; j < width; j++)
         {
             if (rem_bin[i][j] == 0)
             {
@@ -1173,25 +1164,23 @@ void reverse_cc(
             }
         }
     }
-    multifree(tmp_bin, 2);
-
 }
 
 
 void Region_growing
         (
                 CC_pixel s,              /* i : seed pixels */
-                unsigned char **bin_msk,        /* i : input binary mask */
-                unsigned char **out_msk,        /* o : detected region map */
+                unsigned char** bin_msk,        /* i : input binary mask */
+                unsigned char** out_msk,        /* o : detected region map */
                 int width,
                 int height
         )
 {
-    CC_clist *pstart;
-    CC_clist *pend;
+    CC_clist* pstart;
+    CC_clist* pend;
     CC_clist data;
-    CC_clist tmp[4];
-    CC_pixel neigh[4];
+    std::array<CC_clist, 4> tmp;
+    std::array<CC_pixel, 4> neigh;
     int M, i;
 
     /* Initialization */
@@ -1219,7 +1208,7 @@ void Region_growing
         ConnectedNeighbors_UCHAR(data.pixels, bin_msk, width, height,
                                  &M, neigh);
 
-        for (i = 0; i < M; i++)
+        for (int i = 0; i < M; i++)
         {
             tmp[i].pixels = neigh[i];
             tmp[i].pnext = nullptr;
@@ -1232,22 +1221,22 @@ void Region_growing
                 out_msk[tmp[i].pixels.m][tmp[i].pixels.n] = 1;
             }
         }
-    }/* while */
+    }
 }
 
 void ConnectedNeighbors_UCHAR
         (
                 CC_pixel s,
-                unsigned char **bin_msk,
+                unsigned char** bin_msk,
                 int width,
                 int height,
-                int *M,
-                CC_pixel c[4]
+                int* M,
+                std::array<CC_pixel, 4>& c
         )
 {
     int count = 0;
     int s1, s2, i, pixel_i, pixel_j;
-    CC_pixel neighbor[4];
+    std::array<CC_pixel, 4> neighbor;
 
     /* current pixel */
     s1 = s.m;
@@ -1255,8 +1244,7 @@ void ConnectedNeighbors_UCHAR
 
     if ((s1 < 0) || (s1 > height) || (s2 < 0) || (s2 > width))
     {
-        fprintf(stderr, "Arguments error\n");
-        fprintf(stderr, "Pixel s is out of range.\n");
+        throw std::invalid_argument("Pixel s is out of range");
     }
 
     neighbor[0].m = s1 - 1;
@@ -1268,7 +1256,7 @@ void ConnectedNeighbors_UCHAR
     neighbor[3].m = s1;
     neighbor[3].n = s2 + 1;
 
-    for (i = 0; i < 4; i++)
+    for (int i = 0; i < 4; i++)
     {
         pixel_i = neighbor[i].m;
         pixel_j = neighbor[i].n;
@@ -1288,7 +1276,7 @@ void ConnectedNeighbors_UCHAR
 
 void record_corner(
         marklistptr n,           /* i : connected component list */
-        Corner_info *corner_info /* io: updated corner information */
+        Corner_info* corner_info /* io: updated corner information */
 )
 {
     int lowerrightrow, lowerrightcol;
@@ -1329,18 +1317,18 @@ void record_corner(
 
 
 void flip_reversed_cc(
-        unsigned char ***input_img,
+        unsigned char*** input_img,
         cv::Mat& bin_msk,
         unsigned int height,
         unsigned int width
 )
 {
-    unsigned char **bin_msk_r, **bin_flip, **bin_input, **bin_img, **rem_bin;
+    unsigned char** bin_msk_r, ** bin_flip, ** bin_input, ** bin_img, ** rem_bin;
     marktype im;
     marklistptr list = nullptr;
     marklistptr n;
     unsigned int i, j;
-    double **vector;
+    double** vector;
     unsigned int comp_num, comp_cnt;
     short startx, starty;
 
@@ -1380,7 +1368,7 @@ void flip_reversed_cc(
     /*             Feature vector calculation                         */
     /******************************************************************/
     /* Allocate memories for feature vector */
-    vector = (double **) alloc_img(comp_num, 4, sizeof(double));
+    vector = (double**) alloc_img(comp_num, 4, sizeof(double));
 
     std::vector<double> white_cc_edge_list(comp_num), black_cc_edge_list(comp_num), area_list(comp_num);
     calc_white_edge(list, white_cc_edge_list, black_cc_edge_list, area_list,
@@ -1431,7 +1419,7 @@ void flip_reversed_cc(
     /******************************************************************/
     /*             Reverese flipped text                              */
     /******************************************************************/
-    bin_msk_r = (unsigned char **) alloc_img(height, width, sizeof(char));
+    bin_msk_r = (unsigned char**) alloc_img(height, width, sizeof(char));
     for (i = 0; i < height; i++)
     {
         for (j = 0; j < width; j++)
@@ -1473,14 +1461,14 @@ void flip_reversed_cc(
         {
 
             /* Flip text component */
-            bin_flip = (unsigned char **) alloc_img(n->data.h, n->data.w,
+            bin_flip = (unsigned char**) alloc_img(n->data.h, n->data.w,
+                                                   sizeof(unsigned char));
+            bin_input = (unsigned char**) alloc_img(n->data.h, n->data.w,
                                                     sizeof(unsigned char));
-            bin_input = (unsigned char **) alloc_img(n->data.h, n->data.w,
-                                                     sizeof(unsigned char));
-            bin_img = (unsigned char **) alloc_img(n->data.h, n->data.w,
-                                                   sizeof(unsigned char));
-            rem_bin = (unsigned char **) alloc_img(n->data.h, n->data.w,
-                                                   sizeof(unsigned char));
+            bin_img = (unsigned char**) alloc_img(n->data.h, n->data.w,
+                                                  sizeof(unsigned char));
+            rem_bin = (unsigned char**) alloc_img(n->data.h, n->data.w,
+                                                  sizeof(unsigned char));
 
             for (i = 0; i < n->data.h; i++)
             {
@@ -1540,12 +1528,12 @@ void make_feat(
         unsigned int comp_num,      /* i : # of component */
         unsigned int height,
         unsigned int width,
-        unsigned char ***input_img, /* i : input image */
+        unsigned char*** input_img, /* i : input image */
         cv::Mat& bin_msk,    /* i : binary mask */
-        double **vector             /* o : feature vector */
+        double** vector             /* o : feature vector */
 )
 {
-    unsigned char ***inner_edge, ***outer_edge;
+    unsigned char*** inner_edge, *** outer_edge;
     unsigned int i;
 
     /* Count length of boundary for each component */
@@ -1557,7 +1545,7 @@ void make_feat(
     alloc_edge_memory(bound_list, comp_num, &outer_edge);
 
     calc_boundary(list, bound_list, inner_edge, outer_edge,
-                  height, width, (unsigned char ***) input_img, bin_msk);
+                  height, width, (unsigned char***) input_img, bin_msk);
 
     std::vector<double> edge_depth(comp_num), edge_std(comp_num),
             edge_std2(comp_num), edge_max(comp_num), edge_min(comp_num);
@@ -1662,13 +1650,6 @@ unsigned int Partition
 
         if (i < j)
         {
-            //tempf = array[i];
-            //tempi = index[i];
-            //array[i] = array[j];
-            //index[i] = index[j];
-            //array[j] = tempf;
-            //index[j] = tempi;
-
             std::swap(array[i], array[j]);
             std::swap(index[i], index[j]);
         }
@@ -1682,18 +1663,18 @@ unsigned int Partition
 void Region_growing_cnt
         (
                 CC_pixel s,              /* i : seed pixels */
-                unsigned char **bin_msk,        /* i : input binary mask */
-                unsigned char **out_msk,        /* o : detected region map */
+                unsigned char** bin_msk,        /* i : input binary mask */
+                cv::Mat& out_msk,        /* o : detected region map */
                 int width,
                 int height,
-                unsigned int *count          /* o : number of pixels */
+                unsigned int* count          /* o : number of pixels */
         )
 {
-    CC_clist *pstart;
-    CC_clist *pend;
+    CC_clist* pstart;
+    CC_clist* pend;
     CC_clist data;
-    CC_clist tmp[4];
-    CC_pixel neigh[4];
+    std::array<CC_clist, 4> tmp;
+    std::array<CC_pixel,4> neigh;
     int M, i;
     unsigned int cnt = 0;
 
@@ -1709,7 +1690,8 @@ void Region_growing_cnt
     Addtail(data, &pstart, &pend);
     cnt++;
 
-    out_msk[data.pixels.m][data.pixels.n] = 1;
+    //out_msk[data.pixels.m][data.pixels.n] = 1;
+    out_msk.at<uchar>({data.pixels.m, data.pixels.n}) = 1;
 
     while (pstart)
     {
@@ -1720,21 +1702,22 @@ void Region_growing_cnt
         data = Removehead(&pstart, &pend);
 
         /* Find neighboring pixels */
-        ConnectedNeighbors_UCHAR(data.pixels, bin_msk, width, height,
-                                 &M, neigh);
+        ConnectedNeighbors_UCHAR(data.pixels, bin_msk, width, height, &M, neigh);
 
-        for (i = 0; i < M; i++)
+        for (int i = 0; i < M; i++)
         {
             tmp[i].pixels = neigh[i];
             tmp[i].pnext = nullptr;
 
             /* If neighboring pixel is not inspected yet */
-            if (out_msk[tmp[i].pixels.m][tmp[i].pixels.n] == 0)
+            //if (out_msk[tmp[i].pixels.m][tmp[i].pixels.n] == 0)
+            if (out_msk.at<uchar>({tmp[i].pixels.m, tmp[i].pixels.n}) == 0)
             {
                 /* Add pixel to cc check list */
                 Addtail(tmp[i], &pstart, &pend);
                 cnt++;
-                out_msk[tmp[i].pixels.m][tmp[i].pixels.n] = 1;
+                //out_msk[tmp[i].pixels.m][tmp[i].pixels.n] = 1;
+                out_msk.at<uchar>({tmp[i].pixels.m, tmp[i].pixels.n}) = 1;
             }
         }
     }/* while */

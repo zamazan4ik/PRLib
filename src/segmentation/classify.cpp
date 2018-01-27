@@ -60,8 +60,6 @@ void eigen(
 
 static void LogLikelihood_init(struct SigSet* S);
 
-int G_ludcmp(double** a, int n, int* indx, double* d);
-
 int invert(
         double** a, /* input/output matrix */
         int n  /* dimension */
@@ -165,8 +163,8 @@ void LogLikelihood(
 )
 {
     //int m;               /* class index */
-    int k;               /* subclass index */
-    int b1, b2;           /* spectral index */
+    //int k;               /* subclass index */
+    //int b1, b2;           /* spectral index */
     int max_nsubclasses; /* maximum number of subclasses */
     int nbands;          /* number of spectral bands */
     //double* subll;        /* log likelihood of subclasses */
@@ -198,18 +196,18 @@ void LogLikelihood(
         C = &(S->classSig[m]);
 
         /* compute log likelihood for each subclass */
-        for (k = 0; k < C->nsubclasses; k++)
+        for (int k = 0; k < C->nsubclasses; k++)
         {
             SubS = &(C->subSig[k]);
             subll[k] = SubS->cnst;
-            for (b1 = 0; b1 < nbands; b1++)
+            for (int b1 = 0; b1 < nbands; b1++)
             {
                 diff[b1] = vector[b1] - SubS->means[b1];
                 subll[k] -= 0.5 * diff[b1] * diff[b1] * SubS->Rinv[b1][b1];
             }
-            for (b1 = 0; b1 < nbands; b1++)
+            for (int b1 = 0; b1 < nbands; b1++)
             {
-                for (b2 = b1 + 1; b2 < nbands; b2++)
+                for (int b2 = b1 + 1; b2 < nbands; b2++)
                 {
                     subll[k] -= diff[b1] * diff[b2] * SubS->Rinv[b1][b2];
                 }
@@ -225,7 +223,7 @@ void LogLikelihood(
         else
         {
             /* find the most likely subclass */
-            for (k = 0; k < C->nsubclasses; k++)
+            for (int k = 0; k < C->nsubclasses; k++)
             {
                 if (k == 0)
                 { maxlike = subll[k]; }
@@ -235,7 +233,7 @@ void LogLikelihood(
 
             /* Sum weighted subclass likelihoods */
             subsum = 0;
-            for (k = 0; k < C->nsubclasses; k++)
+            for (int k = 0; k < C->nsubclasses; k++)
             {
                 subsum += std::exp(subll[k] - maxlike) * C->subSig[k].pi;
             }
@@ -251,7 +249,7 @@ void LogLikelihood(
 }
 
 
-void LogLikelihood_init(struct SigSet* S)
+void LogLikelihood_init(SigSet* S)
 {
     int nbands;
     ClassSig* C;
@@ -302,7 +300,7 @@ void LogLikelihood_init(struct SigSet* S)
             SubS->cnst = (-nbands / 2.0) * std::log(2 * PI);
             for (int b1 = 0; b1 < nbands; b1++)
             {
-                SubS->cnst += -0.5 * log(lambda[b1]);
+                SubS->cnst += -0.5 * std::log(lambda[b1]);
             }
 
             /* Precomputes the inverse of tex->R */
@@ -310,4 +308,3 @@ void LogLikelihood_init(struct SigSet* S)
         }
     }
 }
-
