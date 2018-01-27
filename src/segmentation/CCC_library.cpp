@@ -1070,11 +1070,11 @@ void calc_white_cc(
 
 void reverse_cc(
         cv::Mat& input_bin,        /* i : cc binary mask */
-        unsigned char** bin_img,          /* i : org binary mask */
+        cv::Mat& bin_img,          /* i : org binary mask */
         unsigned int height,                /* i : height */
         unsigned int width,                 /* i : width */
-        unsigned char** flip_bin,         /* o : reversed binary mask */
-        unsigned char** rem_bin           /* o : reversed binary mask */
+        cv::Mat& flip_bin,         /* o : reversed binary mask */
+        cv::Mat& rem_bin           /* o : reversed binary mask */
 )
 {
 /*********************************************************************
@@ -1101,13 +1101,13 @@ void reverse_cc(
     {
         for (int j = 0; j < width; j++)
         {
-            if (bin_img[i][j] == 0)
+            if (bin_img.at<uchar>({i, j}) == 0)
             {
-                flip_bin[i][j] = 1;
+                flip_bin.at<uchar>({i, j}) = 1;
             }
             else
             {
-                flip_bin[i][j] = 0;
+                flip_bin.at<uchar>({i, j}) = 0;
             }
         }
     }
@@ -1140,7 +1140,7 @@ void reverse_cc(
     {
         for (int j = 0; j < width; j++)
         {
-            tmp_bin.at<uchar>({i, j}) = rem_bin[i][j];
+            tmp_bin.at<uchar>({i, j}) = rem_bin.at<uchar>({i, j});
         }
     }
 
@@ -1148,7 +1148,7 @@ void reverse_cc(
     {
         for (int j = 0; j < width; j++)
         {
-            if (rem_bin[i][j] == 0)
+            if (rem_bin.at<uchar>({i, j}) == 0)
             {
                 /* Pick a seed */
                 if (input_bin.at<uchar>({i, j}) == 0)
@@ -1171,7 +1171,7 @@ void Region_growing
         (
                 CC_pixel s,              /* i : seed pixels */
                 cv::Mat& bin_msk,        /* i : input binary mask */
-                unsigned char** out_msk,        /* o : detected region map */
+                cv::Mat& out_msk,        /* o : detected region map */
                 int width,
                 int height
         )
@@ -1194,7 +1194,7 @@ void Region_growing
     /* Add a seed pixel to cc check list */
     Addtail(data, &pstart, &pend);
 
-    out_msk[data.pixels.m][data.pixels.n] = 1;
+    out_msk.at<uchar>({data.pixels.m, data.pixels.n}) = 1;
 
     while (pstart)
     {
@@ -1213,11 +1213,11 @@ void Region_growing
             tmp[i].pnext = nullptr;
 
             /* If neighboring pixel is not inspected yet */
-            if (out_msk[tmp[i].pixels.m][tmp[i].pixels.n] == 0)
+            if (out_msk.at<uchar>({tmp[i].pixels.m, tmp[i].pixels.n}) == 0)
             {
                 /* Add pixel to cc check list */
                 Addtail(tmp[i], &pstart, &pend);
-                out_msk[tmp[i].pixels.m][tmp[i].pixels.n] = 1;
+                out_msk.at<uchar>({tmp[i].pixels.m, tmp[i].pixels.n}) = 1;
             }
         }
     }
@@ -1321,7 +1321,7 @@ void flip_reversed_cc(
         unsigned int width
 )
 {
-    unsigned char** bin_msk_r, ** bin_flip, ** bin_img, ** rem_bin;
+    unsigned char** bin_msk_r;
     marktype im;
     marklistptr list = nullptr;
     marklistptr n;
@@ -1453,21 +1453,16 @@ void flip_reversed_cc(
         {
 
             /* Flip text component */
-            bin_flip = (unsigned char**) alloc_img(n->data.h, n->data.w,
-                                                   sizeof(unsigned char));
-            //bin_input = (unsigned char**) alloc_img(n->data.h, n->data.w,
-            //                                       sizeof(unsigned char));
+            cv::Mat bin_flip(n->data.h, n->data.w, CV_8UC3);
             cv::Mat bin_input(n->data.h, n->data.w, CV_8UC3);
-            bin_img = (unsigned char**) alloc_img(n->data.h, n->data.w,
-                                                  sizeof(unsigned char));
-            rem_bin = (unsigned char**) alloc_img(n->data.h, n->data.w,
-                                                  sizeof(unsigned char));
+            cv::Mat bin_img(n->data.h, n->data.w, CV_8UC3);
+            cv::Mat rem_bin(n->data.h, n->data.w, CV_8UC3);
 
             for (int i = 0; i < n->data.h; i++)
             {
                 for (int j = 0; j < n->data.w; j++)
                 {
-                    bin_img[i][j] = bin_msk.at<uchar>({starty + i, startx + j});
+                    bin_img.at<uchar>({i, j}) = bin_msk.at<uchar>({starty + i, startx + j});
                 }
             }
 
@@ -1483,22 +1478,17 @@ void flip_reversed_cc(
             }
 
             reverse_cc(bin_input, bin_img, n->data.h, n->data.w, bin_flip, rem_bin);
-            //multifree(bin_input, 2);
-            multifree(bin_img, 2);
 
             for (int i = 0; i < n->data.h; i++)
             {
                 for (int j = 0; j < n->data.w; j++)
                 {
-                    if (rem_bin[i][j] == 0)
+                    if (rem_bin.at<uchar>({i, j}) == 0)
                     {
-                        bin_msk_r[starty + i][startx + j] = bin_flip[i][j];
+                        bin_msk_r[starty + i][startx + j] = bin_flip.at<uchar>({i, j});
                     }
                 }
             }
-
-            multifree(bin_flip, 2);
-            multifree(rem_bin, 2);
         }
         n = n->next;
         comp_cnt++;
@@ -1682,7 +1672,6 @@ void Region_growing_cnt
     Addtail(data, &pstart, &pend);
     cnt++;
 
-    //out_msk[data.pixels.m][data.pixels.n] = 1;
     out_msk.at<uchar>({data.pixels.m, data.pixels.n}) = 1;
 
     while (pstart)
@@ -1702,17 +1691,15 @@ void Region_growing_cnt
             tmp[i].pnext = nullptr;
 
             /* If neighboring pixel is not inspected yet */
-            //if (out_msk[tmp[i].pixels.m][tmp[i].pixels.n] == 0)
             if (out_msk.at<uchar>({tmp[i].pixels.m, tmp[i].pixels.n}) == 0)
             {
                 /* Add pixel to cc check list */
                 Addtail(tmp[i], &pstart, &pend);
                 cnt++;
-                //out_msk[tmp[i].pixels.m][tmp[i].pixels.n] = 1;
                 out_msk.at<uchar>({tmp[i].pixels.m, tmp[i].pixels.n}) = 1;
             }
         }
-    }/* while */
+    }
     *count = cnt;
 }
 
