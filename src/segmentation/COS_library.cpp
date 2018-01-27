@@ -378,7 +378,7 @@ void dynamic_seg(
     pre_dynm_comp.C_b = C_b;
 
     /* Dynamic programming */
-    calc_overlap_bet_layer(seg_para, &pre_dynm_comp, block, nh, nw);
+    calc_overlap_bet_layer(seg_para, &pre_dynm_comp, nh, nw);
     calc_overlap_pxl(&pre_dynm_comp, block, nh, nw);
     for (int K = 0; K < dynamic_itr_num; K++)
     {
@@ -1331,11 +1331,7 @@ double calc_MSE(
     {
         cost = gam_b;
     }
-    else if (sb_cur == 2)
-    {
-        cost = var_b;
-    }
-    else if (sb_cur == 3)
+    else if (sb_cur == 2 || sb_cur == 3)
     {
         cost = var_b;
     }
@@ -1442,7 +1438,7 @@ double calc_Vb5(
         cost = blocksize - pre_dynm_comp->prev_cnt_1[i][j];
     }
 
-    return ((double) cost / blocksize);
+    return (double) cost / blocksize;
 
 }
 
@@ -1501,7 +1497,6 @@ void calc_overlap_bet_layer
         (
                 Seg_parameter* seg_para,       /* i : segmentation parameters */
                 Pre_dynm_para* pre_dynm_comp,  /* io : precomputed values */
-                unsigned int block,
                 unsigned int nh,              /* i : block height */
                 unsigned int nw               /* i : block width */
         )
@@ -1543,7 +1538,7 @@ void cnt_mismatch_bet_layer(
         unsigned int** prev_cnt_1   /* o : # of 1 pixels on previous layer */
 )
 {
-    double cost, mismatch, rev_mismatch, cnt_one;
+    double mismatch, rev_mismatch, cnt_one;
     unsigned int half_block, block;
     unsigned int prev_value, pos_i, pos_j;
 

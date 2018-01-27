@@ -79,8 +79,7 @@ void calc_overlap_pxl(Pre_dynm_para *pre_dynm_comp, unsigned int block, unsigned
 void free_overlap_pxl(Pre_dynm_para *pre_dynm_comp);
 
 void calc_overlap_bet_layer( Seg_parameter *seg_para,
- Pre_dynm_para *pre_dynm_comp, unsigned int  block, unsigned int  nh,
-  unsigned int  nw);
+ Pre_dynm_para *pre_dynm_comp, unsigned int  nh, unsigned int  nw);
 
 void free_overlap_bet_layer(Pre_dynm_para *pre_dynm_comp);
 void cnt_mismatch_bet_layer(Seg_parameter *seg_para,

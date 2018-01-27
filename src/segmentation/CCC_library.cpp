@@ -1069,7 +1069,7 @@ void calc_white_cc(
 }
 
 void reverse_cc(
-        unsigned char** input_bin,        /* i : cc binary mask */
+        cv::Mat& input_bin,        /* i : cc binary mask */
         unsigned char** bin_img,          /* i : org binary mask */
         unsigned int height,                /* i : height */
         unsigned int width,                 /* i : width */
@@ -1089,7 +1089,7 @@ void reverse_cc(
     {
         for (int j = 0; j < width; j++)
         {
-            if (input_bin[i][j] == 1)
+            if (input_bin.at<uchar>({i, j}) == 1)
             {
                 b_pxl_cnt++;
             }
@@ -1122,7 +1122,7 @@ void reverse_cc(
                 continue;
             }
             /* Pick a seed */
-            if (input_bin[i][j] == 1)
+            if (input_bin.at<uchar>({i, j}) == 1)
             {
                 continue;
             }
@@ -1151,7 +1151,7 @@ void reverse_cc(
             if (rem_bin[i][j] == 0)
             {
                 /* Pick a seed */
-                if (input_bin[i][j] == 0)
+                if (input_bin.at<uchar>({i, j}) == 0)
                 {
                     seed.m = i;
                     seed.n = j;
@@ -1170,7 +1170,7 @@ void reverse_cc(
 void Region_growing
         (
                 CC_pixel s,              /* i : seed pixels */
-                unsigned char** bin_msk,        /* i : input binary mask */
+                cv::Mat& bin_msk,        /* i : input binary mask */
                 unsigned char** out_msk,        /* o : detected region map */
                 int width,
                 int height
@@ -1181,7 +1181,7 @@ void Region_growing
     CC_clist data;
     std::array<CC_clist, 4> tmp;
     std::array<CC_pixel, 4> neigh;
-    int M, i;
+    int M;
 
     /* Initialization */
     pstart = nullptr;
@@ -1205,8 +1205,7 @@ void Region_growing
         data = Removehead(&pstart, &pend);
 
         /* Find neighboring pixels */
-        ConnectedNeighbors_UCHAR(data.pixels, bin_msk, width, height,
-                                 &M, neigh);
+        ConnectedNeighbors_UCHAR(data.pixels, bin_msk, width, height, &M, neigh);
 
         for (int i = 0; i < M; i++)
         {
@@ -1227,7 +1226,7 @@ void Region_growing
 void ConnectedNeighbors_UCHAR
         (
                 CC_pixel s,
-                unsigned char** bin_msk,
+                cv::Mat& bin_msk,
                 int width,
                 int height,
                 int* M,
@@ -1235,7 +1234,7 @@ void ConnectedNeighbors_UCHAR
         )
 {
     int count = 0;
-    int s1, s2, i, pixel_i, pixel_j;
+    int s1, s2, pixel_i, pixel_j;
     std::array<CC_pixel, 4> neighbor;
 
     /* current pixel */
@@ -1263,7 +1262,7 @@ void ConnectedNeighbors_UCHAR
         if ((pixel_i >= 0) && (pixel_i <= height - 1)
             && (pixel_j >= 0) && (pixel_j <= width - 1))
         {
-            if (bin_msk[pixel_i][pixel_j] == bin_msk[s1][s2])
+            if (bin_msk.at<uchar>({pixel_i, pixel_j}) == bin_msk.at<uchar>({s1, s2}))
             {
                 c[count] = neighbor[i];
                 count++;
@@ -1312,7 +1311,6 @@ void record_corner(
             corner_info->lowerright.col = lowerrightcol;
         }
     }
-
 }
 
 
@@ -1323,11 +1321,10 @@ void flip_reversed_cc(
         unsigned int width
 )
 {
-    unsigned char** bin_msk_r, ** bin_flip, ** bin_input, ** bin_img, ** rem_bin;
+    unsigned char** bin_msk_r, ** bin_flip, ** bin_img, ** rem_bin;
     marktype im;
     marklistptr list = nullptr;
     marklistptr n;
-    unsigned int i, j;
     double** vector;
     unsigned int comp_num, comp_cnt;
     short startx, starty;
@@ -1339,9 +1336,9 @@ void flip_reversed_cc(
     marktype_alloc(&im, width, height);
 
     /* Conversion from 8bpp to 1bpp (pbm) */
-    for (i = 0; i < height; i++)
+    for (int i = 0; i < height; i++)
     {
-        for (j = 0; j < width; j++)
+        for (int j = 0; j < width; j++)
         {
             pbm_putpixel(im.bitmap, j, i, bin_msk.at<uchar>({i, j}));
         }
@@ -1374,7 +1371,7 @@ void flip_reversed_cc(
     calc_white_edge(list, white_cc_edge_list, black_cc_edge_list, area_list,
                     height, width, bin_msk, FLG_BOUND);
 
-    for (i = 0; i < comp_num; i++)
+    for (int i = 0; i < comp_num; i++)
     {
         vector[i][0] = white_cc_edge_list[i] / black_cc_edge_list[i];
         vector[i][1] = area_list[i];
@@ -1386,7 +1383,7 @@ void flip_reversed_cc(
     calc_white_cc(list, white_cc_pxl_list, cnt_white,
                   height, width, input_img, bin_msk);
 
-    for (i = 0; i < comp_num; i++)
+    for (int i = 0; i < comp_num; i++)
     {
         vector[i][2] = white_cc_pxl_list[i];
         vector[i][3] = (double) cnt_white[i];
@@ -1397,14 +1394,9 @@ void flip_reversed_cc(
     /******************************************************************/
     std::vector<int> clus(comp_num);
 
-    for (i = 0; i < comp_num; i++)
+    for (int i = 0; i < comp_num; i++)
     {
-/*
-    if ( (  vector[i][0] > 1.0 && vector[i][1] < 0.1 && vector[i][2] < 0.5 
-         &&  vector[i][3] > 5 ) )
-*/
-        if ((vector[i][2] < 0.5
-             && vector[i][3] > 8))
+        if (vector[i][2] < 0.5 && vector[i][3] > 8)
         {
             clus[i] = 0;
         }
@@ -1420,9 +1412,9 @@ void flip_reversed_cc(
     /*             Reverese flipped text                              */
     /******************************************************************/
     bin_msk_r = (unsigned char**) alloc_img(height, width, sizeof(char));
-    for (i = 0; i < height; i++)
+    for (int i = 0; i < height; i++)
     {
-        for (j = 0; j < width; j++)
+        for (int j = 0; j < width; j++)
         {
             bin_msk_r[i][j] = 0;
         }
@@ -1436,9 +1428,9 @@ void flip_reversed_cc(
         starty = n->data.ypos;
         if (clus[comp_cnt] == 1)
         {
-            for (i = 0; i < n->data.h; i++)
+            for (int i = 0; i < n->data.h; i++)
             {
-                for (j = 0; j < n->data.w; j++)
+                for (int j = 0; j < n->data.w; j++)
                 {
                     if (pbm_getpixel(n->data.bitmap, j, i) == 1)
                     {
@@ -1463,39 +1455,40 @@ void flip_reversed_cc(
             /* Flip text component */
             bin_flip = (unsigned char**) alloc_img(n->data.h, n->data.w,
                                                    sizeof(unsigned char));
-            bin_input = (unsigned char**) alloc_img(n->data.h, n->data.w,
-                                                    sizeof(unsigned char));
+            //bin_input = (unsigned char**) alloc_img(n->data.h, n->data.w,
+            //                                       sizeof(unsigned char));
+            cv::Mat bin_input(n->data.h, n->data.w, CV_8UC3);
             bin_img = (unsigned char**) alloc_img(n->data.h, n->data.w,
                                                   sizeof(unsigned char));
             rem_bin = (unsigned char**) alloc_img(n->data.h, n->data.w,
                                                   sizeof(unsigned char));
 
-            for (i = 0; i < n->data.h; i++)
+            for (int i = 0; i < n->data.h; i++)
             {
-                for (j = 0; j < n->data.w; j++)
+                for (int j = 0; j < n->data.w; j++)
                 {
                     bin_img[i][j] = bin_msk.at<uchar>({starty + i, startx + j});
                 }
             }
 
-            for (i = 0; i < n->data.h; i++)
+            for (int i = 0; i < n->data.h; i++)
             {
-                for (j = 0; j < n->data.w; j++)
+                for (int j = 0; j < n->data.w; j++)
                 {
                     if (pbm_getpixel(n->data.bitmap, j, i) == 1)
                     {
-                        bin_input[i][j] = 1;
+                        bin_input.at<uchar>({i, j}) = 1;
                     }
                 }
             }
 
             reverse_cc(bin_input, bin_img, n->data.h, n->data.w, bin_flip, rem_bin);
-            multifree(bin_input, 2);
+            //multifree(bin_input, 2);
             multifree(bin_img, 2);
 
-            for (i = 0; i < n->data.h; i++)
+            for (int i = 0; i < n->data.h; i++)
             {
-                for (j = 0; j < n->data.w; j++)
+                for (int j = 0; j < n->data.w; j++)
                 {
                     if (rem_bin[i][j] == 0)
                     {
@@ -1510,9 +1503,9 @@ void flip_reversed_cc(
         n = n->next;
         comp_cnt++;
     }
-    for (i = 0; i < height; i++)
+    for (int i = 0; i < height; i++)
     {
-        for (j = 0; j < width; j++)
+        for (int j = 0; j < width; j++)
         {
             bin_msk.at<uchar>({i, j}) = bin_msk_r[i][j];
         }
@@ -1534,7 +1527,6 @@ void make_feat(
 )
 {
     unsigned char*** inner_edge, *** outer_edge;
-    unsigned int i;
 
     /* Count length of boundary for each component */
     std::vector<int> bound_list(comp_num);
@@ -1545,14 +1537,14 @@ void make_feat(
     alloc_edge_memory(bound_list, comp_num, &outer_edge);
 
     calc_boundary(list, bound_list, inner_edge, outer_edge,
-                  height, width, (unsigned char***) input_img, bin_msk);
+                  height, width, input_img, bin_msk);
 
     std::vector<double> edge_depth(comp_num), edge_std(comp_num),
             edge_std2(comp_num), edge_max(comp_num), edge_min(comp_num);
     calc_edge(bound_list, comp_num, inner_edge, outer_edge, edge_depth,
               edge_std, edge_std2, edge_max, edge_min);
 
-    for (i = 0; i < comp_num; i++)
+    for (int i = 0; i < comp_num; i++)
     {
         vector[i][0] = edge_depth[i];
         vector[i][1] = edge_max[i] - edge_min[i];
@@ -1663,7 +1655,7 @@ unsigned int Partition
 void Region_growing_cnt
         (
                 CC_pixel s,              /* i : seed pixels */
-                unsigned char** bin_msk,        /* i : input binary mask */
+                cv::Mat& bin_msk,        /* i : input binary mask */
                 cv::Mat& out_msk,        /* o : detected region map */
                 int width,
                 int height,
@@ -1675,7 +1667,7 @@ void Region_growing_cnt
     CC_clist data;
     std::array<CC_clist, 4> tmp;
     std::array<CC_pixel,4> neigh;
-    int M, i;
+    int M;
     unsigned int cnt = 0;
 
     /* Initialization */
