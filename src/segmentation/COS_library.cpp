@@ -420,7 +420,7 @@ void horizontal_dynamic_seg
     double cost_Vb2, cost_MSE, cost_Vb3, cost_Vb5;
     unsigned char** prev_stat;
     std::array<double, 4> cost, cost_Vb1;
-    unsigned int ** V_b, ** R_b, ** L_b, ** T_b, ** B_b;
+    unsigned int ** R_b, ** L_b, ** T_b, ** B_b;
     int class_old, index;
     unsigned char old_class;
 
@@ -441,7 +441,7 @@ void horizontal_dynamic_seg
 
     /* Horizontal overlapping */
     cv::Mat H_b = pre_dynm_comp->H_b;
-    V_b = pre_dynm_comp->V_b;
+    cv::Mat V_b = pre_dynm_comp->V_b;
     R_b = pre_dynm_comp->R_b;
     L_b = pre_dynm_comp->L_b;
     T_b = pre_dynm_comp->T_b;
@@ -1043,7 +1043,7 @@ void cnt_ext_neighbor(
         unsigned int nw,          /* i : Block width */
         unsigned int block,       /* i : Block size */
         cv::Mat& H_b,       /* o : # of mismatches in horizontal overlap */
-        unsigned int** V_b        /* o : # of mismatches in vertical overlap */
+        cv::Mat& V_b        /* o : # of mismatches in vertical overlap */
 )
 {
     /* For each block, count # of mismatches between a neighboring block and  */
@@ -1075,18 +1075,18 @@ void cnt_ext_neighbor(
     /* Count # of mismatches in vertical overlapping region */
     for (int j = 0; j < nw; j++)
     {
-        V_b[0][j] = 0;
+        V_b.at<unsigned int>({0, j}) = 0;
     }
     for (int i = 1; i < nh; i++)
     {
         for (int j = 0; j < nw; j++)
         {
-            V_b[i][j] = 0;
+            V_b.at<unsigned int>({i, j}) = 0;
             for (int k = 0; k < block / 2; k++)
             {
                 for (int l = 0; l < block; l++)
                 {
-                    V_b[i][j] = V_b[i][j] + (C_b[i - 1][j][block / 2 + k][l] != C_b[i][j][k][l]);
+                    V_b.at<unsigned int>({i, j}) = V_b.at<unsigned int>({i, j}) + (C_b[i - 1][j][block / 2 + k][l] != C_b[i][j][k][l]);
                 }
             }
         }
@@ -1202,7 +1202,7 @@ double calc_Vb1(
 double calc_Vb2(
         unsigned char sb_cur,        /* i : current class */
         Seg_parameter* seg_para,     /* i : previous class */
-        unsigned int** V_b,           /* i : # of mismatches in vertical direction */
+        cv::Mat& V_b,           /* i : # of mismatches in vertical direction */
         unsigned int** B_b,           /* i : # of 1's in bottom half */
         unsigned int** T_b,           /* i : # of 1's in top half */
         cv::Mat& var_b,           /* i : variance of previous block */
@@ -1229,11 +1229,11 @@ double calc_Vb2(
 
         if ((sb_prev_above == 0 && sb_cur == 0) || (sb_prev_above == 1 && sb_cur == 1))
         {
-            cost_above = V_b[i][j];
+            cost_above = V_b.at<unsigned int>({i, j});
         }
         else if ((sb_prev_above == 0 && sb_cur == 1) || (sb_prev_above == 1 && sb_cur == 0))
         {
-            cost_above = num - V_b[i][j];
+            cost_above = num - V_b.at<unsigned int>({i, j});
         }
         else if ((sb_prev_above == 0 && sb_cur == 2) || (sb_prev_above == 1 && sb_cur == 3))
         {
@@ -1272,11 +1272,11 @@ double calc_Vb2(
 
             if ((sb_prev_below == 0 && sb_cur == 0) || (sb_prev_below == 1 && sb_cur == 1))
             {
-                cost_below = V_b[i + 1][j];
+                cost_below = V_b.at<unsigned int>({i + 1, j});
             }
             else if ((sb_prev_below == 0 && sb_cur == 1) || (sb_prev_below == 1 && sb_cur == 0))
             {
-                cost_below = num - V_b[i + 1][j];
+                cost_below = num - V_b.at<unsigned int>({i + 1, j});
             }
             else if ((sb_prev_below == 0 && sb_cur == 2) || (sb_prev_below == 1 && sb_cur == 3))
             {
@@ -1444,7 +1444,7 @@ void calc_overlap_pxl
                 unsigned int nw               /* i : block width */
         )
 {
-    unsigned int** V_b, ** R_b, ** L_b, ** T_b, ** B_b;
+    unsigned int** R_b, ** L_b, ** T_b, ** B_b;
     unsigned char**** C_b;
 
     /* Read pre-computed values */
@@ -1454,7 +1454,8 @@ void calc_overlap_pxl
     /* Horizontal overlapping */
     cv::Mat H_b(nh, nw, CV_32SC3);
     /* Vertical   overlapping */
-    V_b = (unsigned int**) alloc_img(nh, nw, sizeof(unsigned int));
+    cv::Mat V_b(nh, nw, CV_32SC3);
+    //V_b = (unsigned int**) alloc_img(nh, nw, sizeof(unsigned int));
     /* # of 1's in Right  half */
     R_b = (unsigned int**) alloc_img(nh, nw, sizeof(unsigned int));
     /* # of 1's in Left   half */
@@ -1479,7 +1480,7 @@ void calc_overlap_pxl
 void free_overlap_pxl(Pre_dynm_para* pre_dynm_comp   /* i : precomputed values */)
 {
     /* free memory */
-    multifree(pre_dynm_comp->V_b, 2);
+    //multifree(pre_dynm_comp->V_b, 2);
     multifree(pre_dynm_comp->R_b, 2);
     multifree(pre_dynm_comp->L_b, 2);
     multifree(pre_dynm_comp->T_b, 2);
