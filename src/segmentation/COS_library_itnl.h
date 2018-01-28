@@ -26,7 +26,7 @@ typedef struct
     //unsigned int **H_b;
     cv::Mat H_b;
     cv::Mat V_b;
-    unsigned int **R_b;
+    cv::Mat R_b;
     unsigned int **L_b;
     unsigned int **T_b;
     unsigned int **B_b;
@@ -56,7 +56,7 @@ void dynamic_seg(unsigned char ****C_b, cv::Mat& gamma_b, cv::Mat& var_b, cv::Ma
 
 void cnt_ext_neighbor( unsigned char ****C_b, unsigned int nh, unsigned int nw, unsigned int block, cv::Mat& H_b, cv::Mat& V_b);
 
-void cnt_one_edge( unsigned char ****C_b, unsigned int nh, unsigned int nw, unsigned int block, unsigned int **R_b, unsigned int **L_b, unsigned int **T_b, unsigned int **B_b);
+void cnt_one_edge( unsigned char ****C_b, unsigned int nh, unsigned int nw, unsigned int block, cv::Mat& R_b, unsigned int **L_b, unsigned int **T_b, unsigned int **B_b);
 
 double calc_Vb1( unsigned char sb_prev, unsigned char sb_cur, unsigned int H_b, unsigned int R_b, unsigned int L_b, unsigned int num);
 
