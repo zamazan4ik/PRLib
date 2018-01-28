@@ -420,7 +420,7 @@ void horizontal_dynamic_seg
     double cost_Vb2, cost_MSE, cost_Vb3, cost_Vb5;
     unsigned char** prev_stat;
     std::array<double, 4> cost, cost_Vb1;
-    unsigned int** L_b, ** T_b, ** B_b;
+    unsigned int** T_b, ** B_b;
     int class_old, index;
     unsigned char old_class;
 
@@ -443,7 +443,7 @@ void horizontal_dynamic_seg
     cv::Mat H_b = pre_dynm_comp->H_b;
     cv::Mat V_b = pre_dynm_comp->V_b;
     cv::Mat R_b = pre_dynm_comp->R_b;
-    L_b = pre_dynm_comp->L_b;
+    cv::Mat L_b = pre_dynm_comp->L_b;
     T_b = pre_dynm_comp->T_b;
     B_b = pre_dynm_comp->B_b;
 
@@ -545,7 +545,7 @@ void horizontal_dynamic_seg
                     {
                         /* Cost1 : # of mismatches in horizontal overlap region */
                         cost_Vb1[prev_sb] = calc_Vb1(prev_sb, sb, H_b.at<unsigned int>({i, j}), R_b.at<unsigned int>({i, j - 1}),
-                                                     L_b[i][j], overlap);
+                                                     L_b.at<unsigned int>({i, j}), overlap);
                         /* Total Cost */
                         cost[prev_sb] = sum_cost.at<double>({j - 1, prev_sb})
                                         + lambda1 * cost_Vb1[prev_sb] + lambda2 * cost_Vb2
@@ -1099,7 +1099,7 @@ void cnt_one_edge(
         unsigned int nw,            /* i : block width */
         unsigned int block,         /* i : block size */
         cv::Mat& R_b,         /* o : # of 1's of right  half */
-        unsigned int** L_b,         /* o : # of 1's of left   half */
+        cv::Mat& L_b,         /* o : # of 1's of left   half */
         unsigned int** T_b,         /* o : # of 1's of top    half */
         unsigned int** B_b          /* o : # of 1's of bottom half */
 )
@@ -1120,7 +1120,7 @@ void cnt_one_edge(
                 }
                 for (int l = 0; l < block / 2; l++)
                 {
-                    L_b[i][j] = L_b[i][j] + (C_b[i][j][k][l] == 1);
+                    L_b.at<unsigned int>({i, j}) = L_b.at<unsigned int>({i, j}) + (C_b[i][j][k][l] == 1);
                 }
             }
         }
@@ -1444,7 +1444,7 @@ void calc_overlap_pxl
                 unsigned int nw               /* i : block width */
         )
 {
-    unsigned int** L_b, ** T_b, ** B_b;
+    unsigned int** T_b, ** B_b;
     unsigned char**** C_b;
 
     /* Read pre-computed values */
@@ -1460,7 +1460,8 @@ void calc_overlap_pxl
     cv::Mat R_b(nh, nw, CV_32SC3);
     //R_b = (unsigned int**) alloc_img(nh, nw, sizeof(unsigned int));
     /* # of 1's in Left   half */
-    L_b = (unsigned int**) alloc_img(nh, nw, sizeof(unsigned int));
+    cv::Mat L_b(nh, nw, CV_32SC3);
+    //L_b = (unsigned int**) alloc_img(nh, nw, sizeof(unsigned int));
     /* # of 1's in Top    half */
     T_b = (unsigned int**) alloc_img(nh, nw, sizeof(unsigned int));
     /* # of 1's in Bottom half */
@@ -1483,7 +1484,7 @@ void free_overlap_pxl(Pre_dynm_para* pre_dynm_comp   /* i : precomputed values *
     /* free memory */
     //multifree(pre_dynm_comp->V_b, 2);
     //multifree(pre_dynm_comp->R_b, 2);
-    multifree(pre_dynm_comp->L_b, 2);
+    //multifree(pre_dynm_comp->L_b, 2);
     multifree(pre_dynm_comp->T_b, 2);
     multifree(pre_dynm_comp->B_b, 2);
 }
