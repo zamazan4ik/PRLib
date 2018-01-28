@@ -25,7 +25,6 @@
 #include "boundary.h"
 
 #include "allocate.h"
-#include "getopt.h"
 #include "prior_calc.h"
 
 #define boundary8_j(x) ((((x)==7)||((x)==0)||((x)==1))?1:((((x)==3)||((x)==4)||((x)==5))?-1 : 0))
@@ -45,20 +44,18 @@ const double inv_C[FEATAUG_DIM][FEATAUG_DIM] = {\
 void Addtail(Nei_list newlist, Nei_header* neighbors,
                     unsigned int comp_cnt);
 
-static Nei_list Removehead(Nei_list** pstart, Nei_list** pend);
-
 void Removeall(Nei_list* pstart);
 
 double mahal_dis(double* vec_a, double* vec_b);
 
 void find_neighbors(
         marklistptr list,        /* i : connected component list */
-        Pixel_pos* hw,          /* i : height width */
+        cv::Point2i& hw,          /* i : height width */
         Nei_header* neighbors    /* io : neighborhood que */
 )
 {
     unsigned int** loc_map;
-    int x, y, i, j, k, f, ci;
+    int x, y, i, j, k, ci;
     int height, width;
     unsigned int cur_comp_num, nei_num, comp_cnt, cur_size;
     Nei_list data;
@@ -68,11 +65,9 @@ void find_neighbors(
     int startx, starty, ti, tj, dir;
     double dist;
     char check_flg;
-    double feat_dis;
-    double tmp, tmp2;
 
-    height = hw->i;
-    width = hw->j;
+    height = hw.x;
+    width = hw.y;
     loc_map = (unsigned int**) alloc_img(height, width, sizeof(unsigned int));
     n = list;
     comp_cnt = 0;
@@ -88,8 +83,8 @@ void find_neighbors(
         if (loc_map[i_mark][j_mark] == 0)
         { /* empty */
             loc_map[i_mark][j_mark] = comp_cnt + 1; /* Label number */
-            neighbors[comp_cnt].cur_pos.i = i_mark;
-            neighbors[comp_cnt].cur_pos.j = j_mark;
+            neighbors[comp_cnt].cur_pos.x = i_mark;
+            neighbors[comp_cnt].cur_pos.y = j_mark;
             neighbors[comp_cnt].size = (unsigned int) n->data.h;
         }
         else
@@ -107,8 +102,8 @@ void find_neighbors(
                 { /* empty */
                     check_flg = FLG_ON;
                     loc_map[ti][tj] = comp_cnt + 1; /* Label number */
-                    neighbors[comp_cnt].cur_pos.i = ti;
-                    neighbors[comp_cnt].cur_pos.j = tj;
+                    neighbors[comp_cnt].cur_pos.x = ti;
+                    neighbors[comp_cnt].cur_pos.y = tj;
                     neighbors[comp_cnt].size = (unsigned int) n->data.h;
                     break;
                 }
@@ -127,15 +122,14 @@ void find_neighbors(
                     { /* empty */
                         check_flg = FLG_ON;
                         loc_map[ti][tj] = comp_cnt + 1; /* Label number */
-                        neighbors[comp_cnt].cur_pos.i = ti;
-                        neighbors[comp_cnt].cur_pos.j = tj;
+                        neighbors[comp_cnt].cur_pos.x = ti;
+                        neighbors[comp_cnt].cur_pos.y = tj;
                         break;
                     }
                 }
                 if (check_flg == FLG_OFF)
                 {
-                    printf("FATAL ERROR: Cannot locate the centroid\n");
-                    exit;
+                    throw std::logic_error("Cannot locate the centroid");
                 }
             }
         }
@@ -146,16 +140,16 @@ void find_neighbors(
     for (ci = 0; ci < comp_cnt; ci++)
     {
         /* Get current component location */
-        x = neighbors[ci].cur_pos.i;
-        y = neighbors[ci].cur_pos.j;
+        x = neighbors[ci].cur_pos.x;
+        y = neighbors[ci].cur_pos.y;
 
         if (height < width)
         {
-            search_len = (unsigned int) floor((double) height / 2) - 1;
+            search_len = (unsigned int) std::floor((double) height / 2) - 1;
         }
         else
         {
-            search_len = (unsigned int) floor((double) width / 2) - 1;
+            search_len = (unsigned int) std::floor((double) width / 2) - 1;
         }
 
         /* Get current component number */
@@ -184,7 +178,7 @@ void find_neighbors(
                         /* Add the neighbor to que */
                         data.nei_info.comp_num = loc_map[i][j] - 1;
 
-                        dist = sqrt((i - x) * (i - x) + (j - y) * (j - y));
+                        dist = std::sqrt((i - x) * (i - x) + (j - y) * (j - y));
                         data.nei_info.dis = dist;
                         Addtail(data, neighbors, cur_comp_num);
                         nei_num++;
@@ -214,7 +208,7 @@ void find_neighbors(
                         /* Add the neighbor to que */
                         data.nei_info.comp_num = loc_map[i][j] - 1;
 
-                        dist = sqrt((i - x) * (i - x) + (j - y) * (j - y));
+                        dist = std::sqrt((i - x) * (i - x) + (j - y) * (j - y));
                         data.nei_info.dis = dist;
                         Addtail(data, neighbors, cur_comp_num);
                         nei_num++;
@@ -291,41 +285,6 @@ void Addtail(
 
     neighbors[comp_cnt].pstart = pstart;
     neighbors[comp_cnt].pend = pend;
-}
-
-/**
- * Function Name : Removehead
- *
- * Function Description :
- * Get a node from chain
- *
- * Input/Output: pstart, starting address of chain
- *             : pend,   ending address of chain
- * Version : 1.0
- */
-
-Nei_list Removehead
-        (
-                Nei_list** pstart,
-                Nei_list** pend
-        )
-{
-    Nei_list ret;
-
-    if (*pstart)
-    {/* If que is not empty */
-
-        ret = **pstart;
-        free(*pstart);
-        *pstart = ret.pnext;
-
-        if (!(*pstart))
-        {/* If que has become empty */
-            *pend = nullptr;
-        }
-    }
-
-    return ret;
 }
 
 /**
@@ -453,7 +412,7 @@ void calc_featdis(
             j = nptr->nei_info.comp_num;
             feat_i = neighbors[i].normfeat;
             feat_j = neighbors[j].normfeat;
-            feat = (double) (mahal_dis(feat_list[i], feat_list[j]));
+            feat = mahal_dis(feat_list[i], feat_list[j]);
             feat = 2.0 * feat / (feat_i + feat_j);
             nptr->nei_info.featdis = feat;
             nptr = nptr->pnext;
@@ -461,7 +420,8 @@ void calc_featdis(
     }
 }
 
-double mahal_dis(double* vec_a,     /* i : vector a */ double* vec_b      /* i : vector b */)
+double mahal_dis(double* vec_a,     /* i : vector a */
+                 double* vec_b      /* i : vector b */)
 {
     std::vector<double> vec_diff(FEATAUG_DIM), tmp(FEATAUG_DIM);
 
@@ -500,8 +460,8 @@ void make_feataug(
         {
             feataug[i][j] = feat[i][j];
         }
-        feataug[i][FEAT_DIM] = (double) neighbors[i].cur_pos.i;
-        feataug[i][FEAT_DIM + 1] = (double) neighbors[i].cur_pos.j;
+        feataug[i][FEAT_DIM] = (double) neighbors[i].cur_pos.x;
+        feataug[i][FEAT_DIM + 1] = (double) neighbors[i].cur_pos.y;
     }
 }
 

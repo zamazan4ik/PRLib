@@ -56,18 +56,16 @@ void CCC_segment(
     marklistptr n;
     unsigned int cnt, comp_num, comp_cnt;
     short startx, starty;
-    double** vector, ** feataug;
+    double** vector;
     int ret;
     double text_cost, non_text_cost;
     double** ll;
     Nei_header* neighbors;
-    Pixel_pos hw;
     Dist_para dis_para;
     std::array<double, 2> map;
     char stop_flg;
     int org_clus;
     unsigned int height, width;
-    //unsigned char **bin_msk;
 
     height = seg_para->height;
     width = seg_para->width;
@@ -126,7 +124,6 @@ void CCC_segment(
                 {
                     if (pbm_getpixel(n->data.bitmap, j, i) == 1)
                     {
-                        //bin_msk[starty + i][startx + j] = 0;
                         bin_msk.at<uchar>({starty + i, startx + j}) = 0;
                     }
                 }
@@ -209,18 +206,17 @@ void CCC_segment(
     init_neighbors(&neighbors, comp_num);
 
     /* Find neighbors */
-    hw.i = height;
-    hw.j = width;
-    find_neighbors(list, &hw, neighbors);
+    cv::Point2i p(height, width);
+    find_neighbors(list, p, neighbors);
 
     /* Calculate feature vector with augments */
-    feataug = (double**) alloc_img(comp_num, FEATAUG_DIM, sizeof(double));
+    double** feataug = (double**) alloc_img(comp_num, FEATAUG_DIM, sizeof(double));
     make_feataug(comp_num, vector, neighbors, feataug);
     multifree(vector, 2);
 
     /* Calculate feature vector distance */
     calc_featdis(comp_num, feataug, neighbors);
-    multifree(feataug, 2);
+    //multifree(feataug, 2);
 
 
     /* MAP optimization */
@@ -239,7 +235,7 @@ void CCC_segment(
             {
                 map[j] = -ll[i][j];
                 /* calculate prior term */
-                map[j] += (calc_prior(i, (int) j, neighbors, clus, &dis_para));
+                map[j] += (calc_prior(i, j, neighbors, clus, &dis_para));
             }
             if (map[0] < map[1])
             {

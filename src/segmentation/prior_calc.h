@@ -15,6 +15,8 @@
 
 #include <vector>
 
+
+//TODO: Review constants
 #define  NEAREST_K     6
 #define  FEAT_DIM      4
 #define  FEATAUG_DIM   6
@@ -25,11 +27,6 @@
 
 
 /* internal structure definition */
-typedef struct
-{
-    int  i;   
-    int  j;  
-} Pixel_pos;
 
 typedef struct
 {
@@ -41,12 +38,12 @@ typedef struct
 typedef struct nei_list
 {
     Nei_info  nei_info;       /* Neighbors info */
-    struct nei_list *pnext;   /* Pointer to next data */
+    nei_list *pnext;   /* Pointer to next data */
 } Nei_list;
 
 typedef struct
 {
-    Pixel_pos  cur_pos;
+    cv::Point2i  cur_pos;
     Nei_list*  pstart;  
     Nei_list*  pend;  
     double     dist_avg;
@@ -62,13 +59,12 @@ typedef struct
 } Dist_para;
 
 /* external function declaration */
-void find_neighbors(marklistptr list, Pixel_pos *hw, 
-Nei_header *neighbors);
+void find_neighbors(marklistptr list, cv::Point2i& hw, Nei_header *neighbors);
 void init_neighbors(Nei_header **header,unsigned int comp_num);
 void free_neighbors (Nei_header *header, unsigned int comp_num);
 double calc_prior(unsigned int comp_cnt, int val, Nei_header *neighbors, std::vector<int>& class_old, Dist_para *para);
-void calc_featdis(unsigned int comp_num, double **feat, Nei_header *neighbors);
-void make_feataug(unsigned int comp_num, double **feat, Nei_header *neighbors, double **feataug);
+void calc_featdis(unsigned int comp_num, double** feat, Nei_header *neighbors);
+void make_feataug(unsigned int comp_num, double **feat, Nei_header *neighbors, double** feataug);
 
 #endif
 

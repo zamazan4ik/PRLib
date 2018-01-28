@@ -73,8 +73,7 @@ void COS_segment(
 
     /*** (2) Threshold each block to get blockwise segmentation ***/
 
-    C_b = (unsigned char****) alloc_vols(nh, nw, block, block,
-                                         sizeof(unsigned char));
+    C_b = (unsigned char****) alloc_vols(nh, nw, block, block, sizeof(unsigned char));
     cv::Mat gamma_b(nh, nw, CV_64FC3);
     cv::Mat cnt_1_b(nh, nw, CV_64FC3);
     thres_mmse(O_b, nh, nw, block, C_b, gamma_b, cnt_1_b);
@@ -114,30 +113,23 @@ void make_blkseq_c(
     /* Then, set the selected color data to                          */
     /* nh*nw*block*block format                                      */
 
-    unsigned int half_blk;
-    unsigned int x, y;
-    int index;
-    double mean_x, mean_x_2;
-    unsigned int block_size;
-    double total, total_2, val;
     std::array<double, 3> array;
-
-    block_size = block * block;
-    half_blk = block / 2;
+    size_t block_size = block * block;
+    size_t half_blk = block / 2;
     for (size_t i = 0, I = 0; i < nh; i++, I += half_blk)
     {
         for (size_t j = 0, J = 0; j < nw; j++, J += half_blk)
         {
             for (size_t c = 0; c < 3; c++)
             {
-                total = 0;
-                total_2 = 0;
+                double total = 0.0, total_2 = 0.0;
                 for (size_t k = 0; k < block; k++)
                 {
                     for (size_t l = 0; l < block; l++)
                     {
-                        x = I + k;
-                        y = J + l;
+                        double val;
+                        size_t x = I + k;
+                        size_t y = J + l;
                         if ((x < org_height) && (y < org_width))
                         {
                             val = (double) img[c][x][y];
@@ -145,18 +137,18 @@ void make_blkseq_c(
                         else
                         {
                             val = 0.0;
-                        } /* padding */
+                        }
                         total += val;
                         total_2 += val * val;
                     }
                 }
                 /* Calculate variance for each overlapping block in RGB */
-                mean_x = total / block_size;
-                mean_x_2 = total_2 / block_size;
+                double mean_x = total / block_size;
+                double mean_x_2 = total_2 / block_size;
                 array[c] = mean_x_2 - mean_x * mean_x;
             }
             /* Find color which has the largest variance in RGB */
-            index = 0;
+            int index = 0;
             if (array[1] > array[0])
             {
                 index = 1;
@@ -173,8 +165,8 @@ void make_blkseq_c(
             {
                 for (size_t l = 0; l < block; l++)
                 {
-                    x = I + k;
-                    y = J + l;
+                    size_t x = I + k;
+                    size_t y = J + l;
                     if ((x < org_height) && (y < org_width))
                     {
                         O_b[i][j][k][l] = img[index][x][y];
@@ -182,7 +174,7 @@ void make_blkseq_c(
                     else
                     {
                         O_b[i][j][k][l] = 0;
-                    } /* padding */
+                    }
                 }
             }
         }
@@ -204,20 +196,19 @@ void thres_mmse(
     /* The clustering procedure uses partition to minimize            */
     /* the total variance of sub-groups.                              */
 
-    int i, j, k, l, thres;
-
-    for (int i = 0; i < nh; i++)
+    for (size_t i = 0; i < nh; i++)
     {
-        for (j = 0; j < nw; j++)
+        for (size_t j = 0; j < nw; j++)
         {
 
             /* Calculate smallest gamma */
+            int thres;
             gamma_b.at<double>({i, j}) = calc_min_gamma(O_b[i][j], block, &thres, &(cnt_1_b.at<double>({i, j})));
 
             /* Segmentation for each overlapping block */
-            for (k = 0; k < block; k++)
+            for (size_t k = 0; k < block; k++)
             {
-                for (l = 0; l < block; l++)
+                for (size_t l = 0; l < block; l++)
                 {
                     if (O_b[i][j][k][l] > thres)
                     {
@@ -253,14 +244,11 @@ double calc_min_gamma(
     /*      var_0 : Variance of pixels of '0'              (G1)             */
     /*      var_1 : Variance of pixels of '1'              (G2)             */
 
-    std::array<unsigned int, 256> bak;
-    std::array<unsigned char, 256> z;
-    std::array<unsigned int, 256> c;
+    const size_t MaxIntensity = 256;
+
+    std::array<unsigned int, MaxIntensity> bak, c;
+    std::array<unsigned char, MaxIntensity> z;
     double G1_s1, G1_s2, G2_s1, G2_s2, total_s1, total_s2;
-    int m;
-    double total_num, G1_num, G2_num;
-    double gamma, min_gamma;
-    int min_index;
 
     /* Initialization */
     bak.fill(0);
@@ -268,16 +256,16 @@ double calc_min_gamma(
     c.fill(0);
 
     /* bucket sort */
-    for (int k = 0; k < block; k++)
+    for (int k = 0; k < block; ++k)
     {
-        for (int l = 0; l < block; l++)
+        for (int l = 0; l < block; ++l)
         {
-            bak[O_b[k][l]]++;
+            ++bak[O_b[k][l]];
         }
     }
     /* Create histogram */
-    m = 0;
-    for (int n = 0; n < 256; n++)
+    int m = 0;
+    for (int n = 0; n < bak.size(); ++n)
     {
         if (bak[n] != 0)
         {
@@ -287,6 +275,7 @@ double calc_min_gamma(
         }
     }
 
+    double total_num, G1_num, G2_num;
     total_s1 = 0;   /* Total sum of value */
     total_s2 = 0;   /* Total sum of squared value */
     total_num = 0;  /* Total number */
@@ -299,10 +288,12 @@ double calc_min_gamma(
         total_num = total_num + c[i];
     }
 
-    G1_s1 = 0;   /* Sum of data in group1 (G1) */
-    G1_s2 = 0;   /* Sum of squared data in group1 (G1) */
-    G1_num = 0;  /* Total number of group1 (G1) */
+    G1_s1 = 0.0;   /* Sum of data in group1 (G1) */
+    G1_s2 = 0.0;   /* Sum of squared data in group1 (G1) */
+    G1_num = 0.0;  /* Total number of group1 (G1) */
 
+    int min_index;
+    double gamma, min_gamma;
     for (int t = 0; t < m; t++)
     {
         /* For all possible thresholds */
@@ -429,7 +420,7 @@ void horizontal_dynamic_seg
     double cost_Vb2, cost_MSE, cost_Vb3, cost_Vb5;
     unsigned char** prev_stat;
     std::array<double, 4> cost, cost_Vb1;
-    unsigned int** H_b, ** V_b, ** R_b, ** L_b, ** T_b, ** B_b;
+    unsigned int ** V_b, ** R_b, ** L_b, ** T_b, ** B_b;
     int class_old, index;
     unsigned char old_class;
 
@@ -449,7 +440,7 @@ void horizontal_dynamic_seg
     cv::Mat cnt_1_b = pre_dynm_comp->cnt_1_b;
 
     /* Horizontal overlapping */
-    H_b = pre_dynm_comp->H_b;
+    cv::Mat H_b = pre_dynm_comp->H_b;
     V_b = pre_dynm_comp->V_b;
     R_b = pre_dynm_comp->R_b;
     L_b = pre_dynm_comp->L_b;
@@ -553,7 +544,7 @@ void horizontal_dynamic_seg
                     if (j > 0)
                     {
                         /* Cost1 : # of mismatches in horizontal overlap region */
-                        cost_Vb1[prev_sb] = calc_Vb1(prev_sb, sb, H_b[i][j], R_b[i][j - 1],
+                        cost_Vb1[prev_sb] = calc_Vb1(prev_sb, sb, H_b.at<unsigned int>({i, j}), R_b[i][j - 1],
                                                      L_b[i][j], overlap);
                         /* Total Cost */
                         cost[prev_sb] = sum_cost.at<double>({j - 1, prev_sb})
@@ -1051,7 +1042,7 @@ void cnt_ext_neighbor(
         unsigned int nh,          /* i : Block height */
         unsigned int nw,          /* i : Block width */
         unsigned int block,       /* i : Block size */
-        unsigned int** H_b,       /* o : # of mismatches in horizontal overlap */
+        cv::Mat& H_b,       /* o : # of mismatches in horizontal overlap */
         unsigned int** V_b        /* o : # of mismatches in vertical overlap */
 )
 {
@@ -1061,18 +1052,21 @@ void cnt_ext_neighbor(
     /* Count # of mismatches in horizontal overlapping region */
     for (int i = 0; i < nh; i++)
     {
-        H_b[i][0] = 0;
+        //H_b[i][0] = 0;
+        H_b.at<unsigned int>({i, 0}) = 0;
     }
     for (int i = 0; i < nh; i++)
     {
         for (int j = 1; j < nw; j++)
         {
-            H_b[i][j] = 0;
+            //H_b[i][j] = 0;
+            H_b.at<unsigned int>({i, j}) = 0;
             for (int k = 0; k < block; k++)
             {
                 for (int l = 0; l < block / 2; l++)
                 {
-                    H_b[i][j] = H_b[i][j] + (C_b[i][j - 1][k][block / 2 + l] != C_b[i][j][k][l]);
+                    //H_b[i][j] = H_b[i][j] + (C_b[i][j - 1][k][block / 2 + l] != C_b[i][j][k][l]);
+                    H_b.at<unsigned int>({i, j}) = H_b.at<unsigned int>({i, j}) + (C_b[i][j - 1][k][block / 2 + l] != C_b[i][j][k][l]);
                 }
             }
         }
@@ -1355,7 +1349,6 @@ double calc_gamma(
 
     double G1_s1, G1_s2, G2_s1, G2_s2;
     double total_num, G1_num, G2_num;
-    double gamma;
 
     total_num = block * block;  /* Total number */
 
@@ -1385,6 +1378,7 @@ double calc_gamma(
         }
     }
     /* calculate gamma */
+    double gamma;
     if (G1_num == 0)
     {
         gamma = (G2_s2 - G2_s1 * G2_s1 / G2_num) / total_num;
@@ -1450,7 +1444,7 @@ void calc_overlap_pxl
                 unsigned int nw               /* i : block width */
         )
 {
-    unsigned int** H_b, ** V_b, ** R_b, ** L_b, ** T_b, ** B_b;
+    unsigned int** V_b, ** R_b, ** L_b, ** T_b, ** B_b;
     unsigned char**** C_b;
 
     /* Read pre-computed values */
@@ -1458,7 +1452,7 @@ void calc_overlap_pxl
 
     /* memory allocation */
     /* Horizontal overlapping */
-    H_b = (unsigned int**) alloc_img(nh, nw, sizeof(unsigned int));
+    cv::Mat H_b(nh, nw, CV_32SC3);
     /* Vertical   overlapping */
     V_b = (unsigned int**) alloc_img(nh, nw, sizeof(unsigned int));
     /* # of 1's in Right  half */
@@ -1485,7 +1479,6 @@ void calc_overlap_pxl
 void free_overlap_pxl(Pre_dynm_para* pre_dynm_comp   /* i : precomputed values */)
 {
     /* free memory */
-    multifree(pre_dynm_comp->H_b, 2);
     multifree(pre_dynm_comp->V_b, 2);
     multifree(pre_dynm_comp->R_b, 2);
     multifree(pre_dynm_comp->L_b, 2);

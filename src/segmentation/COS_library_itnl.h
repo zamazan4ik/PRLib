@@ -23,7 +23,8 @@ typedef struct
     cv::Mat gamma_b;
     cv::Mat var_b;
     cv::Mat cnt_1_b;
-    unsigned int **H_b;
+    //unsigned int **H_b;
+    cv::Mat H_b;
     unsigned int **V_b;
     unsigned int **R_b;
     unsigned int **L_b;
@@ -53,7 +54,7 @@ double calc_min_gamma(unsigned char **O_b, unsigned int block, int *thres, doubl
 
 void dynamic_seg(unsigned char ****C_b, cv::Mat& gamma_b, cv::Mat& var_b, cv::Mat& cnt_1_b, unsigned int nh, unsigned int nw, Seg_parameter *seg_para, cv::Mat& bin_msk_n);
 
-void cnt_ext_neighbor( unsigned char ****C_b, unsigned int nh, unsigned int nw, unsigned int block, unsigned int **H_b, unsigned int **V_b);
+void cnt_ext_neighbor( unsigned char ****C_b, unsigned int nh, unsigned int nw, unsigned int block, cv::Mat& H_b, unsigned int **V_b);
 
 void cnt_one_edge( unsigned char ****C_b, unsigned int nh, unsigned int nw, unsigned int block, unsigned int **R_b, unsigned int **L_b, unsigned int **T_b, unsigned int **B_b);
 
