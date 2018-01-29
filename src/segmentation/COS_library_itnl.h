@@ -30,9 +30,9 @@ typedef struct
     cv::Mat L_b;
     unsigned int **T_b;
     unsigned int **B_b;
-    unsigned int **lyr_mismatch;
-    unsigned int **rev_lyr_mismatch;
-    unsigned int **prev_cnt_1;
+    cv::Mat lyr_mismatch;
+    cv::Mat rev_lyr_mismatch;
+    cv::Mat prev_cnt_1;
     
 } Pre_dynm_para;
 
@@ -85,7 +85,6 @@ void calc_overlap_bet_layer( Seg_parameter *seg_para,
 void free_overlap_bet_layer(Pre_dynm_para *pre_dynm_comp);
 void cnt_mismatch_bet_layer(Seg_parameter *seg_para,
 unsigned char  ****C_b, unsigned int  nh, unsigned int  nw,
-unsigned int  **lyr_mis, unsigned int  **rev_lyr_mis,
-unsigned int  **prev_cnt_1);
+cv::Mat& lyr_mis, cv::Mat& rev_lyr_mis, cv::Mat& prev_cnt_1);
 
 

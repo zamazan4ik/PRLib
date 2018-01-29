@@ -388,7 +388,6 @@ void dynamic_seg(
         }
     }
     free_overlap_pxl(&pre_dynm_comp);
-    free_overlap_bet_layer(&pre_dynm_comp);
     decide_binmsk(C_b, block, nh, nw, seg_para->S_b, bin_msk);
 }
 
@@ -1417,19 +1416,19 @@ double calc_Vb5(
 
     if (sb_cur == 0)
     {
-        cost = pre_dynm_comp->lyr_mismatch[i][j];
+        cost = pre_dynm_comp->lyr_mismatch.at<unsigned int>({i, j});
     }
     else if (sb_cur == 1)
     {
-        cost = pre_dynm_comp->rev_lyr_mismatch[i][j];
+        cost = pre_dynm_comp->rev_lyr_mismatch.at<unsigned int>({i, j});
     }
     else if (sb_cur == 2)
     {
-        cost = pre_dynm_comp->prev_cnt_1[i][j];
+        cost = pre_dynm_comp->prev_cnt_1.at<unsigned int>({i, j});
     }
     else if (sb_cur == 3)
     {
-        cost = blocksize - pre_dynm_comp->prev_cnt_1[i][j];
+        cost = blocksize - pre_dynm_comp->prev_cnt_1.at<unsigned int>({i, j});
     }
 
     return (double) cost / blocksize;
@@ -1482,9 +1481,6 @@ void calc_overlap_pxl
 void free_overlap_pxl(Pre_dynm_para* pre_dynm_comp   /* i : precomputed values */)
 {
     /* free memory */
-    //multifree(pre_dynm_comp->V_b, 2);
-    //multifree(pre_dynm_comp->R_b, 2);
-    //multifree(pre_dynm_comp->L_b, 2);
     multifree(pre_dynm_comp->T_b, 2);
     multifree(pre_dynm_comp->B_b, 2);
 }
@@ -1497,16 +1493,15 @@ void calc_overlap_bet_layer
                 unsigned int nw               /* i : block width */
         )
 {
-    unsigned int** lyr_mismatch, ** rev_lyr_mismatch, ** prev_cnt_1;
     unsigned char**** C_b;
 
     /* Read pre-computed values */
     C_b = pre_dynm_comp->C_b;
 
     /* # of mismatched pixels (1->0 and 1->1) between layers */
-    lyr_mismatch = (unsigned int**) alloc_img(nh, nw, sizeof(unsigned int));
-    rev_lyr_mismatch = (unsigned int**) alloc_img(nh, nw, sizeof(unsigned int));
-    prev_cnt_1 = (unsigned int**) alloc_img(nh, nw, sizeof(unsigned int));
+    cv::Mat lyr_mismatch(nh, nw, CV_32SC3);
+    cv::Mat rev_lyr_mismatch(nh, nw, CV_32SC3);
+    cv::Mat prev_cnt_1(nh, nw, CV_32SC3);
 
     /* Pre-compute */
     cnt_mismatch_bet_layer(seg_para, C_b, nh, nw, lyr_mismatch, rev_lyr_mismatch, prev_cnt_1);
@@ -1518,10 +1513,7 @@ void calc_overlap_bet_layer
 
 void free_overlap_bet_layer(Pre_dynm_para* pre_dynm_comp   /* i : precomputed values */)
 {
-    /* free memory */
-    multifree(pre_dynm_comp->lyr_mismatch, 2);
-    multifree(pre_dynm_comp->rev_lyr_mismatch, 2);
-    multifree(pre_dynm_comp->prev_cnt_1, 2);
+
 }
 
 void cnt_mismatch_bet_layer(
@@ -1529,9 +1521,9 @@ void cnt_mismatch_bet_layer(
         unsigned char**** C_b,    /* i : Block binary image */
         unsigned int nh,          /* i : Block height */
         unsigned int nw,          /* i : Block width */
-        unsigned int** lyr_mis,   /* o : # of mismatches between layers (1->0) */
-        unsigned int** rev_lyr_mis, /* o : # of mismatches (1->1) */
-        unsigned int** prev_cnt_1   /* o : # of 1 pixels on previous layer */
+        cv::Mat& lyr_mis,   /* o : # of mismatches between layers (1->0) */
+        cv::Mat& rev_lyr_mis, /* o : # of mismatches (1->1) */
+        cv::Mat& prev_cnt_1   /* o : # of 1 pixels on previous layer */
 )
 {
     double mismatch, rev_mismatch, cnt_one;
@@ -1584,9 +1576,9 @@ void cnt_mismatch_bet_layer(
                     }
                 }
             }
-            lyr_mis[i][j] = mismatch;
-            rev_lyr_mis[i][j] = rev_mismatch;
-            prev_cnt_1[i][j] = cnt_one;
+            lyr_mis.at<unsigned int>({i, j}) = mismatch;
+            rev_lyr_mis.at<unsigned int>({i, j}) = rev_mismatch;
+            prev_cnt_1.at<unsigned int>({i, j}) = cnt_one;
         }
     }
 }
