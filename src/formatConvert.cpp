@@ -102,7 +102,7 @@ Pix* prl::opencvToLeptonica(const cv::Mat* inputImage)
             break;
 
         default:
-            CV_Error(CV_StsError, "Cannot convert RAW image to Pix\n");
+            CV_Error(cv::Error::StsError, "Cannot convert RAW image to Pix\n");
     }
     pixSetYRes(pix, 300);
     return pix;
@@ -129,7 +129,7 @@ cv::Mat prl::leptonicaToOpenCV(Pix* inputImage)
             type = CV_8UC3;
             break;
         default:
-            CV_Error(CV_StsError, "Cannot convert Pix image to cv::Mat\n");
+            CV_Error(cv::Error::StsError, "Cannot convert Pix image to cv::Mat\n");
             break;
     }
 
@@ -212,7 +212,7 @@ cv::Mat prl::leptonicaToOpenCV(Pix* inputImage)
             break;
 
         default:
-            CV_Error(CV_StsError, "Cannot convert Pix image to cv::Mat\n");
+            CV_Error(cv::Error::StsError, "Cannot convert Pix image to cv::Mat\n");
     }
 
     return mObj;

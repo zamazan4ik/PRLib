@@ -164,7 +164,7 @@ bool findDocumentContour(cv::Mat& source, std::vector<cv::Point2f>& resultContou
 
     cv::findContours(
             source.clone(), contours, hierarchy,
-            CV_RETR_CCOMP, CV_CHAIN_APPROX_SIMPLE,
+            cv::RETR_CCOMP, cv::CHAIN_APPROX_SIMPLE,
             cv::Point(0, 0));
 
     //! Approximate contours to polygons + get bounding rectangles and circles

@@ -49,7 +49,7 @@ void prl::colorBalance(const cv::Mat& inputImage, cv::Mat& outputImage,
 
     if (inputImage.channels() == 4)
     {
-        cv::cvtColor(imageCopy, imageCopy, CV_BGRA2BGR);
+        cv::cvtColor(imageCopy, imageCopy, cv::COLOR_BGRA2BGR);
     }
 
     std::vector<cv::Mat> srcChans(imageCopy.channels());
@@ -72,7 +72,7 @@ void prl::colorBalance(const cv::Mat& inputImage, cv::Mat& outputImage,
     {
         cv::Mat hsvImg;
 
-        cv::cvtColor(convertedTmp, hsvImg, CV_BGR2HSV);
+        cv::cvtColor(convertedTmp, hsvImg, cv::COLOR_BGR2HSV);
 
         cv::split(hsvImg, srcChans);
 
@@ -84,7 +84,7 @@ void prl::colorBalance(const cv::Mat& inputImage, cv::Mat& outputImage,
 
         cv::merge(srcChans, convertedTmp);
 
-        cv::cvtColor(convertedTmp, convertedTmp, CV_HSV2BGR);
+        cv::cvtColor(convertedTmp, convertedTmp, cv::COLOR_HSV2BGR);
     }
 
     outputImage = convertedTmp.clone();

@@ -121,7 +121,7 @@ namespace prl
         cv::convertScaleAbs(varianceMapWithGammaCorrection, varianceMapWithGammaCorrection, 255.0, 0);
         //! Binarize
         cv::adaptiveThreshold(varianceMapWithGammaCorrection, varianceMapWithGammaCorrection,
-                              127.0, CV_ADAPTIVE_THRESH_MEAN_C, cv::THRESH_BINARY, 15, 0);
+                              127.0, cv::ADAPTIVE_THRESH_MEAN_C, cv::THRESH_BINARY, 15, 0);
 
         //! Try to extract noise for variance map in logarithmic scale
         cv::Mat noiseOfLogVarianceMap = varianceMapWithoutAdditionalProcessing.clone();

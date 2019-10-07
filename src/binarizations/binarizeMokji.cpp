@@ -45,7 +45,7 @@ void binarizeMokji(const cv::Mat& inputImage, cv::Mat& outputImage,
     }
 
     cv::Mat gray;
-    cv::cvtColor(inputImage, gray, CV_BGR2GRAY);
+    cv::cvtColor(inputImage, gray, cv::COLOR_BGR2GRAY);
 
     const size_t dilateSize = (maxEdgeWidth + 1) * 2 - 1;
 
@@ -86,11 +86,11 @@ void binarizeMokji(const cv::Mat& inputImage, cv::Mat& outputImage,
 
     if (denominator == 0)
     {
-        cv::threshold(gray, outputImage, 128, 255, CV_THRESH_BINARY);
+        cv::threshold(gray, outputImage, 128, 255, cv::THRESH_BINARY);
     }
 
     const int threshold = 0.5 * nominator / denominator + 0.5;
-    cv::threshold(gray, outputImage, threshold, 255, CV_THRESH_BINARY);
+    cv::threshold(gray, outputImage, threshold, 255, cv::THRESH_BINARY);
 }
 
 }

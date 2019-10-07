@@ -73,7 +73,7 @@ void gammaCorrection(const cv::Mat& inputImage, cv::Mat& outputImage,
 	//Converting to 3 channels
 	if (channels == 4)
 	{
-		cv::cvtColor(inputImageMat, outputImageMat, CV_BGRA2BGR);
+		cv::cvtColor(inputImageMat, outputImageMat, cv::COLOR_BGRA2BGR);
 	}
 
 	//Applying gamma correction

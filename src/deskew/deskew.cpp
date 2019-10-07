@@ -72,10 +72,10 @@ double prl::findOrientation(const cv::Mat& inputImage)
     cv::Mat grayImage;
     if(inputImage.channels() == 3)
     {
-        cv::cvtColor(inputImage, grayImage, CV_BGR2GRAY);
+        cv::cvtColor(inputImage, grayImage, cv::COLOR_BGR2GRAY);
     }
 
-    cv::adaptiveThreshold(grayImage, grayImage, 255, CV_ADAPTIVE_THRESH_MEAN_C, CV_THRESH_BINARY, 19, 9);
+    cv::adaptiveThreshold(grayImage, grayImage, 255, cv::ADAPTIVE_THRESH_MEAN_C, cv::THRESH_BINARY, 19, 9);
 
     PIX* pix = prl::opencvToLeptonica(&grayImage);
     if (!pix)
@@ -139,7 +139,7 @@ double prl::findOrientation(const cv::Mat& inputImage)
 double prl::findAngle(const cv::Mat& inputImage)
 {
     // AA: we need black-&-white image here even if none of threshold algorithms were called before
-    //cv::adaptiveThreshold(input, input, 255, CV_ADAPTIVE_THRESH_GAUSSIAN_C, CV_THRESH_BINARY, 15, 5);
+    //cv::adaptiveThreshold(input, input, 255, cv::ADAPTIVE_THRESH_GAUSSIAN_C, cv::THRESH_BINARY, 15, 5);
     cv::Mat input = inputImage.clone();
 
     cv::Size imgSize = input.size();
@@ -213,7 +213,7 @@ CV_EXPORTS bool prl::deskew(const cv::Mat& inputImage, cv::Mat& outputImage)
 
     if (inputImage.channels() != 1)
     {
-        cv::cvtColor(inputImage, processingImage, CV_BGR2GRAY);
+        cv::cvtColor(inputImage, processingImage, cv::COLOR_BGR2GRAY);
     }
     else
     {
@@ -221,7 +221,7 @@ CV_EXPORTS bool prl::deskew(const cv::Mat& inputImage, cv::Mat& outputImage)
     }
 
     //TODO: Should we use here another binarization algorithm?
-    cv::threshold(processingImage, processingImage, 128, 255, CV_THRESH_BINARY | CV_THRESH_OTSU);
+    cv::threshold(processingImage, processingImage, 128, 255, cv::THRESH_BINARY | cv::THRESH_OTSU);
 
     double angle = findAngle(processingImage);
 

@@ -142,7 +142,7 @@ bool autoCrop(cv::Mat& inputImage, cv::Mat& outputImage)
         case CV_8UC3:
             break;
         case CV_8UC1:
-            cv::cvtColor(inputImage, inputImage, CV_GRAY2BGR);
+            cv::cvtColor(inputImage, inputImage, cv::COLOR_GRAY2BGR);
             break;
         default:
             if (inputImage.empty())

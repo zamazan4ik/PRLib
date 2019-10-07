@@ -293,7 +293,7 @@ void CannyEdgeDetection(cv::Mat& imageToProc, cv::Mat& resultCanny, int Gaussian
         //! 2. get Otsu threshold...
         cv::Mat tmp;
         double otsuThresholdValue = cv::threshold(channel, tmp, 0, 255,
-                                                  CV_THRESH_BINARY | CV_THRESH_OTSU);
+                                                  cv::THRESH_BINARY | cv::THRESH_OTSU);
 
         //! ... and calculate thresholds for ...
         double upperCoeff = CannyUpperThresholdCoeff;

@@ -78,7 +78,7 @@ void prl::thinGuoHall(cv::Mat& inputImage, cv::Mat& outputImage)
 
     if (imageUnderProcess.channels() == 3)
     {
-        cvtColor(imageUnderProcess, imageUnderProcess, CV_BGR2GRAY);
+        cvtColor(imageUnderProcess, imageUnderProcess, cv::COLOR_BGR2GRAY);
     }
 
     imageUnderProcess &= 1;

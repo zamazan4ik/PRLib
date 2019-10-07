@@ -67,7 +67,7 @@ void prl::binarizeCOCOCLUST(cv::Mat& inputImage, cv::Mat& outputImage, const flo
     //! Processing for gray scaled image
     if (inputImage.type() == CV_8UC3)
     {
-        cvtColor(inputImage, imageSelectedColorSpace, CV_RGB2GRAY);
+        cvtColor(inputImage, imageSelectedColorSpace, cv::COLOR_RGB2GRAY);
     }
     else
     {
@@ -103,7 +103,7 @@ void prl::binarizeCOCOCLUST(cv::Mat& inputImage, cv::Mat& outputImage, const flo
     //! We should have corresponding channels count for processing
     if (imageSelectedColorSpace.channels() != 3)
     {
-        cv::cvtColor(imageSelectedColorSpace, imageSelectedColorSpace, CV_GRAY2BGR);
+        cv::cvtColor(imageSelectedColorSpace, imageSelectedColorSpace, cv::COLOR_GRAY2BGR);
     }
 
     // Work copy of contours set
@@ -116,7 +116,7 @@ void prl::binarizeCOCOCLUST(cv::Mat& inputImage, cv::Mat& outputImage, const flo
         std::vector<cv::Vec4i> hierarchy;
 
         cv::findContours(resultCanny, contoursAll, hierarchy,
-                         CV_RETR_EXTERNAL, CV_CHAIN_APPROX_SIMPLE, cv::Point(0, 0));
+                         cv::RETR_EXTERNAL, cv::CHAIN_APPROX_SIMPLE, cv::Point(0, 0));
 
         contours = contoursAll;
 

@@ -32,7 +32,7 @@ void prl::removeLines(const cv::Mat& inputImage, cv::Mat& outputImage)
     cv::Mat gray;
     if (inputImage.channels() == 3)
     {
-        cvtColor(inputImage, gray, CV_BGR2GRAY);
+        cvtColor(inputImage, gray, cv::COLOR_BGR2GRAY);
     }
     else
     {
@@ -41,8 +41,8 @@ void prl::removeLines(const cv::Mat& inputImage, cv::Mat& outputImage)
 
     cv::Mat bw;
     // TODO: Try to use another binarization here
-    //cv::adaptiveThreshold(gray, bw, 255, CV_ADAPTIVE_THRESH_MEAN_C, CV_THRESH_BINARY, 15, 0);
-    cv::threshold(~gray, bw, 255, 255, CV_THRESH_BINARY | CV_THRESH_OTSU);
+    //cv::adaptiveThreshold(gray, bw, 255, cv::ADAPTIVE_THRESH_MEAN_C, cv::THRESH_BINARY, 15, 0);
+    cv::threshold(~gray, bw, 255, 255, cv::THRESH_BINARY | cv::THRESH_OTSU);
 
     // Create the images that will use to extract the horizontal and vertical lines
     cv::Mat horizontal = bw.clone();
