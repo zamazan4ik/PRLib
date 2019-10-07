@@ -47,7 +47,7 @@ void eigen(
 }
 
 
-/* From Numerical Recipies in C */
+/* From Numerical Recipes in C */
 
 int G_tqli(double* d, double* e, int n, double** z)
 {

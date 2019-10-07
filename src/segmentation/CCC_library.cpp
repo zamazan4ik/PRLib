@@ -204,7 +204,7 @@ void CCC_segment(
     }
 
     /****** Calculate prior term ******/
-    /* Initialization of neighborhood que */
+    /* Initialization of neighborhood queue */
     init_neighbors(&neighbors, comp_num);
 
     /* Find neighbors */
@@ -760,14 +760,14 @@ CC_clist Removehead
     CC_clist ret;
 
     if (*pstart)
-    {/* If que is not empty */
+    {/* If queue is not empty */
 
         ret = **pstart;
         free(*pstart);
         *pstart = ret.pnext;
 
         if (!(*pstart))
-        {/* If que has become empty */
+        {/* If queue has become empty */
             *pend = NULL;
         }
     }
@@ -799,7 +799,7 @@ void Addtail(
     ptr = (CC_clist*) malloc(sizeof(CC_clist));
 
     if (*pend)
-    {/* If que is not empty */
+    {/* If queue is not empty */
 
         (*pend)->pnext = ptr;
     }
@@ -1193,7 +1193,7 @@ void Region_growing
 
     while (pstart)
     {
-        /* Initialize # of neigboring pixels */
+        /* Initialize # of neighboring pixels */
         M = 0;
 
         /* Get a pixel from waiting list */
@@ -1406,7 +1406,7 @@ void flip_reversed_cc(
 
 
     /******************************************************************/
-    /*             Reverese flipped text                              */
+    /*             Reverse flipped text                              */
     /******************************************************************/
     cv::Mat bin_mask_r(height, width, CV_8UC1);
     bin_mask_r.setTo(0);
@@ -1673,7 +1673,7 @@ void Region_growing_cnt
 
     while (pstart)
     {
-        /* Initialize # of neigboring pixels */
+        /* Initialize # of neighboring pixels */
         M = 0;
 
         /* Get a pixel from waiting list */

@@ -163,7 +163,7 @@ Pixel** pbm_readfile(FILE* fp, int* cols, int* rows, short* resolution)
         s = fgoodgets(fp);
         arg = sscanf(s, "%d", rows);
         if (arg != 1)
-        { error("pbm_readfile", "bizzare pbm format", ""); }
+        { error("pbm_readfile", "bizarre pbm format", ""); }
         free(s);
         s = NULL;
     }
@@ -252,7 +252,7 @@ void pbm_writefile(FILE* fp, Pixel** bitmap, int cols, int rows, int resolution)
     free(buf);
     if (ferror(fp))
     {
-        fprintf(stderr, "pbm_writefile: error occured while writing file.\n");
+        fprintf(stderr, "pbm_writefile: error occurred while writing file.\n");
         return;
     }
 }
