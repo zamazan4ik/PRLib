@@ -54,7 +54,7 @@ double mahal_dis(double* vec_a, double* vec_b);
 void find_neighbors(
         marklistptr list,        /* i : connected component list */
         Pixel_pos* hw,          /* i : height width */
-        Nei_header* neighbors    /* io : neighborhood que */
+        Nei_header* neighbors    /* io : neighborhood queue */
 )
 {
     unsigned int** loc_map;
@@ -181,7 +181,7 @@ void find_neighbors(
                             continue;
                         }
 
-                        /* Add the neighbor to que */
+                        /* Add the neighbor to queue */
                         data.nei_info.comp_num = loc_map[i][j] - 1;
 
                         dist = std::sqrt((i - x) * (i - x) + (j - y) * (j - y));
@@ -211,7 +211,7 @@ void find_neighbors(
                             continue;
                         }
 
-                        /* Add the neighbor to que */
+                        /* Add the neighbor to queue */
                         data.nei_info.comp_num = loc_map[i][j] - 1;
 
                         dist = std::sqrt((i - x) * (i - x) + (j - y) * (j - y));
@@ -276,7 +276,7 @@ void Addtail(
     ptr = (Nei_list*) malloc(sizeof(Nei_list));
 
     if (pend)
-    {/* If que is not empty */
+    {/* If queue is not empty */
 
         pend->pnext = ptr;
     }
@@ -313,14 +313,14 @@ Nei_list Removehead
     Nei_list ret;
 
     if (*pstart)
-    {/* If que is not empty */
+    {/* If queue is not empty */
 
         ret = **pstart;
         free(*pstart);
         *pstart = ret.pnext;
 
         if (!(*pstart))
-        {/* If que has become empty */
+        {/* If queue has become empty */
             *pend = NULL;
         }
     }
@@ -383,7 +383,7 @@ void free_neighbors(
 double calc_prior(
         unsigned int comp_cnt,  /* i : component # */
         int val,                /* i : class value for specified cc # */
-        Nei_header* neighbors,  /* i : neighborhood que */
+        Nei_header* neighbors,  /* i : neighborhood queue */
         const std::vector<int>& class_old,             /* i : class */
         Dist_para* para         /* i : parameters for distance func */
 )
@@ -421,7 +421,7 @@ void calc_featdis(
         unsigned int comp_num,    /* i : # of connected component */
         marklistptr list,        /* i : connected component list */
         double** feat_list,   /* i : feature vector list */
-        Nei_header* neighbors    /* io : neighborhood que */
+        Nei_header* neighbors    /* io : neighborhood queue */
 )
 {
     int j;
@@ -492,7 +492,7 @@ double mahal_dis(double* vec_a,     /* i : vector a */ double* vec_b      /* i :
 void make_feataug(
         unsigned int comp_num,    /* i : # of connected component */
         double** feat,        /* i : feature vector */
-        Nei_header* neighbors,   /* i : neighborhood que */
+        Nei_header* neighbors,   /* i : neighborhood queue */
         double** feataug      /* o : feature vector with augments */
 )
 {

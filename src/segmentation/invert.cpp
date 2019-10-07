@@ -56,7 +56,7 @@ int invert(
 }
 
 
-/* From Numerical Recipies in C */
+/* From Numerical Recipes in C */
 
 int G_ludcmp(double** a, int n, int* indx, double* d)
 {

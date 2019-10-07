@@ -1,6 +1,6 @@
 * Scan Tailor - tool with good interface. Supports deskew, rotating, splitting pages. https://github.com/scantailor/scantailor/
 * TextFairy - Android tool with good image processing.
 * PRLIB - good tool for OCR, Have a lot of legacy algorithms (binarizations, grayscale, deskew (handwritten))
-* gImageReader - very nice OCR tool. Now have not intersting image processing.
+* gImageReader - very nice OCR tool. Now have not interesting image processing.
 * unpaper - old C tool, have a little bit image processing.
 * imageJ - good Java tool, with image processing algorithms

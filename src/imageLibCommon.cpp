@@ -144,7 +144,7 @@ void GetHistExtremums(cv::Mat& hist,
 {
     if (hist.empty())
     {
-        throw std::invalid_argument("Histogram for extremums extration is empty");
+        throw std::invalid_argument("Histogram for extremums extraction is empty");
     }
 
     histLocalMinPositions.clear();

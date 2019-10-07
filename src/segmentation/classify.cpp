@@ -282,7 +282,7 @@ static void LogLikelihood_init(struct SigSet* S)
         {
             SubS = &(C->subSig[i]);
 
-            /* Test for symetric  matrix */
+            /* Test for symmetric  matrix */
             for (int b1 = 0; b1 < nbands; b1++)
             {
                 for (int b2 = 0; b2 < nbands; b2++)

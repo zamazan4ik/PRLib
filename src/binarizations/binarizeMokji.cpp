@@ -37,7 +37,7 @@ void binarizeMokji(const cv::Mat& inputImage, cv::Mat& outputImage,
 {
     if (maxEdgeWidth < 1)
     {
-        throw std::invalid_argument("mokjiThreshold: invalud maxEdgeWidth");
+        throw std::invalid_argument("mokjiThreshold: invalid maxEdgeWidth");
     }
     if (minEdgeMagnitude < 1)
     {
