@@ -43,7 +43,7 @@ void prl::binarizePureAdaptiveGaussian(const cv::Mat& inputImage, cv::Mat& outpu
     {
         if (inputImageMat.channels() != 1)
         {
-            cv::cvtColor(inputImageMat, inputImageMat, CV_BGR2GRAY);
+            cv::cvtColor(inputImageMat, inputImageMat, cv::COLOR_BGR2GRAY);
         }
     }*/
 
@@ -51,7 +51,7 @@ void prl::binarizePureAdaptiveGaussian(const cv::Mat& inputImage, cv::Mat& outpu
 
     if (inputImageMat.channels() != 1)
     {
-        cv::cvtColor(inputImageMat, outputImageMat, CV_BGR2GRAY);
+        cv::cvtColor(inputImageMat, outputImageMat, cv::COLOR_BGR2GRAY);
     }
     /*else
     {

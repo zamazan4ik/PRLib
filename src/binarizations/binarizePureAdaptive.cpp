@@ -42,14 +42,14 @@ void prl::binarizePureAdaptive(const cv::Mat& inputImage, cv::Mat& outputImage,
 
     if (inputImageMat.channels() != 1)
     {
-        cv::cvtColor(inputImageMat, inputImageMat, CV_BGR2GRAY);
+        cv::cvtColor(inputImageMat, inputImageMat, cv::COLOR_BGR2GRAY);
     }
 
     cv::Mat outputImageMat;
 
     if (inputImageMat.channels() != 1)
     {
-        cv::cvtColor(inputImageMat, outputImageMat, CV_BGR2GRAY);
+        cv::cvtColor(inputImageMat, outputImageMat, cv::COLOR_BGR2GRAY);
     }
 
     cv::adaptiveThreshold(

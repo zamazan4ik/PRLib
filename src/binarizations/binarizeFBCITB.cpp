@@ -97,7 +97,7 @@ void prl::binarizeFBCITB(
     {
         if (inputImage.channels() == 1)
         {
-            cv::cvtColor(inputImage, inputImage, CV_GRAY2BGR);
+            cv::cvtColor(inputImage, inputImage, cv::COLOR_GRAY2BGR);
         }
         else
         {
@@ -199,14 +199,14 @@ void prl::binarizeFBCITB(
     //! contours detection
     if (useVariancesMap)
     {
-        cv::findContours(varianceMap, contours, hierarchy, CV_RETR_TREE,
-                         CV_CHAIN_APPROX_SIMPLE, cv::Point(0, 0));
+        cv::findContours(varianceMap, contours, hierarchy, cv::RETR_TREE,
+                         cv::CHAIN_APPROX_SIMPLE, cv::Point(0, 0));
     }
 
     if (isCannyRequired && !isVariancesMapRequired)
     {
-        cv::findContours(resultCanny, contours, hierarchy, CV_RETR_TREE,
-                         CV_CHAIN_APPROX_SIMPLE, cv::Point(0, 0));
+        cv::findContours(resultCanny, contours, hierarchy, cv::RETR_TREE,
+                         cv::CHAIN_APPROX_SIMPLE, cv::Point(0, 0));
     }
 
     if (contours.empty())
@@ -254,8 +254,8 @@ void prl::binarizeFBCITB(
 
     if (imageToProc.channels() == 3)
     {
-        cv::cvtColor(imageToProc, imageToProc, CV_BGR2GRAY);
-        cv::cvtColor(imageToProc, imageToProc, CV_GRAY2BGR);
+        cv::cvtColor(imageToProc, imageToProc, cv::COLOR_BGR2GRAY);
+        cv::cvtColor(imageToProc, imageToProc, cv::COLOR_GRAY2BGR);
     }
 
     cv::Mat resultImage(imageToProc.size(), CV_8UC1);

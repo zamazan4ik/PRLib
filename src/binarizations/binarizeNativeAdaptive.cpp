@@ -57,7 +57,7 @@ void prl::binarizeNativeAdaptive(
 
     if (inputImage.channels() > 1)
     {
-        cv::cvtColor(inputImage, inputImage, CV_BGR2GRAY);
+        cv::cvtColor(inputImage, inputImage, cv::COLOR_BGR2GRAY);
     }
 
     if (!isGaussianBlurReqiured)
@@ -75,11 +75,11 @@ void prl::binarizeNativeAdaptive(
     }
 
 
-    int adaptiveMethod = CV_ADAPTIVE_THRESH_MEAN_C;
+    int adaptiveMethod = cv::ADAPTIVE_THRESH_MEAN_C;
 
     if (isAdaptiveThresholdCalculatedByGaussian)
     {
-        adaptiveMethod = CV_ADAPTIVE_THRESH_GAUSSIAN_C;
+        adaptiveMethod = cv::ADAPTIVE_THRESH_GAUSSIAN_C;
     }
 
     std::vector<cv::Mat> inputImageChannels(outputImage.channels());

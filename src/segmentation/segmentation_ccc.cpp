@@ -30,7 +30,7 @@ namespace prl
             throw std::invalid_argument("Input image hasn't 3 channels.");
         }
         cv::Mat convImage;
-        cv::cvtColor(inputImage, convImage, CV_BGR2RGB);
+        cv::cvtColor(inputImage, convImage, cv::COLOR_BGR2RGB);
 
         int height, width;
         int i;
@@ -154,7 +154,7 @@ namespace prl
 
         outputImages.resize(3);
 
-        cv::threshold(outputImageBin, outputImageBin, 0, 255, CV_THRESH_BINARY | CV_THRESH_OTSU);
+        cv::threshold(outputImageBin, outputImageBin, 0, 255, cv::THRESH_BINARY | cv::THRESH_OTSU);
 
         outputImages[0] = outputImageBin.clone();
 

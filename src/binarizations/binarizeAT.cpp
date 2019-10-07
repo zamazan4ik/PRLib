@@ -44,7 +44,7 @@ void prl::binarizeAT(const cv::Mat& inputImage, cv::Mat& outputImage, const int 
     {
         if (inputImageMat.channels() != 1)
         {
-            cv::cvtColor(inputImageMat, inputImageMat, CV_BGR2GRAY);
+            cv::cvtColor(inputImageMat, inputImageMat, cv::COLOR_BGR2GRAY);
         }
     }*/
 
@@ -55,7 +55,7 @@ void prl::binarizeAT(const cv::Mat& inputImage, cv::Mat& outputImage, const int 
 
     if (inputImageMat.channels() != 1)
     {
-        cv::cvtColor(tempOutputImageMat, outputImageMat, CV_BGR2GRAY);
+        cv::cvtColor(tempOutputImageMat, outputImageMat, cv::COLOR_BGR2GRAY);
     }
 
     cv::adaptiveThreshold(

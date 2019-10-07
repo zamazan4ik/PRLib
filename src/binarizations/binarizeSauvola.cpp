@@ -48,7 +48,7 @@ void prl::binarizeSauvola(
 
     if (imageInput.channels() != 1)
     {
-        cv::cvtColor(imageInput, imageInput, CV_BGR2GRAY);
+        cv::cvtColor(imageInput, imageInput, cv::COLOR_BGR2GRAY);
     }
 
     const int usedFloatType = CV_64FC1;

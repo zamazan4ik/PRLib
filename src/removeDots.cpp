@@ -40,7 +40,7 @@ void prl::removeDots(const cv::Mat& inputImage, cv::Mat& outputImage, const doub
     cv::Mat gray;
     if (inputImage.channels() == 3)
     {
-        cv::cvtColor(inputImage, gray, CV_BGR2GRAY);
+        cv::cvtColor(inputImage, gray, cv::COLOR_BGR2GRAY);
     }
     else
     {
@@ -90,7 +90,7 @@ void prl::removeDots(const cv::Mat& inputImage, cv::Mat& outputImage, const doub
     // TODO: maybe we should find automatically background color and use it for filling instead of white
     /*for(const auto& keypoint : filteredKeypoints)
     {
-        cv::circle(outputImage, keypoint.pt, keypoint.size / 2.0 + 3, cv::Scalar(255,255,255), CV_FILLED);
+        cv::circle(outputImage, keypoint.pt, keypoint.size / 2.0 + 3, cv::Scalar(255,255,255), cv::FILLED);
     }*/
     cv::drawKeypoints(outputImage, keypoints, outputImage, cv::Scalar(0,0,255), cv::DrawMatchesFlags::DRAW_RICH_KEYPOINTS);
 }

@@ -60,7 +60,7 @@ void prl::binarizeLocalOtsu(
     //! we work with gray image
     if (inputImage.channels() != 1)
     {
-        cv::cvtColor(inputImage, imageSelectedColorSpace, CV_RGB2GRAY);
+        cv::cvtColor(inputImage, imageSelectedColorSpace, cv::COLOR_RGB2GRAY);
     }
     else
     {
@@ -94,7 +94,7 @@ void prl::binarizeLocalOtsu(
 
     if (imageSelectedColorSpace.channels() != 3)
     {
-        cv::cvtColor(imageSelectedColorSpace, imageSelectedColorSpace, CV_GRAY2BGR);
+        cv::cvtColor(imageSelectedColorSpace, imageSelectedColorSpace, cv::COLOR_GRAY2BGR);
     }
 
     std::vector<std::vector<cv::Point>> contours;
@@ -104,8 +104,8 @@ void prl::binarizeLocalOtsu(
     {
         std::vector<cv::Vec4i> hierarchy;
 
-        cv::findContours(resultCanny, contoursAll, hierarchy, CV_RETR_EXTERNAL,
-                         CV_CHAIN_APPROX_SIMPLE, cv::Point(0, 0));
+        cv::findContours(resultCanny, contoursAll, hierarchy, cv::RETR_EXTERNAL,
+                         cv::CHAIN_APPROX_SIMPLE, cv::Point(0, 0));
 
         contours = contoursAll;
 
@@ -153,7 +153,7 @@ void prl::binarizeLocalOtsu(
             //! ... create copy and ...
             cv::Mat tmp = imageToProc(contourBoundingRectangle).clone();
             //! binarize it by Otsu
-            cv::threshold(tmp, tmp, 128, maxValue, CV_THRESH_OTSU);
+            cv::threshold(tmp, tmp, 128, maxValue, cv::THRESH_OTSU);
 
             //! Store binarization result to output image
             binarized(contourBoundingRectangle).setTo(0, tmp ^ 255);

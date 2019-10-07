@@ -79,7 +79,7 @@ void prl::thinZhangSuen(cv::Mat& inputImage, cv::Mat& outputImage)
 
     if (imageUnderProcess.channels() == 3)
     {
-        cv::cvtColor(imageUnderProcess, imageUnderProcess, CV_BGR2GRAY);
+        cv::cvtColor(imageUnderProcess, imageUnderProcess, cv::COLOR_BGR2GRAY);
     }
 
     imageUnderProcess &= 1;

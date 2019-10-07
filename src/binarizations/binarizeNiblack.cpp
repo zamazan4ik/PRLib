@@ -48,7 +48,7 @@ void prl::binarizeNiblack(
 
     if (inputImage.channels() != 1)
     {
-        cv::cvtColor(inputImage, inputImage, CV_BGR2GRAY);
+        cv::cvtColor(inputImage, inputImage, cv::COLOR_BGR2GRAY);
     }
 
     const int usedFloatType = CV_64FC1;

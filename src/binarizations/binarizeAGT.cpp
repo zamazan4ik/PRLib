@@ -47,7 +47,7 @@ void prl::binarizeAGT(const cv::Mat& inputImage, cv::Mat& outputImage, const int
 
     if (inputImageMat.channels() != 1)
     {
-        cv::cvtColor(tempOutputImageMat, outputImageMat, CV_BGR2GRAY);
+        cv::cvtColor(tempOutputImageMat, outputImageMat, cv::COLOR_BGR2GRAY);
     }
 
     cv::adaptiveThreshold(
